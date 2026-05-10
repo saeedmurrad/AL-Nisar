@@ -1,0 +1,81 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+
+import 'app_role.dart';
+import 'user_profile_model.dart';
+
+class AuthService {
+  AuthService({
+    FirebaseAuth? auth,
+    FirebaseFirestore? firestore,
+    GoogleSignIn? googleSignIn,
+  })  : _auth = auth ?? FirebaseAuth.instance,
+        _firestore = firestore ?? FirebaseFirestore.instance,
+        _google = googleSignIn ?? GoogleSignIn();
+
+  final FirebaseAuth _auth;
+  final FirebaseFirestore _firestore;
+  final GoogleSignIn _google;
+
+  Stream<User?> get authState => _auth.authStateChanges();
+  User? get currentUser => _auth.currentUser;
+
+  Stream<UserProfileModel?> profileStream(String uid) {
+    return _firestore.collection('users').doc(uid).snapshots().map((doc) {
+      if (!doc.exists) return null;
+      return UserProfileModel.fromFirestore(doc);
+    });
+  }
+
+  Future<void> signInWithGoogle() async {
+    final account = await _google.signIn();
+    if (account == null) {
+      throw Exception('cancelled');
+    }
+    final auth = await account.authentication;
+    final cred = GoogleAuthProvider.credential(
+      accessToken: auth.accessToken,
+      idToken: auth.idToken,
+    );
+    final res = await _auth.signInWithCredential(cred);
+    final u = res.user;
+    if (u == null) throw Exception('no_user');
+
+    await _upsertUserProfile(u);
+  }
+
+  Future<void> signOut() async {
+    await _auth.signOut();
+    await _google.signOut();
+  }
+
+  Future<void> _upsertUserProfile(User u) async {
+    final ref = _firestore.collection('users').doc(u.uid);
+    final snap = await ref.get();
+    final now = DateTime.now();
+
+    // If doc exists, keep role. Otherwise create as default 'user'.
+    String role = AppRole.user.firestoreValue;
+    DateTime createdAt = now;
+    if (snap.exists) {
+      final data = snap.data() ?? {};
+      role = (data['role'] as String?) ?? role;
+      final ts = data['createdAt'];
+      if (ts is Timestamp) createdAt = ts.toDate();
+    }
+
+    await ref.set(
+      {
+        'email': (u.email ?? '').trim().toLowerCase(),
+        'displayName': u.displayName ?? '',
+        'photoUrl': u.photoURL ?? '',
+        'role': AppRole.fromString(role).firestoreValue,
+        'createdAt': Timestamp.fromDate(createdAt),
+        'lastLoginAt': Timestamp.fromDate(now),
+      },
+      SetOptions(merge: true),
+    );
+  }
+}
+

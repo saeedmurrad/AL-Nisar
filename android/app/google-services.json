@@ -1,0 +1,100 @@
+{
+  "project_info": {
+    "project_number": "4782847785",
+    "project_id": "al-nisar-app",
+    "storage_bucket": "al-nisar-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:4782847785:android:ac6ec21729169ce343a938",
+        "android_client_info": {
+          "package_name": "com.alnisar.alnisarapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "4782847785-iacahogcpc6cu585t6dagand83dtvdvj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.alnisar.alnisarapp",
+            "certificate_hash": "1f454465449b65d131183f53280ccd4ade447445"
+          }
+        },
+        {
+          "client_id": "4782847785-roetaltojpniudj88g0mr5dg0j1bp178.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.alnisar.alnisarapp",
+            "certificate_hash": "c47089997f2b09de3e6e40377ca3b04f47370680"
+          }
+        },
+        {
+          "client_id": "4782847785-knrpvln5isjsm3tkldbqft5ij1haub3t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCNnzny6SUIZXDGgSNXbe1h-R-oJaxL-9s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "4782847785-knrpvln5isjsm3tkldbqft5ij1haub3t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:4782847785:android:b9ff631a92b0f98043a938",
+        "android_client_info": {
+          "package_name": "com.alnisar.spiritual_learning_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "4782847785-5f3q3t4398tvb2itcf2h1mkgn5o50860.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.alnisar.spiritual_learning_app",
+            "certificate_hash": "1f454465449b65d131183f53280ccd4ade447445"
+          }
+        },
+        {
+          "client_id": "4782847785-e0a1nqlqfkutefrls29k3ipr23hl9atv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.alnisar.spiritual_learning_app",
+            "certificate_hash": "c47089997f2b09de3e6e40377ca3b04f47370680"
+          }
+        },
+        {
+          "client_id": "4782847785-knrpvln5isjsm3tkldbqft5ij1haub3t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCNnzny6SUIZXDGgSNXbe1h-R-oJaxL-9s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "4782847785-knrpvln5isjsm3tkldbqft5ij1haub3t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
