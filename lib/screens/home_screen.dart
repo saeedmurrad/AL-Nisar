@@ -3,12 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+
 import '../auth/auth_provider.dart';
 import '../data/dummy_data.dart';
 import '../theme/app_theme.dart';
 import '../theme/color_utils.dart';
 import '../theme/app_theme_colors.dart';
-import '../widgets/bottom_nav_bar.dart';
+import '../widgets/app_drawer.dart';
 import '../widgets/gold_card.dart';
 import '../widgets/home_grid_icons.dart';
 import '../widgets/mandala_painter.dart';
@@ -25,9 +26,8 @@ class HomeScreen extends StatelessWidget {
     final name = auth.profile?.displayName.trim().isNotEmpty == true
         ? auth.profile!.displayName
         : (auth.user?.displayName ?? 'Member');
-    final showAsbaq = auth.isAdminOrHigher;
-
     return Scaffold(
+      drawer: const AppDrawer(),
       body: Column(
         children: [
           _Header(
@@ -44,12 +44,15 @@ class HomeScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 _HomeGrid(
-                  showAsbaq: showAsbaq,
-                  onAsbaq: () => context.go('/asbaq'),
+                  showAdminPanel: auth.isAdminOrHigher,
+                  onAdminPanel: () => context.go('/admin'),
+                  showAsbaqTareeqat: auth.isAdminOrHigher,
+                  onAsbaqTareeqat: () => context.go('/asbaq'),
+                  onSabaq: () => context.go('/sabaq'),
                   onBooks: () => context.go('/books'),
                   onIrshad: () => context.go('/irshadat'),
                   onNewsEvents: () => context.go('/news-events'),
-                  onShijra: () => context.go('/shijra'),
+                  onShajra: () => context.go('/shijra'),
                   onGallery: () => context.go('/gallery'),
                 ),
               ],
@@ -57,7 +60,6 @@ class HomeScreen extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: const BottomNavBar(currentIndex: 0),
     );
   }
 }
@@ -81,6 +83,8 @@ class _Header extends StatelessWidget {
         bottom: false,
         child: Row(
           children: [
+            const DrawerMenuButton(),
+            const SizedBox(width: 10),
             const MurshidAvatar(
               diameter: 40,
               goldRingWidth: 1.5,
@@ -232,21 +236,27 @@ class _IrshadHeroCard extends StatelessWidget {
 
 class _HomeGrid extends StatelessWidget {
   const _HomeGrid({
-    required this.showAsbaq,
-    required this.onAsbaq,
+    required this.showAdminPanel,
+    required this.onAdminPanel,
+    required this.showAsbaqTareeqat,
+    required this.onAsbaqTareeqat,
+    required this.onSabaq,
     required this.onBooks,
     required this.onIrshad,
     required this.onNewsEvents,
-    required this.onShijra,
+    required this.onShajra,
     required this.onGallery,
   });
 
-  final bool showAsbaq;
-  final VoidCallback onAsbaq;
+  final bool showAdminPanel;
+  final VoidCallback onAdminPanel;
+  final bool showAsbaqTareeqat;
+  final VoidCallback onAsbaqTareeqat;
+  final VoidCallback onSabaq;
   final VoidCallback onBooks;
   final VoidCallback onIrshad;
   final VoidCallback onNewsEvents;
-  final VoidCallback onShijra;
+  final VoidCallback onShajra;
   final VoidCallback onGallery;
 
   @override
@@ -260,14 +270,29 @@ class _HomeGrid extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       childAspectRatio: 1.12,
       children: [
-        if (showAsbaq)
+        if (showAdminPanel)
+          _HomeGridCard(
+            label: 'Admin panel',
+            sublabel: 'Manage content',
+            iconKind: HomeGridIconKind.adminPanel,
+            accent: c.accentGold,
+            onTap: onAdminPanel,
+          ),
+        if (showAsbaqTareeqat)
           _HomeGridCard(
             label: 'Asbaq-e-Tareeqat',
             sublabel: 'Spiritual lessons',
             iconKind: HomeGridIconKind.asbaqTareeqat,
             accent: c.accentGold,
-            onTap: onAsbaq,
+            onTap: onAsbaqTareeqat,
           ),
+        _HomeGridCard(
+          label: 'Sabaq',
+          sublabel: 'Lessons',
+          iconKind: HomeGridIconKind.sabaqLessons,
+          accent: c.accentGold,
+          onTap: onSabaq,
+        ),
         _HomeGridCard(
           label: 'Books',
           sublabel: 'Sacred readings',
@@ -290,11 +315,11 @@ class _HomeGrid extends StatelessWidget {
           onTap: onNewsEvents,
         ),
         _HomeGridCard(
-          label: 'Shijra Pak',
+          label: 'Shajra Pak',
           sublabel: 'Silsila tree',
           iconKind: HomeGridIconKind.shijraPak,
           accent: c.accentGold,
-          onTap: onShijra,
+          onTap: onShajra,
         ),
         _HomeGridCard(
           label: 'Gallery',

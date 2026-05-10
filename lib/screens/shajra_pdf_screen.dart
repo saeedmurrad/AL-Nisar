@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
+import '../navigation/go_router_helpers.dart';
 import '../models/shajra_entry_model.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
@@ -35,7 +35,7 @@ class _ShajraPdfScreenState extends State<ShajraPdfScreen> {
           children: [
             _TopBar(
               title: title,
-              onBack: () => context.pop(),
+              onBack: () => popOrGoHome(context),
             ),
             Expanded(
               child: _missingAsset
@@ -84,6 +84,10 @@ class _TopBar extends StatelessWidget {
           IconButton(
             onPressed: onBack,
             icon: Icon(Icons.arrow_back_ios_new_rounded, color: c.accentGold, size: 20),
+          ),
+          IconButton(
+            onPressed: () => goAppHome(context),
+            icon: Icon(Icons.home_outlined, color: c.accentGold, size: 22),
           ),
           Expanded(
             child: Text(

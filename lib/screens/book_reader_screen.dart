@@ -11,6 +11,7 @@ import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../navigation/go_router_helpers.dart';
 import '../models/book_reader_args.dart';
 import '../services/book_service.dart';
 import '../services/bookmark_service.dart';
@@ -644,9 +645,17 @@ class _BookReaderScreenState extends State<BookReaderScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                IconButton(
-                  onPressed: () => context.pop(),
-                  icon: Icon(Icons.arrow_back, color: c.accentGold),
+                Row(
+                  children: [
+                    IconButton(
+                      onPressed: () => popOrGoHome(context),
+                      icon: Icon(Icons.arrow_back, color: c.accentGold),
+                    ),
+                    IconButton(
+                      onPressed: () => goAppHome(context),
+                      icon: Icon(Icons.home_outlined, color: c.accentGold),
+                    ),
+                  ],
                 ),
                 const Spacer(),
                 Text(
@@ -777,8 +786,12 @@ class _BookReaderScreenState extends State<BookReaderScreen> {
                         : Row(
                             children: [
                               IconButton(
-                                onPressed: () => context.pop(),
+                                onPressed: () => popOrGoHome(context),
                                 icon: Icon(Icons.arrow_back, color: c.accentGold),
+                              ),
+                              IconButton(
+                                onPressed: () => goAppHome(context),
+                                icon: Icon(Icons.home_outlined, color: c.accentGold),
                               ),
                               Expanded(
                                 child: Text(

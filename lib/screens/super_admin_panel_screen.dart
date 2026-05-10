@@ -6,13 +6,13 @@ import '../auth/auth_provider.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
 import '../widgets/gold_card.dart';
+import '../widgets/screen_navigation_header.dart';
 
 class SuperAdminPanelScreen extends StatelessWidget {
   const SuperAdminPanelScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final c = context.c;
     final auth = context.watch<AuthProvider>();
     if (!auth.isSuperAdmin) {
       Future.microtask(() {
@@ -23,27 +23,9 @@ class SuperAdminPanelScreen extends StatelessWidget {
     return Scaffold(
       body: Column(
         children: [
-          Container(
-            color: c.backgroundSurface,
-            padding: const EdgeInsets.fromLTRB(10, 18, 16, 12),
-            child: SafeArea(
-              bottom: false,
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () => context.pop(),
-                    icon: Icon(Icons.arrow_back, color: c.accentGold),
-                  ),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      'Super Admin Panel',
-                      style: AppTheme.cinzelHeading(fontSize: 18),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+          const ScreenNavigationHeader(
+            title: 'Super Admin Panel',
+            padding: EdgeInsets.fromLTRB(4, 18, 16, 12),
           ),
           Expanded(
             child: ListView(

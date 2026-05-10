@@ -9,6 +9,7 @@ import '../services/super_admin_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
 import '../widgets/gold_card.dart';
+import '../widgets/screen_navigation_header.dart';
 
 class SuperAdminUsersScreen extends StatelessWidget {
   const SuperAdminUsersScreen({super.key});
@@ -28,27 +29,9 @@ class SuperAdminUsersScreen extends StatelessWidget {
     return Scaffold(
       body: Column(
         children: [
-          Container(
-            color: c.backgroundSurface,
-            padding: const EdgeInsets.fromLTRB(10, 18, 16, 12),
-            child: SafeArea(
-              bottom: false,
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () => context.pop(),
-                    icon: Icon(Icons.arrow_back, color: c.accentGold),
-                  ),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      'Users',
-                      style: AppTheme.cinzelHeading(fontSize: 18),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+          const ScreenNavigationHeader(
+            title: 'Users',
+            padding: EdgeInsets.fromLTRB(4, 18, 16, 12),
           ),
           Expanded(
             child: StreamBuilder<List<UserProfileModel>>(

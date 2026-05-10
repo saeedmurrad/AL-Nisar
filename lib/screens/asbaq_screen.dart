@@ -10,7 +10,7 @@ import '../models/book_reader_args.dart';
 import '../services/asbaq_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
-import '../widgets/bottom_nav_bar.dart';
+import '../widgets/app_drawer.dart';
 import '../widgets/gold_card.dart';
 import '../widgets/shimmer_placeholder.dart';
 
@@ -23,6 +23,7 @@ class AsbaqScreen extends StatelessWidget {
     final service = AsbaqService();
 
     return Scaffold(
+      drawer: const AppDrawer(),
       body: Column(
         children: [
           Container(
@@ -36,29 +37,7 @@ class AsbaqScreen extends StatelessWidget {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      InkWell(
-                        onTap: () => context.go('/home'),
-                        child: Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: c.backgroundElevated,
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(
-                              color: c.borderDefault,
-                              width: 0.5,
-                            ),
-                          ),
-                          child: SvgPicture.string(
-                            _backSvg,
-                            width: 18,
-                            height: 18,
-                            colorFilter: ColorFilter.mode(
-                              c.accentGold,
-                              BlendMode.srcIn,
-                            ),
-                          ),
-                        ),
-                      ),
+                      const DrawerMenuButton(),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Column(
@@ -166,7 +145,6 @@ class AsbaqScreen extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: const BottomNavBar(currentIndex: 0),
     );
   }
 }
@@ -272,7 +250,5 @@ class _AsbaqPdfCard extends StatelessWidget {
   }
 }
 
-const _backSvg =
-    '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M14.5 5.5L8 12l6.5 6.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const _chevronRightSvg =
     '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 5.5L16 12l-6.5 6.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';

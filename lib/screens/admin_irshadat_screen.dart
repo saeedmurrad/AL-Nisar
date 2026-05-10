@@ -3,14 +3,13 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:go_router/go_router.dart';
-
 import '../models/irshad_firestore_model.dart';
 import '../services/admin_irshadat_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
 import '../theme/color_utils.dart';
 import '../widgets/gold_card.dart';
+import '../widgets/screen_navigation_header.dart';
 import '../widgets/shimmer_placeholder.dart';
 
 class AdminIrshadatScreen extends StatefulWidget {
@@ -65,27 +64,9 @@ class _AdminIrshadatScreenState extends State<AdminIrshadatScreen> {
       ),
       body: Column(
         children: [
-          Container(
-            color: c.backgroundSurface,
-            padding: const EdgeInsets.fromLTRB(10, 18, 16, 12),
-            child: SafeArea(
-              bottom: false,
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () => context.pop(),
-                    icon: Icon(Icons.arrow_back, color: c.accentGold),
-                  ),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      'Manage Irshadat',
-                      style: AppTheme.cinzelHeading(fontSize: 18),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+          const ScreenNavigationHeader(
+            title: 'Manage Irshadat',
+            padding: EdgeInsets.fromLTRB(4, 18, 16, 12),
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),

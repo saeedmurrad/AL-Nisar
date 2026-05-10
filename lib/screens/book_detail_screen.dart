@@ -15,6 +15,7 @@ import '../services/pdf_cache_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/color_utils.dart';
 import '../theme/app_theme_colors.dart';
+import '../navigation/go_router_helpers.dart';
 import '../utils/connectivity_helper.dart';
 import '../widgets/ornament_divider.dart';
 import '../widgets/shimmer_placeholder.dart';
@@ -204,9 +205,17 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                IconButton(
-                  onPressed: () => context.pop(),
-                  icon: Icon(Icons.arrow_back, color: c.accentGold),
+                Row(
+                  children: [
+                    IconButton(
+                      onPressed: () => popOrGoHome(context),
+                      icon: Icon(Icons.arrow_back, color: c.accentGold),
+                    ),
+                    IconButton(
+                      onPressed: () => goAppHome(context),
+                      icon: Icon(Icons.home_outlined, color: c.accentGold),
+                    ),
+                  ],
                 ),
                 const Spacer(),
                 Text(
@@ -321,7 +330,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                   child: Row(
                     children: [
                       InkWell(
-                        onTap: () => context.pop(),
+                        onTap: () => popOrGoHome(context),
                         child: Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
@@ -341,6 +350,22 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                               BlendMode.srcIn,
                             ),
                           ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      InkWell(
+                        onTap: () => goAppHome(context),
+                        child: Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: c.backgroundElevated.o(0.75),
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(
+                              color: c.borderDefault,
+                              width: 0.5,
+                            ),
+                          ),
+                          child: Icon(Icons.home_outlined, size: 20, color: c.accentGold),
                         ),
                       ),
                     ],

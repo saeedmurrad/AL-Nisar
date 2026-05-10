@@ -13,7 +13,7 @@ import '../services/irshadat_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/color_utils.dart';
 import '../theme/app_theme_colors.dart';
-import '../widgets/bottom_nav_bar.dart';
+import '../widgets/app_drawer.dart';
 import '../widgets/gold_card.dart';
 import '../widgets/ornament_divider.dart';
 import '../widgets/shimmer_placeholder.dart';
@@ -138,6 +138,7 @@ class _IrshadatScreenState extends State<IrshadatScreen> {
     final c = context.c;
 
     return Scaffold(
+      drawer: const AppDrawer(),
       body: Column(
         children: [
           Container(
@@ -148,9 +149,15 @@ class _IrshadatScreenState extends State<IrshadatScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Irshadat',
-                    style: AppTheme.cinzelHeading(fontSize: 18),
+                  Row(
+                    children: [
+                      const DrawerMenuButton(),
+                      const SizedBox(width: 12),
+                      Text(
+                        'Irshadat',
+                        style: AppTheme.cinzelHeading(fontSize: 18),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 12),
                   _SearchBar(),
@@ -295,7 +302,6 @@ class _IrshadatScreenState extends State<IrshadatScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: const BottomNavBar(currentIndex: 2),
     );
   }
 }

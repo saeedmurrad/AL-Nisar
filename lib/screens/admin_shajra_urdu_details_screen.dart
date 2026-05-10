@@ -6,6 +6,7 @@ import '../services/shajra_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
 import '../widgets/gold_card.dart';
+import '../widgets/screen_navigation_header.dart';
 
 class AdminShajraUrduDetailsScreen extends StatefulWidget {
   const AdminShajraUrduDetailsScreen({super.key});
@@ -54,97 +55,78 @@ class _AdminShajraUrduDetailsScreenState
     final c = context.c;
     return Scaffold(
       backgroundColor: c.backgroundPrimary,
-      body: SafeArea(
-        child: Column(
-          children: [
-            Container(
-              color: c.backgroundSurface,
-              padding: const EdgeInsets.fromLTRB(10, 18, 16, 12),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () => context.pop(),
-                    icon: Icon(Icons.arrow_back, color: c.accentGold),
-                  ),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      'Add Urdu Shajra Details',
-                      style: AppTheme.cinzelHeading(fontSize: 18),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: _loading
-                  ? Center(child: CircularProgressIndicator(color: c.accentGold))
-                  : _error != null
-                      ? _ErrorState(onRetry: _load)
-                      : ListView.builder(
-                          padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
-                          itemCount: _entries.length,
-                          itemBuilder: (ctx, i) {
-                            final e = _entries[i];
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 10),
-                              child: InkWell(
-                                onTap: () => context.push(
-                                  '/admin/add-data/shajra-urdu/upload',
-                                  extra: AdminShajraUrduUploadArgs(entry: e),
-                                ),
-                                borderRadius: BorderRadius.circular(14),
-                                child: GoldCard(
-                                  backgroundColor: c.backgroundSurface,
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        width: 44,
-                                        height: 44,
-                                        alignment: Alignment.center,
-                                        decoration: BoxDecoration(
-                                          color: c.backgroundElevated,
-                                          borderRadius:
-                                              BorderRadius.circular(12),
-                                          border: Border.all(
-                                            color: c.borderDefault,
-                                            width: 0.5,
-                                          ),
+      body: Column(
+        children: [
+          const ScreenNavigationHeader(
+            title: 'Add Urdu Shajra Details',
+            padding: EdgeInsets.fromLTRB(4, 18, 16, 12),
+          ),
+          Expanded(
+            child: _loading
+                ? Center(child: CircularProgressIndicator(color: c.accentGold))
+                : _error != null
+                    ? _ErrorState(onRetry: _load)
+                    : ListView.builder(
+                        padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
+                        itemCount: _entries.length,
+                        itemBuilder: (ctx, i) {
+                          final e = _entries[i];
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 10),
+                            child: InkWell(
+                              onTap: () => context.push(
+                                '/admin/add-data/shajra-urdu/upload',
+                                extra: AdminShajraUrduUploadArgs(entry: e),
+                              ),
+                              borderRadius: BorderRadius.circular(14),
+                              child: GoldCard(
+                                backgroundColor: c.backgroundSurface,
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: 44,
+                                      height: 44,
+                                      alignment: Alignment.center,
+                                      decoration: BoxDecoration(
+                                        color: c.backgroundElevated,
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(
+                                          color: c.borderDefault,
+                                          width: 0.5,
                                         ),
+                                      ),
+                                      child: Text(
+                                        '${e.number}',
+                                        style: AppTheme.lato(
+                                          fontWeight: FontWeight.w800,
+                                          color: c.accentGold,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Directionality(
+                                        textDirection: TextDirection.rtl,
                                         child: Text(
-                                          '${e.number}',
-                                          style: AppTheme.lato(
-                                            fontWeight: FontWeight.w800,
-                                            color: c.accentGold,
+                                          e.fullTitle,
+                                          style: AppTheme.amiriUrdu(
+                                            fontSize: 16,
+                                            height: 1.6,
+                                            color: c.textPrimary,
                                           ),
                                         ),
                                       ),
-                                      const SizedBox(width: 12),
-                                      Expanded(
-                                        child: Directionality(
-                                          textDirection: TextDirection.rtl,
-                                          child: Text(
-                                            e.fullTitle,
-                                            style: AppTheme.amiriUrdu(
-                                              fontSize: 16,
-                                              height: 1.6,
-                                              color: c.textPrimary,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      Icon(Icons.chevron_right,
-                                          color: c.accentGold),
-                                    ],
-                                  ),
+                                    ),
+                                    Icon(Icons.chevron_right, color: c.accentGold),
+                                  ],
                                 ),
                               ),
-                            );
-                          },
-                        ),
-            ),
-          ],
-        ),
+                            ),
+                          );
+                        },
+                      ),
+          ),
+        ],
       ),
     );
   }

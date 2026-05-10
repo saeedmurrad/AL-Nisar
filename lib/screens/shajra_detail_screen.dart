@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../navigation/go_router_helpers.dart';
 import '../data/shajra_pdf_registry.dart';
 import '../models/shajra_entry_model.dart';
 import '../services/shajra_service.dart';
@@ -124,7 +125,7 @@ class _ShajraDetailScreenState extends State<ShajraDetailScreen> {
           children: [
             _DetailHeader(
               entry: _entry,
-              onBack: () => context.pop(),
+              onBack: () => popOrGoHome(context),
             ),
             Expanded(
               child: Stack(
@@ -243,6 +244,10 @@ class _DetailHeader extends StatelessWidget {
           IconButton(
             onPressed: onBack,
             icon: Icon(Icons.arrow_back_ios_new_rounded, color: c.accentGold, size: 20),
+          ),
+          IconButton(
+            onPressed: () => goAppHome(context),
+            icon: Icon(Icons.home_outlined, color: c.accentGold, size: 22),
           ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),

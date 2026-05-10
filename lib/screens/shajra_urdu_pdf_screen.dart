@@ -1,8 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-
+import '../navigation/go_router_helpers.dart';
 import '../models/shajra_entry_model.dart';
 import '../services/book_service.dart';
 import '../services/pdf_cache_service.dart';
@@ -101,8 +100,12 @@ class _ShajraUrduPdfScreenState extends State<ShajraUrduPdfScreen> {
               child: Row(
                 children: [
                   IconButton(
-                    onPressed: () => context.pop(),
+                    onPressed: () => popOrGoHome(context),
                     icon: Icon(Icons.arrow_back_ios_new_rounded, color: c.accentGold, size: 20),
+                  ),
+                  IconButton(
+                    onPressed: () => goAppHome(context),
+                    icon: Icon(Icons.home_outlined, color: c.accentGold, size: 22),
                   ),
                   Expanded(
                     child: Directionality(

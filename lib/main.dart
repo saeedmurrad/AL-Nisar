@@ -9,6 +9,7 @@ import 'providers/book_provider.dart';
 import 'providers/theme_provider.dart';
 import 'router/app_router.dart';
 import 'theme/app_theme.dart';
+import 'widgets/router_pop_scope.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -43,6 +44,8 @@ class AlNisarApp extends StatelessWidget {
       darkTheme: AppTheme.darkTheme,
       themeMode: themeProvider.themeMode,
       routerConfig: router,
+      builder: (context, child) =>
+          RouterPopScope(router: router, child: child),
     );
   }
 }

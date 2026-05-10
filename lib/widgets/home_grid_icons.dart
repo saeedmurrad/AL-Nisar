@@ -3,7 +3,9 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 enum HomeGridIconKind {
+  adminPanel,
   asbaqTareeqat,
+  sabaqLessons,
   books,
   irshadat,
   newsEvents,
@@ -56,8 +58,14 @@ class _HomeGridIconPainter extends CustomPainter {
     final r = Rect.fromLTWH(pad, pad, size.width - pad * 2, size.height - pad * 2);
 
     switch (kind) {
+      case HomeGridIconKind.adminPanel:
+        _adminPanelGrid(canvas, r, stroke);
+        break;
       case HomeGridIconKind.asbaqTareeqat:
         _openBook(canvas, r, stroke);
+        break;
+      case HomeGridIconKind.sabaqLessons:
+        _sabaqLessonBook(canvas, r, stroke);
         break;
       case HomeGridIconKind.books:
         _stackedBooks(canvas, r, stroke);
@@ -93,6 +101,59 @@ class _HomeGridIconPainter extends CustomPainter {
     canvas.drawRRect(leftRect, stroke);
     canvas.drawRRect(rightRect, stroke);
     canvas.drawLine(Offset(mid, top), Offset(mid, bottom), stroke);
+  }
+
+  void _adminPanelGrid(Canvas canvas, Rect r, Paint stroke) {
+    final outer = RRect.fromRectAndRadius(
+      Rect.fromLTWH(
+        r.left + r.width * 0.08,
+        r.top + r.height * 0.1,
+        r.width * 0.84,
+        r.height * 0.8,
+      ),
+      const Radius.circular(5),
+    );
+    canvas.drawRRect(outer, stroke);
+    final gap = r.shortestSide * 0.09;
+    final cellW = (outer.outerRect.width - gap * 3) / 2;
+    final cellH = (outer.outerRect.height - gap * 3) / 2;
+    final ox = outer.outerRect.left + gap;
+    final oy = outer.outerRect.top + gap;
+    for (int row = 0; row < 2; row++) {
+      for (int col = 0; col < 2; col++) {
+        final cell = RRect.fromRectAndRadius(
+          Rect.fromLTWH(
+            ox + col * (cellW + gap),
+            oy + row * (cellH + gap),
+            cellW,
+            cellH,
+          ),
+          const Radius.circular(2.5),
+        );
+        canvas.drawRRect(cell, stroke);
+      }
+    }
+  }
+
+  /// Closed book with lesson lines (Sabaq), distinct from open-book Asbaaq icon.
+  void _sabaqLessonBook(Canvas canvas, Rect r, Paint stroke) {
+    final rr = RRect.fromRectAndRadius(
+      Rect.fromLTWH(
+        r.left + r.width * 0.14,
+        r.top + r.height * 0.12,
+        r.width * 0.72,
+        r.height * 0.76,
+      ),
+      const Radius.circular(4),
+    );
+    canvas.drawRRect(rr, stroke);
+    final lx = r.left + r.width * 0.28;
+    final rx = r.right - r.width * 0.28;
+    var y = r.top + r.height * 0.32;
+    for (var i = 0; i < 4; i++) {
+      canvas.drawLine(Offset(lx, y), Offset(rx, y), stroke);
+      y += r.height * 0.12;
+    }
   }
 
   void _stackedBooks(Canvas canvas, Rect r, Paint stroke) {

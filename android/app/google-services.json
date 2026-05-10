@@ -30,6 +30,14 @@
           }
         },
         {
+          "client_id": "4782847785-rrr844381s6qaa3g17kfvu6230487al7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.alnisar.alnisarapp",
+            "certificate_hash": "e95e490571f89f8dfc6da5d0b1944cc07cbe6dcb"
+          }
+        },
+        {
           "client_id": "4782847785-knrpvln5isjsm3tkldbqft5ij1haub3t.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -72,6 +80,14 @@
           "android_info": {
             "package_name": "com.alnisar.spiritual_learning_app",
             "certificate_hash": "c47089997f2b09de3e6e40377ca3b04f47370680"
+          }
+        },
+        {
+          "client_id": "4782847785-qlg6vt1vn40a07vkfcvr5gllg712pn19.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.alnisar.spiritual_learning_app",
+            "certificate_hash": "e95e490571f89f8dfc6da5d0b1944cc07cbe6dcb"
           }
         },
         {

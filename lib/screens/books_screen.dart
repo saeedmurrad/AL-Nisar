@@ -16,7 +16,7 @@ import '../theme/color_utils.dart';
 import '../theme/app_theme_colors.dart';
 import '../utils/connectivity_helper.dart';
 import '../widgets/book_feature_icons.dart';
-import '../widgets/bottom_nav_bar.dart';
+import '../widgets/app_drawer.dart';
 import '../widgets/shimmer_placeholder.dart';
 
 class BooksScreen extends StatefulWidget {
@@ -73,6 +73,7 @@ class _BooksScreenState extends State<BooksScreen> {
         final canAdd = context.watch<AuthProvider>().isAdminOrHigher;
 
         return Scaffold(
+          drawer: const AppDrawer(),
           body: Column(
             children: [
               if (_offline)
@@ -113,29 +114,7 @@ class _BooksScreenState extends State<BooksScreen> {
                     children: [
                       Row(
                         children: [
-                          InkWell(
-                            onTap: () => context.go('/home'),
-                            child: Container(
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: c.backgroundElevated,
-                                borderRadius: BorderRadius.circular(14),
-                                border: Border.all(
-                                  color: c.borderDefault,
-                                  width: 0.5,
-                                ),
-                              ),
-                              child: SvgPicture.string(
-                                _backSvg,
-                                width: 18,
-                                height: 18,
-                                colorFilter: ColorFilter.mode(
-                                  c.accentGold,
-                                  BlendMode.srcIn,
-                                ),
-                              ),
-                            ),
-                          ),
+                          const DrawerMenuButton(),
                           const SizedBox(width: 12),
                           Expanded(
                             child: Column(
@@ -300,7 +279,6 @@ class _BooksScreenState extends State<BooksScreen> {
               ),
             ],
           ),
-          bottomNavigationBar: const BottomNavBar(currentIndex: 0),
         );
       },
     );
@@ -627,7 +605,5 @@ class _BooksEmptyState extends StatelessWidget {
   }
 }
 
-const _backSvg =
-    '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M14.5 5.5L8 12l6.5 6.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const _searchSvg =
     '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M10.5 18.5a8 8 0 1 1 0-16 8 8 0 0 1 0 16z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M16.5 16.5L21 21" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';

@@ -9,6 +9,7 @@ import '../services/admin_gallery_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
 import '../theme/color_utils.dart';
+import '../widgets/screen_navigation_header.dart';
 
 class AdminUploadGalleryImagesScreen extends StatefulWidget {
   const AdminUploadGalleryImagesScreen({super.key});
@@ -149,24 +150,10 @@ class _AdminUploadGalleryImagesScreenState
       body: SafeArea(
         child: Column(
           children: [
-            Container(
-              color: c.backgroundSurface,
-              padding: const EdgeInsets.fromLTRB(10, 18, 16, 12),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: _saving ? null : () => context.pop(),
-                    icon: Icon(Icons.arrow_back, color: c.accentGold),
-                  ),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      'Upload Gallery Images',
-                      style: AppTheme.cinzelHeading(fontSize: 18),
-                    ),
-                  ),
-                ],
-              ),
+            ScreenNavigationHeader(
+              title: 'Upload Gallery Images',
+              padding: const EdgeInsets.fromLTRB(4, 18, 16, 12),
+              disableBack: _saving,
             ),
             Expanded(
               child: ListView(

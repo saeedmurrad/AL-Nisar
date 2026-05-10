@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../admin/admin_auth_service.dart';
+import '../widgets/screen_navigation_header.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
 import '../theme/color_utils.dart';
@@ -60,27 +61,10 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
     return Scaffold(
       body: Column(
         children: [
-          Container(
-            color: c.backgroundSurface,
-            padding: const EdgeInsets.fromLTRB(10, 18, 16, 12),
-            child: SafeArea(
-              bottom: false,
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: _loading ? null : () => context.pop(),
-                    icon: Icon(Icons.arrow_back, color: c.accentGold),
-                  ),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      'Admin Login',
-                      style: AppTheme.cinzelHeading(fontSize: 18),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+          ScreenNavigationHeader(
+            title: 'Admin Login',
+            padding: const EdgeInsets.fromLTRB(4, 18, 16, 12),
+            disableBack: _loading,
           ),
           Expanded(
             child: ListView(

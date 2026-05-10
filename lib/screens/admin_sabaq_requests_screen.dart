@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-
 import '../models/sabaq_access_request_model.dart';
 import '../services/sabaq_access_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
 import '../widgets/gold_card.dart';
+import '../widgets/screen_navigation_header.dart';
 
 class AdminSabaqRequestsScreen extends StatelessWidget {
   const AdminSabaqRequestsScreen({super.key});
@@ -18,27 +17,9 @@ class AdminSabaqRequestsScreen extends StatelessWidget {
     return Scaffold(
       body: Column(
         children: [
-          Container(
-            color: c.backgroundSurface,
-            padding: const EdgeInsets.fromLTRB(10, 18, 16, 12),
-            child: SafeArea(
-              bottom: false,
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () => context.pop(),
-                    icon: Icon(Icons.arrow_back, color: c.accentGold),
-                  ),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      'Sabaq Access Requests',
-                      style: AppTheme.cinzelHeading(fontSize: 18),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+          const ScreenNavigationHeader(
+            title: 'Sabaq Access Requests',
+            padding: EdgeInsets.fromLTRB(4, 18, 16, 12),
           ),
           Expanded(
             child: StreamBuilder<List<SabaqAccessRequestModel>>(

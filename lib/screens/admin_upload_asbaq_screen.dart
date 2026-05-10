@@ -9,6 +9,7 @@ import '../services/admin_asbaq_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
 import '../theme/color_utils.dart';
+import '../widgets/screen_navigation_header.dart';
 
 class AdminUploadAsbaqScreen extends StatefulWidget {
   const AdminUploadAsbaqScreen({super.key});
@@ -162,27 +163,10 @@ class _AdminUploadAsbaqScreenState extends State<AdminUploadAsbaqScreen> {
     return Scaffold(
       body: Column(
         children: [
-          Container(
-            color: c.backgroundSurface,
-            padding: const EdgeInsets.fromLTRB(10, 18, 16, 12),
-            child: SafeArea(
-              bottom: false,
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: _saving ? null : () => context.pop(),
-                    icon: Icon(Icons.arrow_back, color: c.accentGold),
-                  ),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      'Upload Asbaq PDF (Admin)',
-                      style: AppTheme.cinzelHeading(fontSize: 18),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+          ScreenNavigationHeader(
+            title: 'Upload Asbaq PDF (Admin)',
+            padding: const EdgeInsets.fromLTRB(4, 18, 16, 12),
+            disableBack: _saving,
           ),
           Expanded(
             child: ListView(

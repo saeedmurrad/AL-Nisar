@@ -11,6 +11,7 @@ import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
 import '../theme/color_utils.dart';
 import '../widgets/book_feature_icons.dart';
+import '../widgets/screen_navigation_header.dart';
 
 class BookmarksScreen extends StatefulWidget {
   const BookmarksScreen({super.key});
@@ -133,69 +134,56 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Container(
-            color: c.backgroundSurface,
-            padding: const EdgeInsets.fromLTRB(8, 12, 16, 14),
-            child: SafeArea(
-              bottom: false,
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () => context.pop(),
-                    icon: Icon(Icons.arrow_back, color: c.accentGold),
+          ScreenNavigationHeader(
+            title: 'My Bookmarks',
+            padding: const EdgeInsets.fromLTRB(4, 12, 16, 14),
+            titleWidget: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'My Bookmarks',
+                  style: AppTheme.cormorantGaramond(
+                    fontSize: 22,
+                    color: c.textPrimary,
                   ),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'My Bookmarks',
-                          style: AppTheme.cormorantGaramond(
-                            fontSize: 22,
-                            color: c.textPrimary,
-                          ),
-                        ),
-                        Directionality(
-                          textDirection: TextDirection.rtl,
-                          child: Text(
-                            'میرے نشانات',
-                            style: AppTheme.amiriUrdu(
-                              fontSize: 15,
-                              height: 1.3,
-                              color: c.textSecondary,
-                            ),
-                          ),
-                        ),
-                      ],
+                ),
+                Directionality(
+                  textDirection: TextDirection.rtl,
+                  child: Text(
+                    'میرے نشانات',
+                    style: AppTheme.amiriUrdu(
+                      fontSize: 15,
+                      height: 1.3,
+                      color: c.textSecondary,
                     ),
                   ),
-                  FutureBuilder<List<BookmarkModel>>(
-                    future: _future,
-                    builder: (context, snap) {
-                      final n = snap.data?.length ?? 0;
-                      return Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: c.accentGold.o(0.2),
-                          borderRadius: BorderRadius.circular(999),
-                          border: Border.all(color: c.accentGold.o(0.5)),
-                        ),
-                        child: Text(
-                          '$n bookmarks',
-                          style: AppTheme.lato(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
-                            color: c.textPrimary,
-                          ),
-                        ),
-                      );
-                    },
+                ),
+              ],
+            ),
+            trailing: FutureBuilder<List<BookmarkModel>>(
+              future: _future,
+              builder: (context, snap) {
+                final n = snap.data?.length ?? 0;
+                return Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
                   ),
-                ],
-              ),
+                  decoration: BoxDecoration(
+                    color: c.accentGold.o(0.2),
+                    borderRadius: BorderRadius.circular(999),
+                    border: Border.all(color: c.accentGold.o(0.5)),
+                  ),
+                  child: Text(
+                    '$n bookmarks',
+                    style: AppTheme.lato(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      color: c.textPrimary,
+                    ),
+                  ),
+                );
+              },
             ),
           ),
           Expanded(

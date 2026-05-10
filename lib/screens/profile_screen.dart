@@ -9,7 +9,7 @@ import '../services/irshadat_bookmark_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/color_utils.dart';
 import '../theme/app_theme_colors.dart';
-import '../widgets/bottom_nav_bar.dart';
+import '../widgets/app_drawer.dart';
 import '../widgets/gold_card.dart';
 import '../widgets/theme_toggle_button.dart';
 
@@ -98,6 +98,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         : (auth.isAdminOrHigher ? 'Admin' : 'User');
 
     return Scaffold(
+      drawer: const AppDrawer(),
       body: Column(
         children: [
           Container(
@@ -107,6 +108,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               bottom: false,
               child: Row(
                 children: [
+                  const DrawerMenuButton(),
+                  const SizedBox(width: 12),
                   Text('Profile', style: AppTheme.cinzelHeading(fontSize: 18)),
                 ],
               ),
@@ -528,7 +531,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: const BottomNavBar(currentIndex: 4),
     );
   }
 }

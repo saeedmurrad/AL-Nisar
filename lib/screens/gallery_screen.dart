@@ -13,7 +13,7 @@ import '../services/gallery_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/color_utils.dart';
 import '../theme/app_theme_colors.dart';
-import '../widgets/bottom_nav_bar.dart';
+import '../widgets/app_drawer.dart';
 import '../widgets/shimmer_placeholder.dart';
 
 class GalleryScreen extends StatelessWidget {
@@ -25,6 +25,7 @@ class GalleryScreen extends StatelessWidget {
     final service = GalleryService();
 
     return Scaffold(
+      drawer: const AppDrawer(),
       body: Column(
         children: [
           Container(
@@ -34,6 +35,8 @@ class GalleryScreen extends StatelessWidget {
               bottom: false,
               child: Row(
                 children: [
+                  const DrawerMenuButton(),
+                  const SizedBox(width: 12),
                   Text(
                     'Gallery',
                     style: AppTheme.cinzelHeading(fontSize: 18),
@@ -109,7 +112,6 @@ class GalleryScreen extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: const BottomNavBar(currentIndex: 3),
     );
   }
 }

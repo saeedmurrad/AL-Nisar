@@ -5,6 +5,7 @@ import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
 import '../theme/color_utils.dart';
 import '../widgets/gold_card.dart';
+import '../widgets/screen_navigation_header.dart';
 
 class AddDataSectionScreen extends StatelessWidget {
   const AddDataSectionScreen({super.key});
@@ -16,27 +17,9 @@ class AddDataSectionScreen extends StatelessWidget {
     return Scaffold(
       body: Column(
         children: [
-          Container(
-            color: c.backgroundSurface,
-            padding: const EdgeInsets.fromLTRB(10, 18, 16, 12),
-            child: SafeArea(
-              bottom: false,
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () => context.pop(),
-                    icon: Icon(Icons.arrow_back, color: c.accentGold),
-                  ),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      'Add Data Section',
-                      style: AppTheme.cinzelHeading(fontSize: 18),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+          const ScreenNavigationHeader(
+            title: 'Add Data Section',
+            padding: EdgeInsets.fromLTRB(4, 18, 16, 12),
           ),
           Expanded(
             child: ListView(

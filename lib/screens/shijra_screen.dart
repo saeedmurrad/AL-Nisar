@@ -9,6 +9,7 @@ import '../services/shajra_urdu_details_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
 import '../theme/color_utils.dart';
+import '../widgets/app_drawer.dart';
 import '../widgets/shimmer_placeholder.dart';
 
 class ShijraScreen extends StatefulWidget {
@@ -120,11 +121,12 @@ class _ShijraScreenState extends State<ShijraScreen> {
 
     return Scaffold(
       backgroundColor: c.backgroundPrimary,
+      drawer: const AppDrawer(),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _ScreenHeader(c: c, onBack: () => context.go('/home')),
+            _ScreenHeader(c: c),
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
@@ -173,10 +175,9 @@ class _ShijraScreenState extends State<ShijraScreen> {
 }
 
 class _ScreenHeader extends StatelessWidget {
-  const _ScreenHeader({required this.c, required this.onBack});
+  const _ScreenHeader({required this.c});
 
   final AppThemeColors c;
-  final VoidCallback onBack;
 
   @override
   Widget build(BuildContext context) {
@@ -185,10 +186,7 @@ class _ScreenHeader extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          IconButton(
-            onPressed: onBack,
-            icon: Icon(Icons.arrow_back_ios_new_rounded, color: c.accentGold, size: 20),
-          ),
+          const DrawerMenuButton(),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

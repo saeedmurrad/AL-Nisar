@@ -10,6 +10,7 @@ import '../services/admin_shajra_urdu_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
 import '../theme/color_utils.dart';
+import '../widgets/screen_navigation_header.dart';
 
 class AdminUploadShajraUrduDetailScreen extends StatefulWidget {
   const AdminUploadShajraUrduDetailScreen({super.key, required this.args});
@@ -121,24 +122,10 @@ class _AdminUploadShajraUrduDetailScreenState
       body: SafeArea(
         child: Column(
           children: [
-            Container(
-              color: c.backgroundSurface,
-              padding: const EdgeInsets.fromLTRB(10, 18, 16, 12),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: _saving ? null : () => context.pop(),
-                    icon: Icon(Icons.arrow_back, color: c.accentGold),
-                  ),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      'Upload Urdu Shajra PDF',
-                      style: AppTheme.cinzelHeading(fontSize: 18),
-                    ),
-                  ),
-                ],
-              ),
+            ScreenNavigationHeader(
+              title: 'Upload Urdu Shajra PDF',
+              padding: const EdgeInsets.fromLTRB(4, 18, 16, 12),
+              disableBack: _saving,
             ),
             Expanded(
               child: ListView(

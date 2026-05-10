@@ -1,6 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
 import '../data/dummy_data.dart';
@@ -10,7 +9,7 @@ import '../services/news_events_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/color_utils.dart';
 import '../theme/app_theme_colors.dart';
-import '../widgets/bottom_nav_bar.dart';
+import '../widgets/app_drawer.dart';
 import '../widgets/shimmer_placeholder.dart';
 
 class NewsEventsScreen extends StatefulWidget {
@@ -52,6 +51,7 @@ class _NewsEventsScreenState extends State<NewsEventsScreen>
     final onGold = _onGold(context, c);
 
     return Scaffold(
+      drawer: const AppDrawer(),
       body: Column(
         children: [
           Container(
@@ -64,29 +64,7 @@ class _NewsEventsScreenState extends State<NewsEventsScreen>
                 children: [
                   Row(
                     children: [
-                      InkWell(
-                        onTap: () => context.go('/home'),
-                        child: Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: c.backgroundElevated,
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(
-                              color: c.borderDefault,
-                              width: 0.5,
-                            ),
-                          ),
-                          child: SvgPicture.string(
-                            _backSvg,
-                            width: 18,
-                            height: 18,
-                            colorFilter: ColorFilter.mode(
-                              c.accentGold,
-                              BlendMode.srcIn,
-                            ),
-                          ),
-                        ),
-                      ),
+                      const DrawerMenuButton(),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
@@ -230,7 +208,6 @@ class _NewsEventsScreenState extends State<NewsEventsScreen>
           ),
         ],
       ),
-      bottomNavigationBar: const BottomNavBar(currentIndex: 0),
     );
   }
 }
@@ -701,6 +678,3 @@ class _EventsTabFirestore extends StatelessWidget {
     );
   }
 }
-
-const _backSvg =
-    '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M14.5 5.5L8 12l6.5 6.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';

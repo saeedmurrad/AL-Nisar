@@ -13,7 +13,7 @@ import '../services/sabaq_access_service.dart';
 import '../services/sabaq_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
-import '../widgets/bottom_nav_bar.dart';
+import '../widgets/app_drawer.dart';
 import '../widgets/gold_card.dart';
 import '../widgets/shimmer_placeholder.dart';
 
@@ -151,12 +151,10 @@ class _SabaqListScreenState extends State<SabaqListScreen> {
     final auth = context.watch<AuthProvider>();
 
     return Scaffold(
+      drawer: const AppDrawer(),
       body: Column(
         children: [
-          _TopBar(
-            title: 'Sabaq',
-            onBack: () => context.go('/home'),
-          ),
+          const _TopBar(title: 'Sabaq'),
           Expanded(
             child: StreamBuilder<List<SabaqPdfModel>>(
               stream: _sabaq.streamSabaqPdfs(),
@@ -267,7 +265,6 @@ class _SabaqListScreenState extends State<SabaqListScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: const BottomNavBar(currentIndex: 1),
     );
   }
 }
@@ -361,13 +358,9 @@ class _SabaqPdfTile extends StatelessWidget {
 }
 
 class _TopBar extends StatelessWidget {
-  const _TopBar({
-    required this.title,
-    required this.onBack,
-  });
+  const _TopBar({required this.title});
 
   final String title;
-  final VoidCallback onBack;
 
   @override
   Widget build(BuildContext context) {
@@ -379,26 +372,7 @@ class _TopBar extends StatelessWidget {
         bottom: false,
         child: Row(
           children: [
-            InkWell(
-              onTap: onBack,
-              child: Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: c.backgroundElevated,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: c.borderDefault, width: 0.5),
-                ),
-                child: SvgPicture.string(
-                  _backSvg,
-                  width: 18,
-                  height: 18,
-                  colorFilter: ColorFilter.mode(
-                    c.accentGold,
-                    BlendMode.srcIn,
-                  ),
-                ),
-              ),
-            ),
+            const DrawerMenuButton(),
             const SizedBox(width: 12),
             Text(
               title,
@@ -411,8 +385,6 @@ class _TopBar extends StatelessWidget {
   }
 }
 
-const _backSvg =
-    '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M14.5 5.5L8 12l6.5 6.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const _chevronRightSvg =
     '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 5.5L16 12l-6.5 6.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 

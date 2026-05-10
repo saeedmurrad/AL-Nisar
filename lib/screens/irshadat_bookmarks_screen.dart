@@ -1,7 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'dart:io';
@@ -13,6 +12,7 @@ import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
 import '../theme/color_utils.dart';
 import '../widgets/gold_card.dart';
+import '../widgets/screen_navigation_header.dart';
 import '../widgets/shimmer_placeholder.dart';
 
 class IrshadatBookmarksScreen extends StatefulWidget {
@@ -283,66 +283,53 @@ class _IrshadatBookmarksScreenState extends State<IrshadatBookmarksScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Container(
-            color: c.backgroundSurface,
-            padding: const EdgeInsets.fromLTRB(8, 12, 16, 14),
-            child: SafeArea(
-              bottom: false,
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () => context.pop(),
-                    icon: Icon(Icons.arrow_back, color: c.accentGold),
+          ScreenNavigationHeader(
+            title: 'Saved Irshadat',
+            padding: const EdgeInsets.fromLTRB(4, 12, 16, 14),
+            titleWidget: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Saved Irshadat',
+                  style: AppTheme.cormorantGaramond(
+                    fontSize: 22,
+                    color: c.textPrimary,
                   ),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Saved Irshadat',
-                          style: AppTheme.cormorantGaramond(
-                            fontSize: 22,
-                            color: c.textPrimary,
-                          ),
-                        ),
-                        Directionality(
-                          textDirection: TextDirection.rtl,
-                          child: Text(
-                            'محفوظ ارشادات',
-                            style: AppTheme.amiriUrdu(
-                              fontSize: 15,
-                              height: 1.3,
-                              color: c.textSecondary,
-                            ),
-                          ),
-                        ),
-                      ],
+                ),
+                Directionality(
+                  textDirection: TextDirection.rtl,
+                  child: Text(
+                    'محفوظ ارشادات',
+                    style: AppTheme.amiriUrdu(
+                      fontSize: 15,
+                      height: 1.3,
+                      color: c.textSecondary,
                     ),
                   ),
-                  FutureBuilder<List<IrshadatBookmarkModel>>(
-                    future: _future,
-                    builder: (context, snap) {
-                      final n = snap.data?.length ?? 0;
-                      return Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: c.accentGold.o(0.2),
-                          borderRadius: BorderRadius.circular(999),
-                          border: Border.all(color: c.accentGold.o(0.5)),
-                        ),
-                        child: Text(
-                          '$n saved',
-                          style: AppTheme.lato(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
-                            color: c.textPrimary,
-                          ),
-                        ),
-                      );
-                    },
+                ),
+              ],
+            ),
+            trailing: FutureBuilder<List<IrshadatBookmarkModel>>(
+              future: _future,
+              builder: (context, snap) {
+                final n = snap.data?.length ?? 0;
+                return Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: c.accentGold.o(0.2),
+                    borderRadius: BorderRadius.circular(999),
+                    border: Border.all(color: c.accentGold.o(0.5)),
                   ),
-                ],
-              ),
+                  child: Text(
+                    '$n saved',
+                    style: AppTheme.lato(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      color: c.textPrimary,
+                    ),
+                  ),
+                );
+              },
             ),
           ),
           Expanded(
