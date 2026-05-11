@@ -88,7 +88,7 @@ class _IrshadatScreenState extends State<IrshadatScreen> {
     final msg = [
       'Irshad (${_language.label}) — ${ir.dateLabel}',
       if (text.isNotEmpty) text,
-      'Al Nisar App',
+      'AL Nisar App',
     ].join('\n\n');
 
     if (url.isEmpty) {

@@ -65,7 +65,7 @@ Future<void> sharePageImageCard({
   );
   final sub = TextPainter(
     text: TextSpan(
-      text: 'Al Nisar App',
+      text: 'AL Nisar App',
       style: TextStyle(
         color: textColor.withValues(alpha: 0.75),
         fontSize: 28,
@@ -86,6 +86,6 @@ Future<void> sharePageImageCard({
   await f.writeAsBytes(bytes);
   await Share.shareXFiles(
     [XFile(f.path)],
-    text: 'From "$bookTitle" — Page $pageNumber\nAl Nisar App',
+    text: 'From "$bookTitle" — Page $pageNumber\nAL Nisar App',
   );
 }

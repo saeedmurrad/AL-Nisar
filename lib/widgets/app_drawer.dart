@@ -86,7 +86,7 @@ class AppDrawer extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
               child: Text(
-                'Al Nisar',
+                'AL Nisar',
                 style: AppTheme.cinzelHeading(
                   fontSize: 20,
                   letterSpacing: 1.4,

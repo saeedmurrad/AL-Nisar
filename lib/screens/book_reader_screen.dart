@@ -376,7 +376,7 @@ class _BookReaderScreenState extends State<BookReaderScreen> {
       if (file != null) {
         await Share.shareXFiles(
           [XFile(file.path)],
-          text: 'From "${book.title}" — Page $_currentPage\nAl Nisar App',
+          text: 'From "${book.title}" — Page $_currentPage\nAL Nisar App',
         );
         return;
       }

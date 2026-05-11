@@ -100,7 +100,7 @@ class _ShajraDetailScreenState extends State<ShajraDetailScreen> {
   Future<void> _share() async {
     final name = _entry.shortName.isNotEmpty ? _entry.shortName : _entry.fullTitle;
     await Share.share(
-      'Shajra Pak — $name\nAl Nisar App',
+      'Shajra Pak — $name\nAL Nisar App',
     );
   }
 

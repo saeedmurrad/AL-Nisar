@@ -73,7 +73,7 @@ class _IrshadatBookmarksScreenState extends State<IrshadatBookmarksScreen> {
     final msg = [
       'Irshad (${bm.language.label}) — ${bm.dateLabel}',
       if (bm.text.trim().isNotEmpty) bm.text.trim(),
-      'Al Nisar App',
+      'AL Nisar App',
     ].join('\n\n');
 
     if (url.isEmpty) {

@@ -101,7 +101,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 18),
                   Text(
-                    'AL NISAR',
+                    'AL Nisar',
                     style: AppTheme.cinzelHeading(
                       fontSize: 22,
                       letterSpacing: 3,

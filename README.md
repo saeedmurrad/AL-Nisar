@@ -1,6 +1,6 @@
-# spiritual_learning_app
+# AL Nisar
 
-A new Flutter project.
+AL Nisar — spiritual learning Flutter application.
 
 ## Getting Started
 
