@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -35,6 +36,14 @@ class AdminBooksService {
     final ref = bookPdfRef(bookId);
     await uploadBookPdfTask(bookId: bookId, pdfPath: pdfPath);
     return ref.fullPath;
+  }
+
+  UploadTask uploadCoverPngDataTask({
+    required String bookId,
+    required Uint8List pngBytes,
+  }) {
+    final ref = bookCoverRef(bookId, extension: 'png');
+    return ref.putData(pngBytes, SettableMetadata(contentType: 'image/png'));
   }
 
   UploadTask uploadCoverImageTask({

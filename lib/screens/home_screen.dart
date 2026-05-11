@@ -1,27 +1,24 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../auth/auth_provider.dart';
-import '../data/dummy_data.dart';
 import '../theme/app_theme.dart';
 import '../theme/color_utils.dart';
 import '../theme/app_theme_colors.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/gold_card.dart';
 import '../widgets/home_grid_icons.dart';
+import '../widgets/irshad_of_the_day_card.dart';
 import '../widgets/mandala_painter.dart';
 import '../widgets/murshid_avatar.dart';
-import '../widgets/shimmer_placeholder.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final irshad = DummyData.irshadList.first;
     final auth = context.watch<AuthProvider>();
     final name = auth.profile?.displayName.trim().isNotEmpty == true
         ? auth.profile!.displayName
@@ -32,16 +29,13 @@ class HomeScreen extends StatelessWidget {
         children: [
           _Header(
             memberName: name,
-            onBellTap: () {},
+            onBellTap: () => context.push('/notifications'),
           ),
           Expanded(
             child: ListView(
               padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
               children: [
-                _IrshadHeroCard(
-                  urduQuote: irshad.urdu,
-                  attribution: '— Hazrat Sufi Nisar Ahmed',
-                ),
+                const IrshadOfTheDayCard(),
                 const SizedBox(height: 16),
                 _HomeGrid(
                   showAdminPanel: auth.isAdminOrHigher,
@@ -135,96 +129,6 @@ class _Header extends StatelessWidget {
                     BlendMode.srcIn,
                   ),
                 ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _IrshadHeroCard extends StatelessWidget {
-  const _IrshadHeroCard({
-    required this.urduQuote,
-    required this.attribution,
-  });
-
-  final String urduQuote;
-  final String attribution;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.c;
-    return GoldCard(
-      backgroundColor: c.backgroundInput,
-      padding: EdgeInsets.zero,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(14),
-        child: Stack(
-          children: [
-            Positioned.fill(
-              child: Opacity(
-                opacity: 0.12,
-                child: CachedNetworkImage(
-                  imageUrl: DummyData.tilePattern,
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) => const ShimmerPlaceholder(),
-                  errorWidget: (context, url, error) => const GoldPatternError(),
-                ),
-              ),
-            ),
-            Positioned(
-              top: -32,
-              right: -18,
-              child: CustomPaint(
-                painter: MandalaPainter(
-                  opacity: 0.09,
-                  strokeWidth: 1,
-                  rings: 5,
-                  petals: 14,
-                ),
-                size: const Size(160, 160),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'IRSHAD OF THE DAY',
-                    style: TextStyle(
-                      color: c.textMuted.o(0.95),
-                      letterSpacing: 2.2,
-                      fontSize: 11,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Directionality(
-                    textDirection: TextDirection.rtl,
-                    child: Text(
-                      urduQuote,
-                      style: AppTheme.amiriUrdu(
-                        fontSize: 18,
-                        color: c.textSecondary,
-                        height: 2.2,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: Text(
-                      attribution,
-                      style: TextStyle(
-                        color: c.textMuted,
-                        fontSize: 12,
-                        fontStyle: FontStyle.italic,
-                      ),
-                    ),
-                  ),
-                ],
               ),
             ),
           ],

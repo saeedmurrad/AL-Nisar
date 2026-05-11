@@ -92,6 +92,7 @@ class SuperAdminUsersScreen extends StatelessWidget {
                   itemBuilder: (context, i) {
                     final u = list[i];
                     final displayName = u.displayName.trim();
+                    final address = u.address.trim();
                     return GoldCard(
                       backgroundColor: c.backgroundSurface,
                       child: Row(
@@ -101,30 +102,29 @@ class SuperAdminUsersScreen extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  displayName.isNotEmpty
-                                      ? displayName
-                                      : (u.email.isEmpty ? '(no name)' : u.email),
+                                  displayName.isNotEmpty ? displayName : '(no name)',
                                   style: AppTheme.lato(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w800,
                                     color: c.textPrimary,
                                   ),
                                 ),
-                                if (displayName.isNotEmpty) ...[
-                                  const SizedBox(height: 4),
+                                const SizedBox(height: 6),
+                                Text(
+                                  address.isNotEmpty ? address : 'Address not provided',
+                                  style: AppTheme.lato(
+                                    fontSize: 12,
+                                    color: c.textMuted,
+                                    height: 1.35,
+                                  ),
+                                ),
+                                if (u.role != AppRole.user) ...[
+                                  const SizedBox(height: 6),
                                   Text(
-                                    u.email.isEmpty ? '(no email)' : u.email,
-                                    style: AppTheme.lato(
-                                      fontSize: 12,
-                                      color: c.textMuted,
-                                    ),
+                                    'Role: ${_roleLabel(u.role)}',
+                                    style: AppTheme.lato(fontSize: 12, color: c.textSecondary),
                                   ),
                                 ],
-                                const SizedBox(height: 4),
-                                Text(
-                                  _roleLabel(u.role),
-                                  style: AppTheme.lato(fontSize: 12, color: c.textMuted),
-                                ),
                               ],
                             ),
                           ),

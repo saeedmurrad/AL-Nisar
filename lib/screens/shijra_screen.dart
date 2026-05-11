@@ -153,15 +153,56 @@ class _ShijraScreenState extends State<ShijraScreen> {
                         onOpen: _openDetail,
                       )
                     else
-                      _UrduBody(
-                        c: c,
-                        cardBorder: cardBorder,
-                        loading: _urduLoading,
-                        error: _urduError,
-                        entries: _urduEntries,
-                        onRetry: _loadUrdu,
-                        detailsStream: _urduDetails.streamIndexByNumber(),
-                        onOpen: _openUrduPdf,
+                      StreamBuilder<List<ShajraUrduDetailModel>>(
+                        stream: _urduDetails.streamAllActive(),
+                        builder: (context, snap) {
+                          final fb = snap.data ?? const <ShajraUrduDetailModel>[];
+                          if (snap.connectionState == ConnectionState.waiting &&
+                              fb.isEmpty) {
+                            return Directionality(
+                              textDirection: TextDirection.rtl,
+                              child: _ShajraListShimmer(c: c),
+                            );
+                          }
+                          if (fb.isNotEmpty) {
+                            final entries = fb
+                                .map(
+                                  (d) => ShajraEntryModel(
+                                    number: d.number,
+                                    fullTitle: d.titleUrdu.trim().isNotEmpty
+                                        ? d.titleUrdu.trim()
+                                        : 'شخصیت ${d.number}',
+                                    shortName: d.titleUrdu.trim().isNotEmpty
+                                        ? d.titleUrdu.trim()
+                                        : '${d.number}',
+                                    detailUrl: '',
+                                    language: ShajraEntryModel.urdu,
+                                  ),
+                                )
+                                .toList();
+                            final map = {for (final d in fb) d.number: d};
+                            return Directionality(
+                              textDirection: TextDirection.rtl,
+                              child: _UrduEntryList(
+                                c: c,
+                                cardBorder: cardBorder,
+                                entries: entries,
+                                detailsByNumber: map,
+                                onOpen: _openUrduPdf,
+                              ),
+                            );
+                          }
+                          return _UrduBody(
+                            c: c,
+                            cardBorder: cardBorder,
+                            loading: _urduLoading,
+                            error: _urduError,
+                            entries: _urduEntries,
+                            onRetry: _loadUrdu,
+                            detailsStream: _urduDetails.streamIndexByNumber(),
+                            onOpen: _openUrduPdf,
+                          );
+                        },
                       ),
                   ],
                 ),

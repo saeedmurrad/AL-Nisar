@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../auth/auth_provider.dart';
 import '../services/bookmark_service.dart';
@@ -61,10 +60,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       },
     );
     if (ok == null || ok.isEmpty) return;
+    if (!context.mounted) return;
     try {
-      await FirebaseFirestore.instance.collection('users').doc(uid).set({
-        'displayName': ok,
-      }, SetOptions(merge: true));
+      await context.read<AuthProvider>().updateDisplayName(ok);
     } catch (_) {
       messenger.showSnackBar(
         SnackBar(

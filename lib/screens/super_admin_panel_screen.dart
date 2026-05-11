@@ -32,6 +32,13 @@ class SuperAdminPanelScreen extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
               children: [
                 _Tile(
+                  icon: Icons.notifications_outlined,
+                  title: 'Notifications',
+                  subtitle: 'New member requests and alerts',
+                  onTap: () => context.push('/notifications'),
+                ),
+                const SizedBox(height: 10),
+                _Tile(
                   icon: Icons.people_outline,
                   title: 'Users',
                   subtitle: 'View all users and promote to Admin',

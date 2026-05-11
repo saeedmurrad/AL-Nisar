@@ -11,6 +11,7 @@ class SabaqAccessRequestModel {
     required this.titleUr,
     required this.userEmail,
     required this.userName,
+    required this.message,
   });
 
   final String id;
@@ -22,6 +23,7 @@ class SabaqAccessRequestModel {
   final String titleUr;
   final String userEmail;
   final String userName;
+  final String message;
 
   factory SabaqAccessRequestModel.fromFirestore(
     DocumentSnapshot<Map<String, dynamic>> doc,
@@ -40,6 +42,7 @@ class SabaqAccessRequestModel {
       titleUr: data['titleUr'] as String? ?? '',
       userEmail: data['userEmail'] as String? ?? '',
       userName: data['userName'] as String? ?? '',
+      message: data['message'] as String? ?? '',
     );
   }
 }

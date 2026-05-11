@@ -50,6 +50,20 @@ class AuthService {
     await _google.signOut();
   }
 
+  /// Persists display name to Firestore and Firebase Auth so it survives sign-out/sign-in.
+  Future<void> updateDisplayName(String displayName) async {
+    final u = _auth.currentUser;
+    if (u == null) throw StateError('not_signed_in');
+    final name = displayName.trim();
+    if (name.isEmpty) throw StateError('empty_name');
+    await u.updateDisplayName(name);
+    await u.reload();
+    await _firestore.collection('users').doc(u.uid).set(
+      {'displayName': name},
+      SetOptions(merge: true),
+    );
+  }
+
   Future<void> _upsertUserProfile(User u) async {
     final ref = _firestore.collection('users').doc(u.uid);
     final snap = await ref.get();

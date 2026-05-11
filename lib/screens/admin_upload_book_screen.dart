@@ -3,9 +3,12 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 import '../models/book_model.dart';
+import '../providers/book_provider.dart';
 import '../services/admin_books_service.dart';
+import '../services/pdf_cover_extractor.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
 import '../theme/color_utils.dart';
@@ -87,6 +90,13 @@ class _AdminUploadBookScreenState extends State<AdminUploadBookScreen> {
 
     setState(() => _saving = true);
     try {
+      final analyzed = await extractPdfPageCountAndCover(pdf);
+      final extractedPages = analyzed.pageCount;
+      final thumbPng = analyzed.coverPng;
+      if (mounted && extractedPages > 0) {
+        _totalPages.text = '$extractedPages';
+      }
+
       final id = await _service.createNewBookId();
       setState(() {
         _progress = 0;
@@ -127,9 +137,26 @@ class _AdminUploadBookScreenState extends State<AdminUploadBookScreen> {
         final lower = cover.toLowerCase();
         final ext = lower.endsWith('.png') ? 'png' : 'jpg';
         coverUrl = await _service.bookCoverRef(id, extension: ext).getDownloadURL();
+      } else if (thumbPng != null && thumbPng.isNotEmpty) {
+        setState(() {
+          _progress = 0;
+          _progressLabel = 'Uploading cover from PDF…';
+        });
+        final coverTask = _service.uploadCoverPngDataTask(bookId: id, pngBytes: thumbPng);
+        coverTask.snapshotEvents.listen((snap) {
+          final total = snap.totalBytes;
+          final done = snap.bytesTransferred;
+          if (total > 0 && mounted) {
+            setState(() => _progress = done / total);
+          }
+        });
+        await coverTask;
+        coverUrl = await _service.bookCoverRef(id, extension: 'png').getDownloadURL();
       }
 
-      final totalPages = int.tryParse(_totalPages.text.trim()) ?? 0;
+      final manualPages = int.tryParse(_totalPages.text.trim()) ?? 0;
+      final totalPages =
+          extractedPages > 0 ? extractedPages : manualPages;
       final model = BookModel(
         id: id,
         title: title,
@@ -147,6 +174,7 @@ class _AdminUploadBookScreenState extends State<AdminUploadBookScreen> {
       await _service.saveBookMetadata(model);
 
       if (!mounted) return;
+      context.read<BookProvider>().loadBooks();
       _snack('Book uploaded to Firebase');
       context.pop();
     } catch (_) {

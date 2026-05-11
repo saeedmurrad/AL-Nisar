@@ -8,6 +8,7 @@ import '../auth/auth_provider.dart';
 import '../data/dummy_data.dart';
 import '../models/book_model.dart';
 import '../models/book_reader_args.dart';
+import '../models/sabaq_access_request_model.dart';
 import '../models/sabaq_pdf_model.dart';
 import '../services/sabaq_access_service.dart';
 import '../services/sabaq_service.dart';
@@ -27,6 +28,25 @@ class SabaqListScreen extends StatefulWidget {
 class _SabaqListScreenState extends State<SabaqListScreen> {
   final _sabaq = SabaqService();
   final _access = SabaqAccessService();
+
+  SabaqAccessRequestModel? _latestRequest(List<SabaqAccessRequestModel> all, String sabaqId) {
+    final m = all.where((r) => r.sabaqId == sabaqId).toList()
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    return m.isEmpty ? null : m.first;
+  }
+
+  String _statusLabel(String raw) {
+    switch (raw.toLowerCase()) {
+      case 'pending':
+        return 'Pending';
+      case 'approved':
+        return 'Approved';
+      case 'denied':
+        return 'Denied';
+      default:
+        return raw;
+    }
+  }
 
   List<SabaqPdfModel> _ordered(List<SabaqPdfModel> list) {
     final copy = [...list];
@@ -125,8 +145,51 @@ class _SabaqListScreenState extends State<SabaqListScreen> {
       );
       return;
     }
+    final msgCtrl = TextEditingController();
+    final send = await showDialog<bool>(
+      context: context,
+      builder: (ctx) {
+        final cc = ctx.c;
+        return AlertDialog(
+          backgroundColor: cc.backgroundSurface,
+          title: Text(
+            'Request Sabaq access',
+            style: AppTheme.cormorantGaramond(color: cc.textPrimary),
+          ),
+          content: TextField(
+            controller: msgCtrl,
+            maxLines: 4,
+            maxLength: 500,
+            style: AppTheme.lato(color: cc.textPrimary),
+            decoration: InputDecoration(
+              hintText: 'Optional message to admin…',
+              hintStyle: AppTheme.lato(color: cc.textFaint),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: Text('Cancel', style: AppTheme.lato(color: cc.textMuted)),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: Text('Send', style: AppTheme.lato(color: cc.accentGold)),
+            ),
+          ],
+        );
+      },
+    );
+    if (send != true) return;
+
+    final displayName = auth.profile?.displayName.trim().isNotEmpty == true
+        ? auth.profile!.displayName.trim()
+        : (auth.user?.displayName ?? '');
     try {
-      await _access.requestAccess(s);
+      await _access.requestAccess(
+        s,
+        message: msgCtrl.text,
+        displayName: displayName,
+      );
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -178,14 +241,18 @@ class _SabaqListScreenState extends State<SabaqListScreen> {
 
                 final ordered = _ordered(use);
                 final firstId = ordered.isNotEmpty ? ordered.first.id : null;
+                final uid = auth.user?.uid ?? '';
 
-                return ListView.separated(
+                return StreamBuilder<List<SabaqAccessRequestModel>>(
+                  stream: uid.isEmpty ? Stream.value(const []) : _access.streamRequestsForUser(uid),
+                  builder: (context, reqSnap) {
+                    final userRequests = reqSnap.data ?? [];
+                    return ListView.separated(
                   padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
                   itemCount: ordered.length,
                   separatorBuilder: (context, index) => const SizedBox(height: 12),
                   itemBuilder: (context, i) {
                     final s = ordered[i];
-                    final uid = auth.user?.uid ?? '';
 
                     final isFree = !auth.isAdminOrHigher &&
                         firstId != null &&
@@ -211,6 +278,7 @@ class _SabaqListScreenState extends State<SabaqListScreen> {
                       builder: (context, accSnap) {
                         final granted = accSnap.data == true;
                         final locked = !granted;
+                        final latest = _latestRequest(userRequests, s.id);
                         return GoldCard(
                           backgroundColor: c.backgroundSurface,
                           padding: const EdgeInsets.all(12),
@@ -225,7 +293,20 @@ class _SabaqListScreenState extends State<SabaqListScreen> {
                               ),
                               const SizedBox(width: 10),
                               Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
+                                  if (latest != null)
+                                    Padding(
+                                      padding: const EdgeInsets.only(bottom: 6),
+                                      child: Text(
+                                        _statusLabel(latest.status),
+                                        style: AppTheme.lato(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w700,
+                                          color: c.accentGold,
+                                        ),
+                                      ),
+                                    ),
                                   if (locked)
                                     TextButton(
                                       onPressed: s.storagePath.trim().isEmpty
@@ -258,6 +339,8 @@ class _SabaqListScreenState extends State<SabaqListScreen> {
                         );
                       },
                     );
+                  },
+                );
                   },
                 );
               },

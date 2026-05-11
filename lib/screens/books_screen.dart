@@ -10,6 +10,7 @@ import 'package:shimmer/shimmer.dart';
 
 import '../auth/auth_provider.dart';
 import '../models/book_model.dart';
+import '../models/book_reader_args.dart';
 import '../providers/book_provider.dart';
 import '../theme/app_theme.dart';
 import '../theme/color_utils.dart';
@@ -59,6 +60,19 @@ class _BooksScreenState extends State<BooksScreen> {
     _debounce = Timer(const Duration(milliseconds: 400), () {
       bp.setSearchQuery(value);
     });
+  }
+
+  void _openBook(BuildContext context, BookModel b) {
+    final remote = b.storagePath.trim().isNotEmpty;
+    final userLocal = b.id.startsWith('user_');
+    if (!remote && !userLocal) {
+      context.push('/books/detail', extra: b);
+      return;
+    }
+    context.push(
+      '/books/reader',
+      extra: BookReaderArgs(book: b, autoDownloadIfMissing: remote),
+    );
   }
 
   @override
@@ -275,6 +289,7 @@ class _BooksScreenState extends State<BooksScreen> {
                   errorKey: bp.error,
                   books: books,
                   onRetry: bp.loadBooks,
+                  onOpenBook: (b) => _openBook(context, b),
                 ),
               ),
             ],
@@ -291,12 +306,14 @@ class _BooksBody extends StatelessWidget {
     required this.errorKey,
     required this.books,
     required this.onRetry,
+    required this.onOpenBook,
   });
 
   final bool isLoading;
   final String? errorKey;
   final List<BookModel> books;
   final VoidCallback onRetry;
+  final void Function(BookModel book) onOpenBook;
 
   @override
   Widget build(BuildContext context) {
@@ -324,7 +341,7 @@ class _BooksBody extends StatelessWidget {
       itemBuilder: (context, i) {
         final b = books[i];
         return InkWell(
-          onTap: () => context.push('/books/detail', extra: b),
+          onTap: () => onOpenBook(b),
           borderRadius: BorderRadius.circular(12),
           child: Container(
             decoration: BoxDecoration(

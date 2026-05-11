@@ -16,6 +16,7 @@ import '../screens/irshadat_screen.dart';
 import '../screens/irshadat_bookmarks_screen.dart';
 import '../screens/news_detail_screen.dart';
 import '../screens/news_events_screen.dart';
+import '../screens/notifications_screen.dart';
 import '../screens/profile_screen.dart';
 import '../screens/sabaq_list_screen.dart';
 import '../models/shajra_entry_model.dart';
@@ -68,6 +69,10 @@ GoRouter createAppRouter(AuthProvider auth) {
       if (loc.startsWith('/super-admin') && !auth.isSuperAdmin) {
         return '/home';
       }
+      // Asbaq-e-Tareeqat: Admin / Super Admin only (same as home grid).
+      if (loc == '/asbaq' || loc.startsWith('/asbaq/')) {
+        if (!auth.isAdminOrHigher) return '/home';
+      }
       return null;
     },
     routes: [
@@ -82,6 +87,10 @@ GoRouter createAppRouter(AuthProvider auth) {
       GoRoute(
         path: '/home',
         builder: (context, state) => const HomeScreen(),
+      ),
+      GoRoute(
+        path: '/notifications',
+        builder: (context, state) => const NotificationsScreen(),
       ),
       GoRoute(
         path: '/sabaq',

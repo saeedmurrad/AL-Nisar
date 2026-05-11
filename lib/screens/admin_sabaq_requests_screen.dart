@@ -69,9 +69,16 @@ class AdminSabaqRequestsScreen extends StatelessWidget {
                           ],
                           const SizedBox(height: 8),
                           Text(
-                            'Member: ${r.userName.isNotEmpty ? r.userName : r.userEmail}',
+                            'Member: ${r.userName.isNotEmpty ? r.userName : '(name not provided)'}',
                             style: AppTheme.lato(fontSize: 12, color: c.textMuted),
                           ),
+                          if (r.message.trim().isNotEmpty) ...[
+                            const SizedBox(height: 8),
+                            Text(
+                              'Message: ${r.message.trim()}',
+                              style: AppTheme.lato(fontSize: 12, color: c.textSecondary, height: 1.35),
+                            ),
+                          ],
                           const SizedBox(height: 10),
                           Row(
                             children: [

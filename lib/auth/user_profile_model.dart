@@ -7,6 +7,7 @@ class UserProfileModel {
     required this.uid,
     required this.email,
     required this.displayName,
+    required this.address,
     required this.photoUrl,
     required this.role,
     required this.createdAt,
@@ -16,6 +17,8 @@ class UserProfileModel {
   final String uid;
   final String email;
   final String displayName;
+  /// Member mailing or location line from Firestore (`address`); optional.
+  final String address;
   final String photoUrl;
   final AppRole role;
   final DateTime createdAt;
@@ -34,6 +37,7 @@ class UserProfileModel {
       uid: doc.id,
       email: (data['email'] as String?) ?? '',
       displayName: (data['displayName'] as String?) ?? '',
+      address: (data['address'] as String?) ?? '',
       photoUrl: (data['photoUrl'] as String?) ?? '',
       role: AppRole.fromString(data['role'] as String?),
       createdAt: dt(data['createdAt']),

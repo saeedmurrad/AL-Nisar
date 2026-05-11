@@ -65,6 +65,13 @@ class AdminPanelScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 _Tile(
+                  icon: Icons.event_note_outlined,
+                  title: 'News & Events',
+                  subtitle: 'Create and manage news articles and events',
+                  onTap: () => context.push('/admin/add-data/news-events'),
+                ),
+                const SizedBox(height: 10),
+                _Tile(
                   icon: Icons.auto_stories_outlined,
                   title: 'Manage Irshadat',
                   subtitle: 'Create daily guidance cards',

@@ -13,8 +13,8 @@ import '../services/irshadat_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/color_utils.dart';
 import '../theme/app_theme_colors.dart';
-import '../widgets/app_drawer.dart';
 import '../widgets/gold_card.dart';
+import '../widgets/screen_navigation_header.dart';
 import '../widgets/ornament_divider.dart';
 import '../widgets/shimmer_placeholder.dart';
 
@@ -29,6 +29,7 @@ class _IrshadatScreenState extends State<IrshadatScreen> {
   IrshadatLanguage _language = IrshadatLanguage.urdu;
   final _service = IrshadatService();
   final _bookmarkService = IrshadatBookmarkService();
+  final _searchCtrl = TextEditingController();
   Set<String> _bookmarkedKeys = {};
 
   String _bookmarkKey(IrshadFirestoreModel ir) => '${_language.name}_${ir.id}';
@@ -48,6 +49,7 @@ class _IrshadatScreenState extends State<IrshadatScreen> {
 
   @override
   void dispose() {
+    _searchCtrl.dispose();
     super.dispose();
   }
 
@@ -138,37 +140,28 @@ class _IrshadatScreenState extends State<IrshadatScreen> {
     final c = context.c;
 
     return Scaffold(
-      drawer: const AppDrawer(),
       body: Column(
         children: [
-          Container(
-            color: c.backgroundSurface,
-            padding: const EdgeInsets.fromLTRB(16, 18, 16, 14),
-            child: SafeArea(
-              bottom: false,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      const DrawerMenuButton(),
-                      const SizedBox(width: 12),
-                      Text(
-                        'Irshadat',
-                        style: AppTheme.cinzelHeading(fontSize: 18),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  _SearchBar(),
-                  const SizedBox(height: 12),
-                  _LanguageToggle(
-                    urduSelected: _language == IrshadatLanguage.urdu,
-                    onSelectUrdu: () => setState(() => _language = IrshadatLanguage.urdu),
-                    onSelectEnglish: () => setState(() => _language = IrshadatLanguage.english),
-                  ),
-                ],
-              ),
+          const ScreenNavigationHeader(
+            title: 'Irshadat',
+            padding: EdgeInsets.fromLTRB(4, 18, 16, 12),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _SearchBar(
+                  controller: _searchCtrl,
+                  onChanged: (_) => setState(() {}),
+                ),
+                const SizedBox(height: 12),
+                _LanguageToggle(
+                  urduSelected: _language == IrshadatLanguage.urdu,
+                  onSelectUrdu: () => setState(() => _language = IrshadatLanguage.urdu),
+                  onSelectEnglish: () => setState(() => _language = IrshadatLanguage.english),
+                ),
+              ],
             ),
           ),
           Expanded(
@@ -195,13 +188,34 @@ class _IrshadatScreenState extends State<IrshadatScreen> {
                     .toList();
 
                 final use = items ?? fallback;
+                final q = _searchCtrl.text.trim().toLowerCase();
+                final filtered = q.isEmpty
+                    ? use
+                    : use.where((ir) {
+                        final text = ir.text.toLowerCase();
+                        final date = ir.dateLabel.toLowerCase();
+                        return text.contains(q) || date.contains(q);
+                      }).toList();
+
+                if (filtered.isEmpty) {
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Text(
+                        q.isEmpty ? 'No Irshadat yet' : 'No matches for your search',
+                        style: AppTheme.lato(color: c.textMuted, fontSize: 14),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  );
+                }
 
                 return ListView.separated(
                   padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
-                  itemCount: use.length,
+                  itemCount: filtered.length,
                   separatorBuilder: (context, index) => const SizedBox(height: 12),
                   itemBuilder: (context, i) {
-                    final ir = use[i];
+                    final ir = filtered[i];
                     final bookmarked = _bookmarkedKeys.contains(_bookmarkKey(ir));
                     final hasText = ir.text.trim().isNotEmpty;
                     return GoldCard(
@@ -275,7 +289,8 @@ class _IrshadatScreenState extends State<IrshadatScreen> {
                                   Expanded(
                                     child: _ActionPill(
                                       label: bookmarked ? 'Saved' : 'Bookmark',
-                                      iconSvg: _bookmarkSvg,
+                                      iconSvg:
+                                          bookmarked ? _bookmarkFilledSvg : _bookmarkSvg,
                                       active: bookmarked,
                                       onTap: () => _toggleBookmark(ir),
                                     ),
@@ -307,6 +322,14 @@ class _IrshadatScreenState extends State<IrshadatScreen> {
 }
 
 class _SearchBar extends StatelessWidget {
+  const _SearchBar({
+    required this.controller,
+    required this.onChanged,
+  });
+
+  final TextEditingController controller;
+  final ValueChanged<String> onChanged;
+
   @override
   Widget build(BuildContext context) {
     final c = context.c;
@@ -316,7 +339,7 @@ class _SearchBar extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: c.borderDefault, width: 0.5),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       child: Row(
         children: [
           SvgPicture.string(
@@ -330,12 +353,19 @@ class _SearchBar extends StatelessWidget {
           ),
           const SizedBox(width: 10),
           Expanded(
-            child: Text(
-              'Search Irshadat...',
-              style: TextStyle(
-                color: c.textFaint,
-                fontSize: 12,
-                letterSpacing: 0.6,
+            child: TextField(
+              controller: controller,
+              onChanged: onChanged,
+              style: TextStyle(color: c.textPrimary, fontSize: 13),
+              decoration: InputDecoration(
+                isDense: true,
+                border: InputBorder.none,
+                hintText: 'Search Irshadat…',
+                hintStyle: TextStyle(
+                  color: c.textFaint,
+                  fontSize: 12,
+                  letterSpacing: 0.6,
+                ),
               ),
             ),
           ),
@@ -478,6 +508,8 @@ const _searchSvg =
     '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M10.5 18.5a8 8 0 1 1 0-16 8 8 0 0 1 0 16z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M16.5 16.5L21 21" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
 const _bookmarkSvg =
     '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7 4h10v17l-5-3-5 3V4z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+const _bookmarkFilledSvg =
+    '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7 4h10v17l-5-3-5 3V4z" fill="currentColor" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>';
 const _shareSvg =
     '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M16 7l-8 4 8 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 9.2a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4zM6 13.2a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4zM18 19.2a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>';
 

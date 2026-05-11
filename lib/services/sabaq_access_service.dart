@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import '../models/sabaq_access_request_model.dart';
 import '../models/sabaq_pdf_model.dart';
+import 'admin_notifications_service.dart';
 
 class SabaqAccessService {
   SabaqAccessService({
@@ -36,21 +37,46 @@ class SabaqAccessService {
     return (data['granted'] as bool?) == true;
   }
 
-  Future<void> requestAccess(SabaqPdfModel sabaq) async {
+  Future<void> requestAccess(
+    SabaqPdfModel sabaq, {
+    String? message,
+    String? displayName,
+  }) async {
     final user = _auth.currentUser;
     if (user == null) throw StateError('not_signed_in');
 
     final id = requestDocId(user.uid, sabaq.id);
+    final name = (displayName ?? user.displayName ?? '').trim();
     await _requests.doc(id).set({
       'userId': user.uid,
       'sabaqId': sabaq.id,
       'titleEn': sabaq.titleEn,
       'titleUr': sabaq.titleUr,
       'userEmail': user.email ?? '',
-      'userName': user.displayName ?? '',
+      'userName': name,
+      'message': message?.trim() ?? '',
       'status': 'pending',
       'createdAt': FieldValue.serverTimestamp(),
     }, SetOptions(merge: true));
+
+    try {
+      await AdminNotificationsService().notifySabaqRequestSubmitted(
+        requestId: id,
+        memberName: name,
+        sabaqTitle: sabaq.titleEn,
+        message: message,
+      );
+    } catch (_) {
+      // Notification is best-effort (rules / offline).
+    }
+  }
+
+  Stream<List<SabaqAccessRequestModel>> streamRequestsForUser(String userId) {
+    return _requests.where('userId', isEqualTo: userId).snapshots().map((snap) {
+      final list = snap.docs.map(SabaqAccessRequestModel.fromFirestore).toList();
+      list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      return list;
+    });
   }
 
   Stream<List<SabaqAccessRequestModel>> streamPendingRequests() {

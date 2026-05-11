@@ -30,6 +30,8 @@ class AuthProvider extends ChangeNotifier {
 
   Future<void> signInWithGoogle() => _service.signInWithGoogle();
   Future<void> signOut() => _service.signOut();
+  Future<void> updateDisplayName(String displayName) =>
+      _service.updateDisplayName(displayName);
 
   void _onAuthChanged(User? u) {
     _user = u;

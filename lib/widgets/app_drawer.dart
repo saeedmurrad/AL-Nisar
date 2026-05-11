@@ -19,17 +19,18 @@ class _DrawerDestination {
   final IconData icon;
 }
 
-const _memberDestinations = <_DrawerDestination>[
-  _DrawerDestination(route: '/home', label: 'Home', icon: Icons.home_outlined),
-  _DrawerDestination(route: '/sabaq', label: 'Sabaq', icon: Icons.menu_book_outlined),
-  _DrawerDestination(route: '/asbaq', label: 'Asbaaq-e-Tareeqat', icon: Icons.auto_stories_outlined),
-  _DrawerDestination(route: '/books', label: 'Books', icon: Icons.library_books_outlined),
-  _DrawerDestination(route: '/irshadat', label: 'Irshadat', icon: Icons.favorite_outline),
-  _DrawerDestination(route: '/news-events', label: 'News & Events', icon: Icons.event_note_outlined),
-  _DrawerDestination(route: '/shijra', label: 'Shajra Pak', icon: Icons.account_tree_outlined),
-  _DrawerDestination(route: '/gallery', label: 'Gallery', icon: Icons.grid_view_outlined),
-  _DrawerDestination(route: '/bookmarks', label: 'Bookmarks', icon: Icons.bookmark_outline),
-  _DrawerDestination(route: '/profile', label: 'Profile', icon: Icons.person_outline),
+List<_DrawerDestination> _memberDestinationsFor(AuthProvider auth) => [
+  const _DrawerDestination(route: '/home', label: 'Home', icon: Icons.home_outlined),
+  const _DrawerDestination(route: '/sabaq', label: 'Sabaq', icon: Icons.menu_book_outlined),
+  if (auth.isAdminOrHigher)
+    const _DrawerDestination(route: '/asbaq', label: 'Asbaaq-e-Tareeqat', icon: Icons.auto_stories_outlined),
+  const _DrawerDestination(route: '/books', label: 'Books', icon: Icons.library_books_outlined),
+  const _DrawerDestination(route: '/irshadat', label: 'Irshadat', icon: Icons.favorite_outline),
+  const _DrawerDestination(route: '/news-events', label: 'News & Events', icon: Icons.event_note_outlined),
+  const _DrawerDestination(route: '/shijra', label: 'Shajra Pak', icon: Icons.account_tree_outlined),
+  const _DrawerDestination(route: '/gallery', label: 'Gallery', icon: Icons.grid_view_outlined),
+  const _DrawerDestination(route: '/bookmarks', label: 'Bookmarks', icon: Icons.bookmark_outline),
+  const _DrawerDestination(route: '/profile', label: 'Profile', icon: Icons.person_outline),
 ];
 
 const _adminPanelDestination = _DrawerDestination(
@@ -39,14 +40,15 @@ const _adminPanelDestination = _DrawerDestination(
 );
 
 List<_DrawerDestination> _destinationsFor(AuthProvider auth) {
+  final member = _memberDestinationsFor(auth);
   if (auth.isAdminOrHigher) {
     return [
-      _memberDestinations.first,
+      member.first,
       _adminPanelDestination,
-      ..._memberDestinations.skip(1),
+      ...member.skip(1),
     ];
   }
-  return [..._memberDestinations];
+  return [...member];
 }
 
 bool _isRouteSelected(String route, String location) {
