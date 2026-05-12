@@ -14,8 +14,8 @@ import '../services/sabaq_access_service.dart';
 import '../services/sabaq_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
-import '../widgets/app_drawer.dart';
 import '../widgets/gold_card.dart';
+import '../widgets/standard_shell_header.dart';
 import '../widgets/shimmer_placeholder.dart';
 
 class SabaqListScreen extends StatefulWidget {
@@ -214,10 +214,12 @@ class _SabaqListScreenState extends State<SabaqListScreen> {
     final auth = context.watch<AuthProvider>();
 
     return Scaffold(
-      drawer: const AppDrawer(),
       body: Column(
         children: [
-          const _TopBar(title: 'Sabaq'),
+          const StandardShellHeader(
+            title: 'Sabaq',
+            padding: EdgeInsets.fromLTRB(4, 18, 16, 14),
+          ),
           Expanded(
             child: StreamBuilder<List<SabaqPdfModel>>(
               stream: _sabaq.streamSabaqPdfs(),
@@ -436,34 +438,6 @@ class _SabaqPdfTile extends StatelessWidget {
             ),
           ),
       ],
-    );
-  }
-}
-
-class _TopBar extends StatelessWidget {
-  const _TopBar({required this.title});
-
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.c;
-    return Container(
-      color: c.backgroundSurface,
-      padding: const EdgeInsets.fromLTRB(10, 18, 16, 14),
-      child: SafeArea(
-        bottom: false,
-        child: Row(
-          children: [
-            const DrawerMenuButton(),
-            const SizedBox(width: 12),
-            Text(
-              title,
-              style: AppTheme.cinzelHeading(fontSize: 18, letterSpacing: 1.8),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

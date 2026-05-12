@@ -75,5 +75,39 @@ class AdminBooksService {
   Future<String> createNewBookId() async {
     return _firestore.collection('books').doc().id;
   }
+
+  Stream<List<BookModel>> streamAllBooks() {
+    return _firestore.collection('books').snapshots().map((snapshot) {
+      final list =
+          snapshot.docs.map((d) => BookModel.fromFirestore(d)).toList();
+      list.sort((a, b) => b.uploadedAt.compareTo(a.uploadedAt));
+      return list;
+    });
+  }
+
+  /// Removes the Firestore doc and best-effort deletes PDF and cover in Storage.
+  /// Tuple entries are `true` when that object was absent or deleted successfully.
+  Future<({bool pdfOk, bool coverOk})> deleteBook(BookModel book) async {
+    var pdfOk = true;
+    var coverOk = true;
+    final sp = book.storagePath.trim();
+    if (sp.isNotEmpty) {
+      try {
+        await _storage.ref(sp).delete();
+      } catch (_) {
+        pdfOk = false;
+      }
+    }
+    final cu = book.coverImageUrl.trim();
+    if (cu.isNotEmpty) {
+      try {
+        await _storage.refFromURL(cu).delete();
+      } catch (_) {
+        coverOk = false;
+      }
+    }
+    await _firestore.collection('books').doc(book.id).delete();
+    return (pdfOk: pdfOk, coverOk: coverOk);
+  }
 }
 

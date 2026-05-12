@@ -5,7 +5,7 @@ import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
 import '../theme/color_utils.dart';
 import '../widgets/gold_card.dart';
-import '../widgets/screen_navigation_header.dart';
+import '../widgets/standard_shell_header.dart';
 
 class AddDataScreen extends StatelessWidget {
   const AddDataScreen({super.key});
@@ -17,7 +17,7 @@ class AddDataScreen extends StatelessWidget {
     return Scaffold(
       body: Column(
         children: [
-          const ScreenNavigationHeader(
+          const StandardShellHeader(
             title: 'Add Data',
             padding: EdgeInsets.fromLTRB(4, 18, 16, 12),
           ),

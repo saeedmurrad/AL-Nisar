@@ -26,6 +26,64 @@ class AdminIrshadatScreen extends StatefulWidget {
 
 class _AdminIrshadatScreenState extends State<AdminIrshadatScreen> {
   late IrshadatLanguage _language = widget.initialLanguage;
+  final Set<String> _deletingIrshadIds = {};
+
+  void _snack(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(msg, style: AppTheme.lato(color: context.c.textPrimary)),
+        backgroundColor: context.c.backgroundElevated,
+      ),
+    );
+  }
+
+  Future<void> _confirmDeleteIrshad(
+    AdminIrshadatService service,
+    IrshadFirestoreModel ir,
+  ) async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) {
+        final cc = ctx.c;
+        return AlertDialog(
+          backgroundColor: cc.backgroundSurface,
+          title: Text(
+            'Delete Irshad?',
+            style: AppTheme.cormorantGaramond(color: cc.textPrimary),
+          ),
+          content: Text(
+            'This removes this entry and its image from Firebase when possible.',
+            style: AppTheme.lato(fontSize: 13, color: cc.textMuted),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: Text('Cancel', style: AppTheme.lato(color: cc.textMuted)),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: Text('Delete', style: AppTheme.lato(color: cc.accentGold)),
+            ),
+          ],
+        );
+      },
+    );
+    if (ok != true || !mounted) return;
+    setState(() => _deletingIrshadIds.add(ir.id));
+    try {
+      final storageOk = await service.deleteIrshad(_language, ir);
+      if (!mounted) return;
+      if (!storageOk) {
+        _snack('Irshad removed; image file may still exist in Storage.');
+      } else {
+        _snack('Irshad deleted');
+      }
+    } catch (_) {
+      if (mounted) _snack('Delete failed. Check connection/rules.');
+    } finally {
+      if (mounted) setState(() => _deletingIrshadIds.remove(ir.id));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -110,6 +168,7 @@ class _AdminIrshadatScreenState extends State<AdminIrshadatScreen> {
                       const SizedBox(height: 10),
                   itemBuilder: (context, i) {
                     final ir = list[i];
+                    final deleting = _deletingIrshadIds.contains(ir.id);
                     final hasImage = ir.imageUrl.trim().isNotEmpty;
                     return GoldCard(
                       backgroundColor: c.backgroundSurface,
@@ -159,7 +218,9 @@ class _AdminIrshadatScreenState extends State<AdminIrshadatScreen> {
                               Switch(
                                 value: ir.isActive,
                                 activeThumbColor: c.accentGold,
-                                onChanged: (v) => service.setActive(_language, ir.id, v),
+                                onChanged: deleting
+                                    ? null
+                                    : (v) => service.setActive(_language, ir.id, v),
                               ),
                             ],
                           ),
@@ -192,31 +253,54 @@ class _AdminIrshadatScreenState extends State<AdminIrshadatScreen> {
                           Row(
                             children: [
                               const Spacer(),
-                              TextButton(
-                                onPressed: () async {
-                                  final updated =
-                                      await showModalBottomSheet<IrshadFirestoreModel?>(
-                                    context: context,
-                                    isScrollControlled: true,
-                                    backgroundColor: c.backgroundSurface,
-                                    shape: const RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-                                    ),
-                                    builder: (ctx) =>
-                                        _IrshadEditor(initial: ir, language: _language),
-                                  );
-                                  if (updated == null) return;
-                                  await service.upsert(_language, updated);
-                                },
-                                child: Text(
-                                  'Edit',
-                                  style: AppTheme.lato(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w700,
+                              if (deleting)
+                                SizedBox(
+                                  width: 22,
+                                  height: 22,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
                                     color: c.accentGold,
                                   ),
+                                )
+                              else ...[
+                                TextButton(
+                                  onPressed: () => _confirmDeleteIrshad(service, ir),
+                                  child: Text(
+                                    'Delete',
+                                    style: AppTheme.lato(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w700,
+                                      color: c.textMuted,
+                                    ),
+                                  ),
                                 ),
-                              ),
+                                TextButton(
+                                  onPressed: () async {
+                                    final updated =
+                                        await showModalBottomSheet<IrshadFirestoreModel?>(
+                                      context: context,
+                                      isScrollControlled: true,
+                                      backgroundColor: c.backgroundSurface,
+                                      shape: const RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.vertical(top: Radius.circular(16)),
+                                      ),
+                                      builder: (ctx) =>
+                                          _IrshadEditor(initial: ir, language: _language),
+                                    );
+                                    if (updated == null) return;
+                                    await service.upsert(_language, updated);
+                                  },
+                                  child: Text(
+                                    'Edit',
+                                    style: AppTheme.lato(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w700,
+                                      color: c.accentGold,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ],
                           ),
                         ],

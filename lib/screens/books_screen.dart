@@ -17,8 +17,8 @@ import '../theme/color_utils.dart';
 import '../theme/app_theme_colors.dart';
 import '../utils/connectivity_helper.dart';
 import '../widgets/book_feature_icons.dart';
-import '../widgets/app_drawer.dart';
 import '../widgets/shimmer_placeholder.dart';
+import '../widgets/standard_shell_header.dart';
 
 class BooksScreen extends StatefulWidget {
   const BooksScreen({super.key});
@@ -87,7 +87,6 @@ class _BooksScreenState extends State<BooksScreen> {
         final canAdd = context.watch<AuthProvider>().isAdminOrHigher;
 
         return Scaffold(
-          drawer: const AppDrawer(),
           body: Column(
             children: [
               if (_offline)
@@ -118,120 +117,108 @@ class _BooksScreenState extends State<BooksScreen> {
                     ),
                   ),
                 ),
-              Container(
-                color: c.backgroundSurface,
-                padding: const EdgeInsets.fromLTRB(10, 18, 16, 12),
-                child: SafeArea(
-                  bottom: false,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          const DrawerMenuButton(),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Books',
-                                  style: AppTheme.cormorantGaramond(
-                                    fontSize: 20,
-                                    letterSpacing: 0.6,
-                                    color: c.textPrimary,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Directionality(
-                                  textDirection: TextDirection.rtl,
-                                  child: Text(
-                                    'کتابیں',
-                                    style: AppTheme.amiriUrdu(
-                                      fontSize: 15,
-                                      height: 1.35,
-                                      color: c.textSecondary,
-                                    ),
-                                  ),
-                                ),
-                              ],
+              StandardShellHeader(
+                padding: const EdgeInsets.fromLTRB(4, 18, 16, 12),
+                titleWidget: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Books',
+                      style: AppTheme.cormorantGaramond(
+                        fontSize: 20,
+                        letterSpacing: 0.6,
+                        color: c.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Directionality(
+                      textDirection: TextDirection.rtl,
+                      child: Text(
+                        'کتابیں',
+                        style: AppTheme.amiriUrdu(
+                          fontSize: 15,
+                          height: 1.35,
+                          color: c.textSecondary,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                trailing: canAdd
+                    ? InkWell(
+                        onTap: () => context.push('/profile/add-data/books'),
+                        borderRadius: BorderRadius.circular(14),
+                        child: Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: c.backgroundElevated,
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(
+                              color: c.borderDefault,
+                              width: 0.5,
                             ),
                           ),
-                          if (canAdd)
-                            InkWell(
-                              onTap: () =>
-                                  context.push('/profile/add-data/books'),
-                              borderRadius: BorderRadius.circular(14),
-                              child: Container(
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: c.backgroundElevated,
-                                  borderRadius: BorderRadius.circular(14),
-                                  border: Border.all(
-                                    color: c.borderDefault,
-                                    width: 0.5,
-                                  ),
-                                ),
-                                child: Icon(
-                                  Icons.add,
-                                  size: 20,
-                                  color: c.accentGold,
+                          child: Icon(
+                            Icons.add,
+                            size: 20,
+                            color: c.accentGold,
+                          ),
+                        ),
+                      )
+                    : null,
+                bottom: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const SizedBox(height: 12),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: c.backgroundInput,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: c.borderDefault,
+                          width: 0.5,
+                        ),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      child: Row(
+                        children: [
+                          SvgPicture.string(
+                            _searchSvg,
+                            width: 18,
+                            height: 18,
+                            colorFilter: ColorFilter.mode(
+                              c.accentGold,
+                              BlendMode.srcIn,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: TextField(
+                              controller: _searchController,
+                              onChanged: (v) => _onSearchChanged(v, bp),
+                              style: AppTheme.lato(
+                                fontSize: 13,
+                                color: c.textPrimary,
+                              ),
+                              decoration: InputDecoration(
+                                isDense: true,
+                                border: InputBorder.none,
+                                hintText: 'Search books...',
+                                hintStyle: AppTheme.lato(
+                                  fontSize: 13,
+                                  color: c.textFaint,
+                                  letterSpacing: 0.3,
                                 ),
                               ),
                             ),
+                          ),
                         ],
                       ),
-                      const SizedBox(height: 12),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: c.backgroundInput,
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(
-                            color: c.borderDefault,
-                            width: 0.5,
-                          ),
-                        ),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        child: Row(
-                          children: [
-                            SvgPicture.string(
-                              _searchSvg,
-                              width: 18,
-                              height: 18,
-                              colorFilter: ColorFilter.mode(
-                                c.accentGold,
-                                BlendMode.srcIn,
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: TextField(
-                                controller: _searchController,
-                                onChanged: (v) => _onSearchChanged(v, bp),
-                                style: AppTheme.lato(
-                                  fontSize: 13,
-                                  color: c.textPrimary,
-                                ),
-                                decoration: InputDecoration(
-                                  isDense: true,
-                                  border: InputBorder.none,
-                                  hintText: 'Search books...',
-                                  hintStyle: AppTheme.lato(
-                                    fontSize: 13,
-                                    color: c.textFaint,
-                                    letterSpacing: 0.3,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
               SizedBox(

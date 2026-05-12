@@ -11,7 +11,7 @@ import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
 import '../theme/color_utils.dart';
 import '../widgets/book_feature_icons.dart';
-import '../widgets/screen_navigation_header.dart';
+import '../widgets/standard_shell_header.dart';
 
 class BookmarksScreen extends StatefulWidget {
   const BookmarksScreen({super.key});
@@ -134,8 +134,7 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          ScreenNavigationHeader(
-            title: 'My Bookmarks',
+          StandardShellHeader(
             padding: const EdgeInsets.fromLTRB(4, 12, 16, 14),
             titleWidget: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

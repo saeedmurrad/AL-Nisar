@@ -1,10 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:go_router/go_router.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import '../data/dummy_data.dart';
+import '../navigation/go_router_helpers.dart';
 import '../models/lesson_model.dart';
 import '../theme/color_utils.dart';
 import '../theme/app_theme_colors.dart';
@@ -44,7 +44,7 @@ class _SabaqReaderScreenState extends State<SabaqReaderScreen> {
         children: [
           _TopBar(
             title: 'Sabaq Reader',
-            onBack: () => context.go('/sabaq'),
+            onBack: () => popOrGoHome(context),
           ),
           Expanded(
             child: ListView(

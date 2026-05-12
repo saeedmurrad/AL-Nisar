@@ -12,7 +12,7 @@ import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
 import '../theme/color_utils.dart';
 import '../widgets/gold_card.dart';
-import '../widgets/screen_navigation_header.dart';
+import '../widgets/standard_shell_header.dart';
 import '../widgets/shimmer_placeholder.dart';
 
 class IrshadatBookmarksScreen extends StatefulWidget {
@@ -283,8 +283,7 @@ class _IrshadatBookmarksScreenState extends State<IrshadatBookmarksScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          ScreenNavigationHeader(
-            title: 'Saved Irshadat',
+          StandardShellHeader(
             padding: const EdgeInsets.fromLTRB(4, 12, 16, 14),
             titleWidget: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

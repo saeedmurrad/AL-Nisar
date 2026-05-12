@@ -41,5 +41,30 @@ class AdminGalleryService {
   Future<void> upsert(GalleryImageModel model) async {
     await _col.doc(model.id).set(model.toMap(), SetOptions(merge: true));
   }
+
+  Stream<List<GalleryImageModel>> streamAll() {
+    return _col.snapshots().map((snap) {
+      final list =
+          snap.docs.map((d) => GalleryImageModel.fromFirestore(d)).toList();
+      list.sort((a, b) => b.uploadedAt.compareTo(a.uploadedAt));
+      return list;
+    });
+  }
+
+  /// Deletes Firestore metadata. Deletes Storage when [item.storagePath] is set.
+  /// Returns `false` if Storage deletion failed (file missing or rules); Firestore is still removed.
+  Future<bool> deleteGalleryImage(GalleryImageModel item) async {
+    var storageOk = true;
+    final path = item.storagePath.trim();
+    if (path.isNotEmpty) {
+      try {
+        await _storage.ref(path).delete();
+      } catch (_) {
+        storageOk = false;
+      }
+    }
+    await _col.doc(item.id).delete();
+    return storageOk;
+  }
 }
 

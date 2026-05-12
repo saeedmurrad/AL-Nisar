@@ -8,7 +8,7 @@ import '../services/irshadat_bookmark_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/color_utils.dart';
 import '../theme/app_theme_colors.dart';
-import '../widgets/app_drawer.dart';
+import '../widgets/standard_shell_header.dart';
 import '../widgets/gold_card.dart';
 import '../widgets/theme_toggle_button.dart';
 
@@ -96,22 +96,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         : (auth.isAdminOrHigher ? 'Admin' : 'User');
 
     return Scaffold(
-      drawer: const AppDrawer(),
       body: Column(
         children: [
-          Container(
-            color: c.backgroundSurface,
-            padding: const EdgeInsets.fromLTRB(16, 18, 16, 14),
-            child: SafeArea(
-              bottom: false,
-              child: Row(
-                children: [
-                  const DrawerMenuButton(),
-                  const SizedBox(width: 12),
-                  Text('Profile', style: AppTheme.cinzelHeading(fontSize: 18)),
-                ],
-              ),
-            ),
+          const StandardShellHeader(
+            title: 'Profile',
+            padding: EdgeInsets.fromLTRB(4, 18, 16, 14),
           ),
           Expanded(
             child: ListView(

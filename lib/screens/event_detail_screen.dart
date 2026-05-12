@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:go_router/go_router.dart';
-
 import '../data/dummy_data.dart';
 import '../services/news_events_service.dart';
 import '../theme/app_theme.dart';
+import '../navigation/go_router_helpers.dart';
 import '../theme/app_theme_colors.dart';
 
 class EventDetailScreen extends StatelessWidget {
@@ -53,7 +52,7 @@ class EventDetailScreen extends StatelessWidget {
                   child: Row(
                     children: [
                       InkWell(
-                        onTap: () => context.pop(),
+                        onTap: () => popOrGoHome(context),
                         child: Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(

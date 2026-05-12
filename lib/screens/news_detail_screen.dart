@@ -1,13 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:go_router/go_router.dart';
-
 import '../data/dummy_data.dart';
 import '../services/news_events_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/color_utils.dart';
 import '../theme/app_theme_colors.dart';
+import '../navigation/go_router_helpers.dart';
 import '../widgets/shimmer_placeholder.dart';
 
 class NewsDetailScreen extends StatelessWidget {
@@ -76,7 +75,7 @@ class NewsDetailScreen extends StatelessWidget {
                         child: Padding(
                           padding: const EdgeInsets.fromLTRB(10, 8, 16, 0),
                           child: InkWell(
-                            onTap: () => context.pop(),
+                            onTap: () => popOrGoHome(context),
                             child: Container(
                               padding: const EdgeInsets.all(10),
                               decoration: BoxDecoration(

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -13,6 +14,7 @@ import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
 import '../theme/color_utils.dart';
 import '../widgets/screen_navigation_header.dart';
+import '../widgets/shimmer_placeholder.dart';
 
 class AdminUploadBookScreen extends StatefulWidget {
   const AdminUploadBookScreen({super.key});
@@ -36,6 +38,7 @@ class _AdminUploadBookScreenState extends State<AdminUploadBookScreen> {
   String? _progressLabel;
 
   final _service = AdminBooksService();
+  final Set<String> _deletingBookIds = {};
 
   @override
   void dispose() {
@@ -200,6 +203,52 @@ class _AdminUploadBookScreenState extends State<AdminUploadBookScreen> {
     );
   }
 
+  Future<void> _confirmDeleteBook(BookModel book) async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) {
+        final cc = ctx.c;
+        return AlertDialog(
+          backgroundColor: cc.backgroundSurface,
+          title: Text(
+            'Delete book?',
+            style: AppTheme.cormorantGaramond(color: cc.textPrimary),
+          ),
+          content: Text(
+            '"${book.title.isEmpty ? book.id : book.title}" will be removed from the app, including the PDF and cover in Storage when possible.',
+            style: AppTheme.lato(fontSize: 13, color: cc.textMuted),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: Text('Cancel', style: AppTheme.lato(color: cc.textMuted)),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: Text('Delete', style: AppTheme.lato(color: cc.accentGold)),
+            ),
+          ],
+        );
+      },
+    );
+    if (ok != true || !mounted) return;
+    setState(() => _deletingBookIds.add(book.id));
+    try {
+      final outcome = await _service.deleteBook(book);
+      if (!mounted) return;
+      context.read<BookProvider>().loadBooks();
+      if (!outcome.pdfOk || !outcome.coverOk) {
+        _snack('Book removed; some Storage files may still exist.');
+      } else {
+        _snack('Book deleted');
+      }
+    } catch (_) {
+      if (mounted) _snack('Delete failed. Check connection/rules.');
+    } finally {
+      if (mounted) setState(() => _deletingBookIds.remove(book.id));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final c = context.c;
@@ -222,6 +271,155 @@ class _AdminUploadBookScreenState extends State<AdminUploadBookScreen> {
             child: ListView(
               padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
               children: [
+                Text(
+                  'Published books',
+                  style: AppTheme.lato(
+                    fontSize: 12,
+                    color: c.textMuted.o(0.95),
+                    letterSpacing: 1.2,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                StreamBuilder<List<BookModel>>(
+                  stream: _service.streamAllBooks(),
+                  builder: (context, snap) {
+                    if (snap.connectionState == ConnectionState.waiting &&
+                        (snap.data == null || snap.data!.isEmpty)) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 24),
+                        child: Center(
+                          child: CircularProgressIndicator(color: c.accentGold),
+                        ),
+                      );
+                    }
+                    final list = snap.data ?? const <BookModel>[];
+                    if (list.isEmpty) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Text(
+                          'No books in Firebase yet',
+                          style: AppTheme.lato(fontSize: 13, color: c.textMuted),
+                        ),
+                      );
+                    }
+                    return Column(
+                      children: list.map((b) {
+                        final busy = _deletingBookIds.contains(b.id);
+                        final cover = b.coverImageUrl.trim();
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              color: c.backgroundInput,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: c.borderDefault, width: 0.5),
+                            ),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: cover.isEmpty
+                                      ? Container(
+                                          width: 40,
+                                          height: 56,
+                                          color: c.backgroundElevated,
+                                          child: Icon(
+                                            Icons.menu_book_outlined,
+                                            color: c.textMuted,
+                                            size: 22,
+                                          ),
+                                        )
+                                      : CachedNetworkImage(
+                                          imageUrl: cover,
+                                          width: 40,
+                                          height: 56,
+                                          fit: BoxFit.cover,
+                                          placeholder: (context, url) =>
+                                              const ShimmerPlaceholder(),
+                                          errorWidget: (context, url, error) =>
+                                              Container(
+                                            width: 40,
+                                            height: 56,
+                                            color: c.backgroundElevated,
+                                            child: Icon(
+                                              Icons.broken_image_outlined,
+                                              color: c.textMuted,
+                                              size: 20,
+                                            ),
+                                          ),
+                                        ),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        b.title.isEmpty ? b.id : b.title,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: AppTheme.lato(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w600,
+                                          color: c.textPrimary,
+                                        ),
+                                      ),
+                                      if (!b.isActive)
+                                        Padding(
+                                          padding: const EdgeInsets.only(top: 4),
+                                          child: Text(
+                                            'Hidden',
+                                            style: AppTheme.lato(
+                                              fontSize: 11,
+                                              color: c.textMuted,
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                                if (busy)
+                                  SizedBox(
+                                    width: 22,
+                                    height: 22,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: c.accentGold,
+                                    ),
+                                  )
+                                else
+                                  IconButton(
+                                    onPressed: _saving
+                                        ? null
+                                        : () => _confirmDeleteBook(b),
+                                    icon: Icon(
+                                      Icons.delete_outline,
+                                      color: c.textMuted,
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    );
+                  },
+                ),
+                const SizedBox(height: 18),
+                Text(
+                  'Upload new',
+                  style: AppTheme.lato(
+                    fontSize: 12,
+                    color: c.textMuted.o(0.95),
+                    letterSpacing: 1.2,
+                  ),
+                ),
+                const SizedBox(height: 8),
                 if (_saving && _progress != null) ...[
                   Text(
                     _progressLabel ?? 'Uploading...',

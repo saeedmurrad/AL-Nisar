@@ -9,8 +9,8 @@ import '../services/news_events_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/color_utils.dart';
 import '../theme/app_theme_colors.dart';
-import '../widgets/app_drawer.dart';
 import '../widgets/shimmer_placeholder.dart';
+import '../widgets/standard_shell_header.dart';
 
 class NewsEventsScreen extends StatefulWidget {
   const NewsEventsScreen({super.key});
@@ -51,57 +51,44 @@ class _NewsEventsScreenState extends State<NewsEventsScreen>
     final onGold = _onGold(context, c);
 
     return Scaffold(
-      drawer: const AppDrawer(),
       body: Column(
         children: [
-          Container(
-            color: c.backgroundSurface,
-            padding: const EdgeInsets.fromLTRB(10, 18, 16, 10),
-            child: SafeArea(
-              bottom: false,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      const DrawerMenuButton(),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          'News & Events',
-                          style: AppTheme.cormorantGaramond(
-                            fontSize: 20,
-                            letterSpacing: 0.5,
-                            color: c.textPrimary,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _PillTabButton(
-                          label: 'News',
-                          urdu: 'خبریں',
-                          selected: _tabController.index == 0,
-                          onTap: () => _tabController.animateTo(0),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: _PillTabButton(
-                          label: 'Events',
-                          urdu: 'تقریبات',
-                          selected: _tabController.index == 1,
-                          onTap: () => _tabController.animateTo(1),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+          StandardShellHeader(
+            padding: const EdgeInsets.fromLTRB(4, 18, 16, 10),
+            titleWidget: Text(
+              'News & Events',
+              style: AppTheme.cormorantGaramond(
+                fontSize: 20,
+                letterSpacing: 0.5,
+                color: c.textPrimary,
               ),
+            ),
+            bottom: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _PillTabButton(
+                        label: 'News',
+                        urdu: 'خبریں',
+                        selected: _tabController.index == 0,
+                        onTap: () => _tabController.animateTo(0),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: _PillTabButton(
+                        label: 'Events',
+                        urdu: 'تقریبات',
+                        selected: _tabController.index == 1,
+                        onTap: () => _tabController.animateTo(1),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
           Expanded(

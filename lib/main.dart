@@ -44,8 +44,11 @@ class AlNisarApp extends StatelessWidget {
       darkTheme: AppTheme.darkTheme,
       themeMode: themeProvider.themeMode,
       routerConfig: router,
-      builder: (context, child) =>
-          RouterPopScope(router: router, child: child),
+      builder: (context, child) => RouterPopScope(
+        router: router,
+        isAuthenticated: context.watch<AuthProvider>().isAuthenticated,
+        child: child,
+      ),
     );
   }
 }

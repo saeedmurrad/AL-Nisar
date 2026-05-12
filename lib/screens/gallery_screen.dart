@@ -13,8 +13,8 @@ import '../services/gallery_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/color_utils.dart';
 import '../theme/app_theme_colors.dart';
-import '../widgets/app_drawer.dart';
 import '../widgets/shimmer_placeholder.dart';
+import '../widgets/standard_shell_header.dart';
 
 class GalleryScreen extends StatelessWidget {
   const GalleryScreen({super.key});
@@ -25,25 +25,11 @@ class GalleryScreen extends StatelessWidget {
     final service = GalleryService();
 
     return Scaffold(
-      drawer: const AppDrawer(),
       body: Column(
         children: [
-          Container(
-            color: c.backgroundSurface,
-            padding: const EdgeInsets.fromLTRB(16, 18, 16, 14),
-            child: SafeArea(
-              bottom: false,
-              child: Row(
-                children: [
-                  const DrawerMenuButton(),
-                  const SizedBox(width: 12),
-                  Text(
-                    'Gallery',
-                    style: AppTheme.cinzelHeading(fontSize: 18),
-                  ),
-                ],
-              ),
-            ),
+          const StandardShellHeader(
+            title: 'Gallery',
+            padding: EdgeInsets.fromLTRB(4, 18, 16, 14),
           ),
           Expanded(
             child: StreamBuilder<List<GalleryImageModel>>(

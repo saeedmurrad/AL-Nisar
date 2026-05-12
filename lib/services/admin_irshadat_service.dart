@@ -51,5 +51,21 @@ class AdminIrshadatService {
     await ref.putFile(File(imagePath));
     return ref.getDownloadURL();
   }
+
+  /// Deletes the Firestore doc and best-effort deletes the image in Storage.
+  /// Returns `false` if Storage deletion failed; metadata is still removed.
+  Future<bool> deleteIrshad(IrshadatLanguage language, IrshadFirestoreModel model) async {
+    var storageOk = true;
+    final url = model.imageUrl.trim();
+    if (url.isNotEmpty) {
+      try {
+        await _storage.refFromURL(url).delete();
+      } catch (_) {
+        storageOk = false;
+      }
+    }
+    await _firestore.collection(language.firestoreCollection).doc(model.id).delete();
+    return storageOk;
+  }
 }
 

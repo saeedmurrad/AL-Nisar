@@ -7,7 +7,7 @@ import '../services/admin_notifications_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
 import '../widgets/gold_card.dart';
-import '../widgets/screen_navigation_header.dart';
+import '../widgets/standard_shell_header.dart';
 
 class NotificationsScreen extends StatelessWidget {
   const NotificationsScreen({super.key});
@@ -21,9 +21,9 @@ class NotificationsScreen extends StatelessWidget {
     return Scaffold(
       body: Column(
         children: [
-          ScreenNavigationHeader(
+          const StandardShellHeader(
             title: 'Notifications',
-            padding: const EdgeInsets.fromLTRB(4, 18, 16, 12),
+            padding: EdgeInsets.fromLTRB(4, 18, 16, 12),
           ),
           Expanded(
             child: auth.isSuperAdmin

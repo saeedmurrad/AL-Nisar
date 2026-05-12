@@ -9,8 +9,8 @@ import '../services/shajra_urdu_details_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
 import '../theme/color_utils.dart';
-import '../widgets/app_drawer.dart';
 import '../widgets/shimmer_placeholder.dart';
+import '../widgets/standard_shell_header.dart';
 
 class ShijraScreen extends StatefulWidget {
   const ShijraScreen({super.key});
@@ -121,12 +121,38 @@ class _ShijraScreenState extends State<ShijraScreen> {
 
     return Scaffold(
       backgroundColor: c.backgroundPrimary,
-      drawer: const AppDrawer(),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _ScreenHeader(c: c),
+            StandardShellHeader(
+              padding: const EdgeInsets.fromLTRB(4, 4, 16, 8),
+              titleWidget: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Shajra Pak',
+                    style: AppTheme.cormorantGaramond(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w600,
+                      color: c.textPrimary,
+                      letterSpacing: 0.8,
+                    ),
+                  ),
+                  Directionality(
+                    textDirection: TextDirection.rtl,
+                    child: Text(
+                      'شجرہ پاک',
+                      style: AppTheme.amiriUrdu(
+                        fontSize: 16,
+                        height: 1.5,
+                        color: c.textSecondary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
@@ -210,52 +236,6 @@ class _ShijraScreenState extends State<ShijraScreen> {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _ScreenHeader extends StatelessWidget {
-  const _ScreenHeader({required this.c});
-
-  final AppThemeColors c;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(8, 4, 16, 8),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          const DrawerMenuButton(),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Shajra Pak',
-                  style: AppTheme.cormorantGaramond(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w600,
-                    color: c.textPrimary,
-                    letterSpacing: 0.8,
-                  ),
-                ),
-                Directionality(
-                  textDirection: TextDirection.rtl,
-                  child: Text(
-                    'شجرہ پاک',
-                    style: AppTheme.amiriUrdu(
-                      fontSize: 16,
-                      height: 1.5,
-                      color: c.textSecondary,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }

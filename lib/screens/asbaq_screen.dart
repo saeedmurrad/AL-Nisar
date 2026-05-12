@@ -10,8 +10,8 @@ import '../models/book_reader_args.dart';
 import '../services/asbaq_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
-import '../widgets/app_drawer.dart';
 import '../widgets/gold_card.dart';
+import '../widgets/standard_shell_header.dart';
 import '../widgets/shimmer_placeholder.dart';
 
 class AsbaqScreen extends StatelessWidget {
@@ -23,61 +23,42 @@ class AsbaqScreen extends StatelessWidget {
     final service = AsbaqService();
 
     return Scaffold(
-      drawer: const AppDrawer(),
       body: Column(
         children: [
-          Container(
-            color: c.backgroundSurface,
-            padding: const EdgeInsets.fromLTRB(10, 18, 16, 14),
-            child: SafeArea(
-              bottom: false,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const DrawerMenuButton(),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Asbaq-e-Tareeqat',
-                              style: AppTheme.cormorantGaramond(
-                                fontSize: 20,
-                                letterSpacing: 0.8,
-                                color: c.textPrimary,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Directionality(
-                              textDirection: TextDirection.rtl,
-                              child: Text(
-                                'اسباقِ طریقت',
-                                style: AppTheme.amiriUrdu(
-                                  fontSize: 15,
-                                  height: 1.4,
-                                  color: c.textSecondary,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              'Select an Asbaq PDF to begin',
-                              style: TextStyle(
-                                color: c.textMuted,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+          StandardShellHeader(
+            padding: const EdgeInsets.fromLTRB(4, 18, 16, 14),
+            titleWidget: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Asbaq-e-Tareeqat',
+                  style: AppTheme.cormorantGaramond(
+                    fontSize: 20,
+                    letterSpacing: 0.8,
+                    color: c.textPrimary,
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(height: 4),
+                Directionality(
+                  textDirection: TextDirection.rtl,
+                  child: Text(
+                    'اسباقِ طریقت',
+                    style: AppTheme.amiriUrdu(
+                      fontSize: 15,
+                      height: 1.4,
+                      color: c.textSecondary,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'Select an Asbaq PDF to begin',
+                  style: TextStyle(
+                    color: c.textMuted,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
             ),
           ),
           Expanded(

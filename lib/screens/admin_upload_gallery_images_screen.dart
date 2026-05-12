@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -10,6 +11,7 @@ import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
 import '../theme/color_utils.dart';
 import '../widgets/screen_navigation_header.dart';
+import '../widgets/shimmer_placeholder.dart';
 
 class AdminUploadGalleryImagesScreen extends StatefulWidget {
   const AdminUploadGalleryImagesScreen({super.key});
@@ -27,6 +29,7 @@ class _AdminUploadGalleryImagesScreenState
   String? _label;
 
   List<String> _paths = const [];
+  final Set<String> _deletingIds = {};
 
   Future<void> _pickImages() async {
     final res = await FilePicker.platform.pickFiles(
@@ -48,6 +51,53 @@ class _AdminUploadGalleryImagesScreenState
         backgroundColor: context.c.backgroundElevated,
       ),
     );
+  }
+
+  Future<void> _confirmDeleteGalleryImage(GalleryImageModel item) async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) {
+        final cc = ctx.c;
+        return AlertDialog(
+          backgroundColor: cc.backgroundSurface,
+          title: Text(
+            'Delete gallery image?',
+            style: AppTheme.cormorantGaramond(color: cc.textPrimary),
+          ),
+          content: Text(
+            'This removes the image from the app and Firebase.',
+            style: AppTheme.lato(fontSize: 13, color: cc.textMuted),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: Text('Cancel', style: AppTheme.lato(color: cc.textMuted)),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, true),
+              child: Text('Delete', style: AppTheme.lato(color: cc.accentGold)),
+            ),
+          ],
+        );
+      },
+    );
+    if (ok != true || !mounted) return;
+    setState(() => _deletingIds.add(item.id));
+    try {
+      final storageOk = await _service.deleteGalleryImage(item);
+      if (!mounted) return;
+      if (!storageOk) {
+        _snack('Removed from gallery; storage file may still exist.');
+      } else {
+        _snack('Image deleted');
+      }
+    } catch (_) {
+      if (mounted) _snack('Delete failed. Check connection/rules.');
+    } finally {
+      if (mounted) {
+        setState(() => _deletingIds.remove(item.id));
+      }
+    }
   }
 
   String _extFromPath(String path) {
@@ -159,6 +209,140 @@ class _AdminUploadGalleryImagesScreenState
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
                 children: [
+                  Text(
+                    'Current images',
+                    style: AppTheme.lato(
+                      fontSize: 12,
+                      color: c.textMuted.o(0.95),
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  StreamBuilder<List<GalleryImageModel>>(
+                    stream: _service.streamAll(),
+                    builder: (context, snap) {
+                      if (snap.connectionState == ConnectionState.waiting &&
+                          (snap.data == null || snap.data!.isEmpty)) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 24),
+                          child: Center(
+                            child: CircularProgressIndicator(color: c.accentGold),
+                          ),
+                        );
+                      }
+                      final list = snap.data ?? const <GalleryImageModel>[];
+                      if (list.isEmpty) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: Text(
+                            'No images in Firebase yet',
+                            style: AppTheme.lato(fontSize: 13, color: c.textMuted),
+                          ),
+                        );
+                      }
+                      return Column(
+                        children: list.map((img) {
+                          final busy = _deletingIds.contains(img.id);
+                          final idShort = img.id.length > 10
+                              ? '${img.id.substring(0, 10)}…'
+                              : img.id;
+                          final label = idShort;
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                color: c.backgroundInput,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(color: c.borderDefault, width: 0.5),
+                              ),
+                              child: Row(
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: img.downloadUrl.isEmpty
+                                        ? Container(
+                                            width: 48,
+                                            height: 48,
+                                            color: c.backgroundElevated,
+                                            child: Icon(
+                                              Icons.image_not_supported_outlined,
+                                              color: c.textMuted,
+                                              size: 22,
+                                            ),
+                                          )
+                                        : CachedNetworkImage(
+                                            imageUrl: img.downloadUrl,
+                                            width: 48,
+                                            height: 48,
+                                            fit: BoxFit.cover,
+                                            placeholder: (context, url) =>
+                                                const ShimmerPlaceholder(),
+                                            errorWidget: (context, url, error) =>
+                                                Container(
+                                              width: 48,
+                                              height: 48,
+                                              color: c.backgroundElevated,
+                                              child: Icon(
+                                                Icons.broken_image_outlined,
+                                                color: c.textMuted,
+                                                size: 22,
+                                              ),
+                                            ),
+                                          ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Text(
+                                      label,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: AppTheme.lato(
+                                        fontSize: 13,
+                                        color: c.textPrimary,
+                                      ),
+                                    ),
+                                  ),
+                                  if (busy)
+                                    SizedBox(
+                                      width: 22,
+                                      height: 22,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: c.accentGold,
+                                      ),
+                                    )
+                                  else
+                                    IconButton(
+                                      onPressed: _saving
+                                          ? null
+                                          : () => _confirmDeleteGalleryImage(img),
+                                      icon: Icon(
+                                        Icons.delete_outline,
+                                        color: c.textMuted,
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 18),
+                  Text(
+                    'Upload new',
+                    style: AppTheme.lato(
+                      fontSize: 12,
+                      color: c.textMuted.o(0.95),
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
                   if (_saving && _progress != null) ...[
                     Text(
                       _label ?? 'Uploading...',
