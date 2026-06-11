@@ -13,6 +13,7 @@ import '../services/irshadat_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/color_utils.dart';
 import '../theme/app_theme_colors.dart';
+import '../widgets/full_screen_image_viewer.dart';
 import '../widgets/gold_card.dart';
 import '../widgets/standard_shell_header.dart';
 import '../widgets/ornament_divider.dart';
@@ -135,6 +136,23 @@ class _IrshadatScreenState extends State<IrshadatScreen> {
     return 'jpg';
   }
 
+  String _resolveImageUrl(IrshadFirestoreModel ir) {
+    return ir.imageUrl.trim().isNotEmpty ? ir.imageUrl.trim() : DummyData.rosePetals;
+  }
+
+  void _openImageFullscreen(
+    List<IrshadFirestoreModel> items,
+    int index,
+  ) {
+    final urls = items.map(_resolveImageUrl).toList();
+    FullScreenImageViewer.open(
+      context,
+      imageUrls: urls,
+      initialIndex: index,
+      caption: items[index].dateLabel,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final c = context.c;
@@ -230,18 +248,45 @@ class _IrshadatScreenState extends State<IrshadatScreen> {
                             children: [
                               AspectRatio(
                                 aspectRatio: 16 / 9,
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: CachedNetworkImage(
-                                    imageUrl: ir.imageUrl.trim().isNotEmpty
-                                        ? ir.imageUrl
-                                        : DummyData.rosePetals,
-                                    fit: BoxFit.cover,
-                                    filterQuality: FilterQuality.high,
-                                    placeholder: (context, url) =>
-                                        const ShimmerPlaceholder(),
-                                    errorWidget: (context, url, error) =>
-                                        const GoldPatternError(),
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    onTap: () => _openImageFullscreen(filtered, i),
+                                    borderRadius: BorderRadius.circular(12),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(12),
+                                      child: Stack(
+                                        fit: StackFit.expand,
+                                        children: [
+                                          CachedNetworkImage(
+                                            imageUrl: _resolveImageUrl(ir),
+                                            fit: BoxFit.cover,
+                                            filterQuality: FilterQuality.high,
+                                            placeholder: (context, url) =>
+                                                const ShimmerPlaceholder(),
+                                            errorWidget: (context, url, error) =>
+                                                const GoldPatternError(),
+                                          ),
+                                          Positioned(
+                                            right: 8,
+                                            bottom: 8,
+                                            child: Container(
+                                              padding: const EdgeInsets.all(6),
+                                              decoration: BoxDecoration(
+                                                color: c.backgroundPrimary.o(0.55),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
+                                              child: Icon(
+                                                Icons.fullscreen_rounded,
+                                                size: 18,
+                                                color: c.accentGold,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),

@@ -9,18 +9,11 @@ import '../services/irshadat_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
 import '../theme/color_utils.dart';
+import 'full_screen_image_viewer.dart';
 import 'gold_card.dart';
-import 'mandala_painter.dart';
 import 'shimmer_placeholder.dart';
 
-class _TaggedIrshad {
-  const _TaggedIrshad({required this.lang, required this.model});
-
-  final IrshadatLanguage lang;
-  final IrshadFirestoreModel model;
-}
-
-/// Deterministic daily pick from merged Urdu + English Firestore feeds (local calendar date).
+/// Daily Urdu Irshad photo from `irshadat_ur` (rotates by local calendar date).
 class IrshadOfTheDayCard extends StatefulWidget {
   const IrshadOfTheDayCard({super.key});
 
@@ -30,40 +23,27 @@ class IrshadOfTheDayCard extends StatefulWidget {
 
 class _IrshadOfTheDayCardState extends State<IrshadOfTheDayCard> {
   final _service = IrshadatService();
-  StreamSubscription<List<IrshadFirestoreModel>>? _subUr;
-  StreamSubscription<List<IrshadFirestoreModel>>? _subEn;
-  List<IrshadFirestoreModel> _ur = [];
-  List<IrshadFirestoreModel> _en = [];
+  StreamSubscription<List<IrshadFirestoreModel>>? _sub;
+  List<IrshadFirestoreModel> _urdu = [];
 
   @override
   void initState() {
     super.initState();
-    _subUr = _service.streamIrshadat(IrshadatLanguage.urdu).listen((l) {
-      if (mounted) setState(() => _ur = l);
-    });
-    _subEn = _service.streamIrshadat(IrshadatLanguage.english).listen((l) {
-      if (mounted) setState(() => _en = l);
+    _sub = _service.streamIrshadat(IrshadatLanguage.urdu).listen((list) {
+      if (mounted) setState(() => _urdu = list);
     });
   }
 
   @override
   void dispose() {
-    _subUr?.cancel();
-    _subEn?.cancel();
+    _sub?.cancel();
     super.dispose();
   }
 
-  List<_TaggedIrshad> _mergedSorted() {
-    final out = <_TaggedIrshad>[
-      ..._ur.map((m) => _TaggedIrshad(lang: IrshadatLanguage.urdu, model: m)),
-      ..._en.map((m) => _TaggedIrshad(lang: IrshadatLanguage.english, model: m)),
-    ];
-    out.sort((a, b) {
-      final c = a.lang.name.compareTo(b.lang.name);
-      if (c != 0) return c;
-      return a.model.id.compareTo(b.model.id);
-    });
-    return out;
+  List<IrshadFirestoreModel> _sortedForDailyPick() {
+    final copy = List<IrshadFirestoreModel>.from(_urdu);
+    copy.sort((a, b) => a.id.compareTo(b.id));
+    return copy;
   }
 
   int _pickIndex(int length, DateTime localNow) {
@@ -72,147 +52,118 @@ class _IrshadOfTheDayCardState extends State<IrshadOfTheDayCard> {
     return key % length;
   }
 
+  String _resolveImageUrl(IrshadFirestoreModel? ir) {
+    final url = ir?.imageUrl.trim() ?? '';
+    return url.isNotEmpty ? url : DummyData.calligraphyClose;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final merged = _mergedSorted();
-    final localNow = DateTime.now();
+    final sorted = _sortedForDailyPick();
+    final pick = sorted.isEmpty ? null : sorted[_pickIndex(sorted.length, DateTime.now())];
+    final imageUrl = _resolveImageUrl(pick);
 
-    if (merged.isEmpty) {
-      final fallback = DummyData.irshadList.first;
-      return _IrshadHeroCard(
-        quote: fallback.urdu,
-        attribution: '— Hazrat Sufi Nisar Ahmed',
-        rtl: true,
-      );
-    }
-
-    final pick = merged[_pickIndex(merged.length, localNow)];
-    final text = pick.model.text.trim();
-    final quote = text.isNotEmpty
-        ? text
-        : (pick.lang == IrshadatLanguage.urdu
-            ? DummyData.irshadList.first.urdu
-            : DummyData.irshadList.first.english);
-
-    return _IrshadHeroCard(
-      quote: quote,
-      attribution: pick.model.dateLabel.trim().isNotEmpty
-          ? pick.model.dateLabel
-          : '— Hazrat Sufi Nisar Ahmed',
-      rtl: pick.lang.isRtl,
-      imageUrl: pick.model.imageUrl.trim(),
+    return _UrduIrshadPhotoCard(
+      imageUrl: imageUrl,
+      loading: sorted.isEmpty && _urdu.isEmpty,
     );
   }
 }
 
-class _IrshadHeroCard extends StatelessWidget {
-  const _IrshadHeroCard({
-    required this.quote,
-    required this.attribution,
-    required this.rtl,
-    this.imageUrl,
+class _UrduIrshadPhotoCard extends StatelessWidget {
+  const _UrduIrshadPhotoCard({
+    required this.imageUrl,
+    required this.loading,
   });
 
-  final String quote;
-  final String attribution;
-  final bool rtl;
-  final String? imageUrl;
+  final String imageUrl;
+  final bool loading;
 
   @override
   Widget build(BuildContext context) {
     final c = context.c;
-    final bg =
-        (imageUrl != null && imageUrl!.trim().isNotEmpty) ? imageUrl!.trim() : DummyData.tilePattern;
 
     return GoldCard(
       backgroundColor: c.backgroundInput,
       padding: EdgeInsets.zero,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(14),
-        child: Stack(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Positioned.fill(
-              child: Opacity(
-                opacity: 0.12,
-                child: CachedNetworkImage(
-                  imageUrl: bg,
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) => const ShimmerPlaceholder(),
-                  errorWidget: (context, url, error) => CachedNetworkImage(
-                    imageUrl: DummyData.tilePattern,
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) => const ShimmerPlaceholder(),
-                    errorWidget: (context, url, error) => const GoldPatternError(),
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              top: -32,
-              right: -18,
-              child: CustomPaint(
-                painter: MandalaPainter(
-                  opacity: 0.09,
-                  strokeWidth: 1,
-                  rings: 5,
-                  petals: 14,
-                ),
-                size: const Size(160, 160),
-              ),
-            ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'IRSHAD OF THE DAY',
-                    style: TextStyle(
-                      color: c.textMuted.o(0.95),
-                      letterSpacing: 2.2,
-                      fontSize: 11,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  rtl
-                      ? Directionality(
-                          textDirection: TextDirection.rtl,
-                          child: Text(
-                            quote,
-                            style: AppTheme.amiriUrdu(
-                              fontSize: 18,
-                              color: c.textSecondary,
-                              height: 2.2,
-                            ),
-                          ),
-                        )
-                      : Text(
-                          quote,
-                          style: TextStyle(
-                            color: c.textSecondary,
-                            fontSize: 15,
-                            height: 1.65,
-                            fontStyle: FontStyle.italic,
+              padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
+              child: Text(
+                'Irshad of the Day',
+                style: AppTheme.cinzelHeading(
+                  fontSize: 15,
+                  letterSpacing: 1.1,
+                  color: c.textPrimary,
+                ),
+              ),
+            ),
+            AspectRatio(
+              aspectRatio: 16 / 9,
+              child: Material(
+                color: c.backgroundInput,
+                child: InkWell(
+                  onTap: loading ? null : () => _openFullscreen(context),
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      if (loading)
+                        const ShimmerPlaceholder()
+                      else
+                        CachedNetworkImage(
+                          imageUrl: imageUrl,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          filterQuality: FilterQuality.high,
+                          placeholder: (context, url) => const ShimmerPlaceholder(),
+                          errorWidget: (context, url, error) => CachedNetworkImage(
+                            imageUrl: DummyData.calligraphyClose,
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            filterQuality: FilterQuality.high,
+                            placeholder: (context, url) => const ShimmerPlaceholder(),
+                            errorWidget: (context, url, error) => const GoldPatternError(),
                           ),
                         ),
-                  const SizedBox(height: 12),
-                  Align(
-                    alignment: rtl ? Alignment.centerRight : Alignment.centerLeft,
-                    child: Text(
-                      attribution,
-                      style: TextStyle(
-                        color: c.textMuted,
-                        fontSize: 12,
-                        fontStyle: FontStyle.italic,
-                      ),
-                    ),
+                      if (!loading)
+                        Positioned(
+                          right: 10,
+                          bottom: 10,
+                          child: Container(
+                            padding: const EdgeInsets.all(7),
+                            decoration: BoxDecoration(
+                              color: c.backgroundPrimary.o(0.6),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: c.borderDefault, width: 0.5),
+                            ),
+                            child: Icon(
+                              Icons.fullscreen_rounded,
+                              size: 18,
+                              color: c.accentGold,
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  void _openFullscreen(BuildContext context) {
+    FullScreenImageViewer.open(
+      context,
+      imageUrls: [imageUrl],
+      initialIndex: 0,
     );
   }
 }

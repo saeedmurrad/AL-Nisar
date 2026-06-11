@@ -1,15 +1,15 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../data/dummy_data.dart';
 import '../models/event_firestore_model.dart';
 import '../models/news_firestore_model.dart';
+import '../models/news_model.dart';
 import '../services/news_events_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/color_utils.dart';
 import '../theme/app_theme_colors.dart';
-import '../widgets/shimmer_placeholder.dart';
+import '../widgets/news_cover_image.dart';
 import '../widgets/standard_shell_header.dart';
 
 class NewsEventsScreen extends StatefulWidget {
@@ -43,6 +43,73 @@ class _NewsEventsScreenState extends State<NewsEventsScreen>
     return Theme.of(context).brightness == Brightness.dark
         ? c.backgroundPrimary
         : c.textPrimary;
+  }
+
+  List<NewsFirestoreModel> _demoNews() {
+    NewsFirestoreModel from(NewsModel n) => NewsFirestoreModel(
+          id: n.id,
+          title: n.title,
+          category: n.category,
+          dateLabel: n.dateLabel,
+          imageUrl: n.imageUrl,
+          readTime: n.readTime,
+          bodyParagraphs: n.bodyParagraphs,
+          createdAt: DateTime.now(),
+          isActive: true,
+        );
+    return [from(DummyData.newsFeatured), ...DummyData.newsList.map(from)];
+  }
+
+  List<EventFirestoreModel> _demoEvents() {
+    return DummyData.eventsList
+        .map(
+          (e) => EventFirestoreModel(
+            id: e.id,
+            title: e.title,
+            urduTitle: e.urduTitle,
+            day: e.day,
+            monthAbbr: e.monthAbbr,
+            fullDateLine: e.fullDateLine,
+            shortDateLabel: e.shortDateLabel,
+            location: e.location,
+            timeLabel: e.timeLabel,
+            organizer: e.organizer,
+            descriptionLines: e.descriptionLines,
+            createdAt: DateTime.now(),
+            isActive: true,
+          ),
+        )
+        .toList();
+  }
+
+  Widget _loadingState(AppThemeColors c) {
+    return Center(child: CircularProgressIndicator(color: c.accentGold));
+  }
+
+  Widget _emptyState(AppThemeColors c, String label) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Text(
+          label,
+          textAlign: TextAlign.center,
+          style: AppTheme.lato(fontSize: 14, color: c.textMuted),
+        ),
+      ),
+    );
+  }
+
+  Widget _errorState(AppThemeColors c, String label) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Text(
+          label,
+          textAlign: TextAlign.center,
+          style: AppTheme.lato(fontSize: 14, color: c.textMuted, height: 1.45),
+        ),
+      ),
+    );
   }
 
   @override
@@ -98,39 +165,31 @@ class _NewsEventsScreenState extends State<NewsEventsScreen>
                 StreamBuilder<List<NewsFirestoreModel>>(
                   stream: _service.streamNews(),
                   builder: (context, snap) {
-                    final list = snap.data;
-                    final use = (list == null || list.isEmpty)
-                        ? DummyData.newsList
-                            .map(
-                              (n) => NewsFirestoreModel(
-                                id: n.id,
-                                title: n.title,
-                                category: n.category,
-                                dateLabel: n.dateLabel,
-                                imageUrl: n.imageUrl,
-                                readTime: n.readTime,
-                                bodyParagraphs: n.bodyParagraphs,
-                                createdAt: DateTime.now(),
-                                isActive: true,
-                              ),
-                            )
-                            .toList()
-                        : list;
+                    if (snap.connectionState == ConnectionState.waiting &&
+                        snap.data == null) {
+                      return _loadingState(c);
+                    }
+                    if (snap.hasError) {
+                      return _errorState(
+                        c,
+                        'Could not load news. Check your connection and try again.',
+                      );
+                    }
 
-                    final featured = use.isEmpty
-                        ? NewsFirestoreModel(
-                            id: DummyData.newsFeatured.id,
-                            title: DummyData.newsFeatured.title,
-                            category: DummyData.newsFeatured.category,
-                            dateLabel: DummyData.newsFeatured.dateLabel,
-                            imageUrl: DummyData.newsFeatured.imageUrl,
-                            readTime: DummyData.newsFeatured.readTime,
-                            bodyParagraphs: DummyData.newsFeatured.bodyParagraphs,
-                            createdAt: DateTime.now(),
-                            isActive: true,
-                          )
-                        : use.first;
-                    final rest = use.length <= 1 ? <NewsFirestoreModel>[] : use.sublist(1);
+                    final list = snap.data;
+                    final use = (list != null && list.isNotEmpty)
+                        ? list
+                        : (!_service.isFirebaseReady
+                            ? _demoNews()
+                            : const <NewsFirestoreModel>[]);
+
+                    if (use.isEmpty) {
+                      return _emptyState(c, 'No news articles yet.');
+                    }
+
+                    final featured = use.first;
+                    final rest =
+                        use.length <= 1 ? <NewsFirestoreModel>[] : use.sublist(1);
 
                     return _NewsTabFirestore(
                       featured: featured,
@@ -142,49 +201,30 @@ class _NewsEventsScreenState extends State<NewsEventsScreen>
                 StreamBuilder<List<EventFirestoreModel>>(
                   stream: _service.streamEvents(),
                   builder: (context, snap) {
-                    final list = snap.data;
-                    final use = (list == null || list.isEmpty)
-                        ? DummyData.eventsList
-                            .map(
-                              (e) => EventFirestoreModel(
-                                id: e.id,
-                                title: e.title,
-                                urduTitle: e.urduTitle,
-                                day: e.day,
-                                monthAbbr: e.monthAbbr,
-                                fullDateLine: e.fullDateLine,
-                                shortDateLabel: e.shortDateLabel,
-                                location: e.location,
-                                timeLabel: e.timeLabel,
-                                organizer: e.organizer,
-                                descriptionLines: e.descriptionLines,
-                                createdAt: DateTime.now(),
-                                isActive: true,
-                              ),
-                            )
-                            .toList()
-                        : list;
+                    if (snap.connectionState == ConnectionState.waiting &&
+                        snap.data == null) {
+                      return _loadingState(c);
+                    }
+                    if (snap.hasError) {
+                      return _errorState(
+                        c,
+                        'Could not load events. Check your connection and try again.',
+                      );
+                    }
 
-                    final next = use.isEmpty
-                        ? EventFirestoreModel(
-                            id: DummyData.eventsList.first.id,
-                            title: DummyData.eventsList.first.title,
-                            urduTitle: DummyData.eventsList.first.urduTitle,
-                            day: DummyData.eventsList.first.day,
-                            monthAbbr: DummyData.eventsList.first.monthAbbr,
-                            fullDateLine: DummyData.eventsList.first.fullDateLine,
-                            shortDateLabel: DummyData.eventsList.first.shortDateLabel,
-                            location: DummyData.eventsList.first.location,
-                            timeLabel: DummyData.eventsList.first.timeLabel,
-                            organizer: DummyData.eventsList.first.organizer,
-                            descriptionLines: DummyData.eventsList.first.descriptionLines,
-                            createdAt: DateTime.now(),
-                            isActive: true,
-                          )
-                        : use.first;
+                    final list = snap.data;
+                    final use = (list != null && list.isNotEmpty)
+                        ? list
+                        : (!_service.isFirebaseReady
+                            ? _demoEvents()
+                            : const <EventFirestoreModel>[]);
+
+                    if (use.isEmpty) {
+                      return _emptyState(c, 'No events scheduled yet.');
+                    }
 
                     return _EventsTabFirestore(
-                      nextEvent: next,
+                      nextEvent: use.first,
                       events: use,
                       onGold: onGold,
                     );
@@ -278,22 +318,16 @@ class _NewsTabFirestore extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
       children: [
         InkWell(
-          onTap: () => context.push('/news-events/news-detail?id=${featured.id}'),
+          onTap: () => context.push('/news-events/news-detail', extra: featured),
           borderRadius: BorderRadius.circular(14),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(14),
             child: Stack(
               children: [
-                SizedBox(
+                NewsCoverImage(
+                  imageUrl: featured.imageUrl,
                   height: 180,
                   width: double.infinity,
-                  child: CachedNetworkImage(
-                    imageUrl: featured.imageUrl,
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) => const ShimmerPlaceholder(),
-                    errorWidget: (context, url, error) =>
-                        const GoldPatternError(),
-                  ),
                 ),
                 Container(
                   height: 180,
@@ -364,8 +398,7 @@ class _NewsTabFirestore extends StatelessWidget {
           (n) => Padding(
             padding: const EdgeInsets.only(bottom: 12),
             child: InkWell(
-              onTap: () =>
-                  context.push('/news-events/news-detail?id=${n.id}'),
+              onTap: () => context.push('/news-events/news-detail', extra: n),
               child: Container(
                 padding: const EdgeInsets.only(bottom: 12),
                 decoration: BoxDecoration(
@@ -381,18 +414,11 @@ class _NewsTabFirestore extends StatelessWidget {
                   children: [
                     ClipRRect(
                       borderRadius: BorderRadius.circular(10),
-                      child: SizedBox(
+                      child: NewsCoverImage(
+                        imageUrl: n.imageUrl,
                         width: 80,
                         height: 80,
-                        child: CachedNetworkImage(
-                          imageUrl: n.imageUrl,
-                          fit: BoxFit.cover,
-                          placeholder: (context, url) => ShimmerPlaceholder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          errorWidget: (context, url, error) =>
-                              const GoldPatternError(),
-                        ),
+                        borderRadius: BorderRadius.circular(10),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -476,7 +502,7 @@ class _EventsTabFirestore extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                'Urs Mubarak 2026',
+                nextEvent.title,
                 style: AppTheme.cormorantGaramond(
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
@@ -519,7 +545,8 @@ class _EventsTabFirestore extends StatelessWidget {
                 width: double.infinity,
                 child: OutlinedButton(
                   onPressed: () => context.push(
-                    '/news-events/event-detail?id=${nextEvent.id}',
+                    '/news-events/event-detail',
+                    extra: nextEvent,
                   ),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: onGold,
@@ -547,8 +574,7 @@ class _EventsTabFirestore extends StatelessWidget {
           (e) => Padding(
             padding: const EdgeInsets.only(bottom: 12),
             child: InkWell(
-              onTap: () =>
-                  context.push('/news-events/event-detail?id=${e.id}'),
+              onTap: () => context.push('/news-events/event-detail', extra: e),
               borderRadius: BorderRadius.circular(12),
               child: Container(
                 padding: const EdgeInsets.all(12),

@@ -29,6 +29,20 @@ class AuthProvider extends ChangeNotifier {
   bool get isSuperAdmin => role.isSuperAdmin;
 
   Future<void> signInWithGoogle() => _service.signInWithGoogle();
+  Future<void> signInWithEmail(String email, String password) =>
+      _service.signInWithEmail(email, password);
+  Future<void> signUpWithEmail({
+    required String email,
+    required String password,
+    String? displayName,
+  }) =>
+      _service.signUpWithEmail(
+        email: email,
+        password: password,
+        displayName: displayName,
+      );
+  Future<void> sendPasswordResetEmail(String email) =>
+      _service.sendPasswordResetEmail(email);
   Future<void> signOut() => _service.signOut();
   Future<void> updateDisplayName(String displayName) =>
       _service.updateDisplayName(displayName);

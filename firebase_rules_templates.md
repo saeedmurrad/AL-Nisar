@@ -68,6 +68,13 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // Super Admin in-app notifications (e.g. new Sabaq access requests)
+    match /admin_notifications/{id} {
+      allow read, update: if isSuperAdmin();
+      allow create: if signedIn();
+      allow delete: if false;
+    }
+
     // Member requests for Sabaq access
     match /sabaq_access_requests/{id} {
       allow create: if signedIn()
@@ -142,6 +149,13 @@ service cloud.firestore {
       match /sabaq_access/{sabaqId} {
         allow read: if signedIn() && request.auth.uid == uid;
         allow write: if isAdmin();
+      }
+
+      // Per-user in-app notifications (written by admins on Sabaq decisions)
+      match /notifications/{notificationId} {
+        allow read, update: if signedIn() && request.auth.uid == uid;
+        allow create: if isAdmin();
+        allow delete: if false;
       }
     }
   }

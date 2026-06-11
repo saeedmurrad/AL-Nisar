@@ -43,6 +43,11 @@ Future<SystemBackResult> handleSystemBack({
     return SystemBackResult.exitedApp;
   }
 
+  if (path == '/signup' || path == '/forgot-password') {
+    router.go('/login');
+    return SystemBackResult.navigatedHome;
+  }
+
   if (path == '/home') {
     return SystemBackResult.needsHomeDoubleBack;
   }

@@ -125,7 +125,7 @@ class _AdminNewsEventsScreenState extends State<AdminNewsEventsScreen>
                   child: _TabPill(
                     label: 'News',
                     selected: _tab.index == 0,
-                    onTap: () => setState(() => _tab.index = 0),
+                    onTap: () => _tab.animateTo(0),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -133,7 +133,7 @@ class _AdminNewsEventsScreenState extends State<AdminNewsEventsScreen>
                   child: _TabPill(
                     label: 'Events',
                     selected: _tab.index == 1,
-                    onTap: () => setState(() => _tab.index = 1),
+                    onTap: () => _tab.animateTo(1),
                   ),
                 ),
               ],
@@ -482,19 +482,21 @@ class _NewsEditorState extends State<_NewsEditor> {
         ? 'No image selected (optional)'
         : _imagePath!.split(Platform.pathSeparator).last;
 
+    final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
+    final maxHeight = MediaQuery.sizeOf(context).height * 0.92;
+
     return Padding(
-      padding: EdgeInsets.only(
-        left: 16,
-        right: 16,
-        top: 14,
-        bottom: 16 + MediaQuery.viewInsetsOf(context).bottom,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            'News',
+      padding: EdgeInsets.only(bottom: bottomInset),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxHeight: maxHeight),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'News',
             style: AppTheme.cormorantGaramond(
               fontSize: 20,
               fontWeight: FontWeight.w600,
@@ -587,8 +589,10 @@ class _NewsEditorState extends State<_NewsEditor> {
                   )
                 : Text('Save', style: AppTheme.lato(fontWeight: FontWeight.w700)),
           ),
-          const SizedBox(height: 8),
-        ],
+              const SizedBox(height: 8),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -729,19 +733,21 @@ class _EventEditorState extends State<_EventEditor> {
         ? 'No image selected (optional)'
         : _imagePath!.split(Platform.pathSeparator).last;
 
+    final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
+    final maxHeight = MediaQuery.sizeOf(context).height * 0.92;
+
     return Padding(
-      padding: EdgeInsets.only(
-        left: 16,
-        right: 16,
-        top: 14,
-        bottom: 16 + MediaQuery.viewInsetsOf(context).bottom,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            'Event',
+      padding: EdgeInsets.only(bottom: bottomInset),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxHeight: maxHeight),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'Event',
             style: AppTheme.cormorantGaramond(
               fontSize: 20,
               fontWeight: FontWeight.w600,
@@ -854,8 +860,10 @@ class _EventEditorState extends State<_EventEditor> {
                   )
                 : Text('Save', style: AppTheme.lato(fontWeight: FontWeight.w700)),
           ),
-          const SizedBox(height: 8),
-        ],
+              const SizedBox(height: 8),
+            ],
+          ),
+        ),
       ),
     );
   }

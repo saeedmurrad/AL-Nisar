@@ -14,6 +14,7 @@ import '../services/sabaq_access_service.dart';
 import '../services/sabaq_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
+import '../theme/color_utils.dart';
 import '../widgets/gold_card.dart';
 import '../widgets/standard_shell_header.dart';
 import '../widgets/shimmer_placeholder.dart';
@@ -35,17 +36,101 @@ class _SabaqListScreenState extends State<SabaqListScreen> {
     return m.isEmpty ? null : m.first;
   }
 
-  String _statusLabel(String raw) {
-    switch (raw.toLowerCase()) {
-      case 'pending':
-        return 'Pending';
-      case 'approved':
-        return 'Approved';
-      case 'denied':
-        return 'Denied';
-      default:
-        return raw;
+  Widget _statusChip(AppThemeColors c, String label, {Color? color}) {
+    final fg = color ?? c.accentGold;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: fg.o(0.12),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: fg.o(0.45)),
+      ),
+      child: Text(
+        label,
+        style: AppTheme.lato(
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          color: fg,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAccessActions({
+    required BuildContext context,
+    required AuthProvider auth,
+    required SabaqPdfModel s,
+    required bool locked,
+    required SabaqAccessRequestModel? latest,
+    required String? freeSabaqId,
+  }) {
+    final c = context.c;
+
+    if (!locked) {
+      return IconButton(
+        onPressed: () => _openSabaq(
+          context: context,
+          auth: auth,
+          s: s,
+          freeSabaqId: freeSabaqId,
+        ),
+        icon: Icon(Icons.open_in_new, color: c.accentGold),
+        tooltip: 'Open',
+      );
     }
+
+    final canRequest = s.storagePath.trim().isNotEmpty;
+    final status = latest?.status.toLowerCase();
+
+    if (status == 'pending') {
+      return _statusChip(c, 'Pending');
+    }
+
+    if (status == 'denied') {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          _statusChip(c, 'Denied', color: c.textMuted),
+          const SizedBox(height: 6),
+          TextButton(
+            onPressed: canRequest
+                ? () => _requestAccess(
+                      context: context,
+                      auth: auth,
+                      s: s,
+                      isResubmit: true,
+                    )
+                : null,
+            child: Text(
+              'Send Request Again',
+              style: AppTheme.lato(
+                fontSize: 12,
+                fontWeight: FontWeight.w800,
+                color: c.accentGold,
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
+    if (status == 'approved') {
+      return _statusChip(c, 'Approved');
+    }
+
+    return TextButton(
+      onPressed: canRequest
+          ? () => _requestAccess(context: context, auth: auth, s: s)
+          : null,
+      child: Text(
+        'Send Request',
+        style: AppTheme.lato(
+          fontSize: 12,
+          fontWeight: FontWeight.w800,
+          color: c.accentGold,
+        ),
+      ),
+    );
   }
 
   List<SabaqPdfModel> _ordered(List<SabaqPdfModel> list) {
@@ -134,6 +219,7 @@ class _SabaqListScreenState extends State<SabaqListScreen> {
     required BuildContext context,
     required AuthProvider auth,
     required SabaqPdfModel s,
+    bool isResubmit = false,
   }) async {
     final c = context.c;
     if (!auth.isAuthenticated) {
@@ -153,7 +239,7 @@ class _SabaqListScreenState extends State<SabaqListScreen> {
         return AlertDialog(
           backgroundColor: cc.backgroundSurface,
           title: Text(
-            'Request Sabaq access',
+            isResubmit ? 'Request Sabaq access again' : 'Request Sabaq access',
             style: AppTheme.cormorantGaramond(color: cc.textPrimary),
           ),
           content: TextField(
@@ -294,47 +380,13 @@ class _SabaqListScreenState extends State<SabaqListScreen> {
                                 ),
                               ),
                               const SizedBox(width: 10),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  if (latest != null)
-                                    Padding(
-                                      padding: const EdgeInsets.only(bottom: 6),
-                                      child: Text(
-                                        _statusLabel(latest.status),
-                                        style: AppTheme.lato(
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.w700,
-                                          color: c.accentGold,
-                                        ),
-                                      ),
-                                    ),
-                                  if (locked)
-                                    TextButton(
-                                      onPressed: s.storagePath.trim().isEmpty
-                                          ? null
-                                          : () => _requestAccess(context: context, auth: auth, s: s),
-                                      child: Text(
-                                        'Request',
-                                        style: AppTheme.lato(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w800,
-                                          color: c.accentGold,
-                                        ),
-                                      ),
-                                    ),
-                                  if (!locked)
-                                    IconButton(
-                                      onPressed: () => _openSabaq(
-                                        context: context,
-                                        auth: auth,
-                                        s: s,
-                                        freeSabaqId: firstId,
-                                      ),
-                                      icon: Icon(Icons.open_in_new, color: c.accentGold),
-                                      tooltip: 'Open',
-                                    ),
-                                ],
+                              _buildAccessActions(
+                                context: context,
+                                auth: auth,
+                                s: s,
+                                locked: locked,
+                                latest: latest,
+                                freeSabaqId: firstId,
                               ),
                             ],
                           ),

@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../models/sabaq_access_request_model.dart';
 import '../models/sabaq_pdf_model.dart';
 import 'admin_notifications_service.dart';
+import 'user_notifications_service.dart';
 
 class SabaqAccessService {
   SabaqAccessService({
@@ -88,6 +89,10 @@ class SabaqAccessService {
   }
 
   Future<void> approve(String requestId, {required String userId, required String sabaqId}) async {
+    final reqSnap = await _requests.doc(requestId).get();
+    final reqData = reqSnap.data() ?? {};
+    final titleEn = reqData['titleEn'] as String? ?? '';
+
     final batch = _firestore.batch();
     batch.set(
       _userAccessDoc(userId, sabaqId),
@@ -104,12 +109,42 @@ class SabaqAccessService {
       SetOptions(merge: true),
     );
     await batch.commit();
+
+    try {
+      await UserNotificationsService().notifySabaqRequestApproved(
+        userId: userId,
+        requestId: requestId,
+        sabaqTitle: titleEn,
+        sabaqId: sabaqId,
+      );
+    } catch (_) {
+      // Notification is best-effort (rules / offline).
+    }
   }
 
   Future<void> deny(String requestId) async {
+    final reqSnap = await _requests.doc(requestId).get();
+    final reqData = reqSnap.data() ?? {};
+    final userId = reqData['userId'] as String? ?? '';
+    final sabaqId = reqData['sabaqId'] as String? ?? '';
+    final titleEn = reqData['titleEn'] as String? ?? '';
+
     await _requests.doc(requestId).set(
       {'status': 'denied', 'decidedAt': FieldValue.serverTimestamp()},
       SetOptions(merge: true),
     );
+
+    if (userId.isNotEmpty) {
+      try {
+        await UserNotificationsService().notifySabaqRequestDenied(
+          userId: userId,
+          requestId: requestId,
+          sabaqTitle: titleEn,
+          sabaqId: sabaqId,
+        );
+      } catch (_) {
+        // Notification is best-effort (rules / offline).
+      }
+    }
   }
 }

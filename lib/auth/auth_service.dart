@@ -28,6 +28,41 @@ class AuthService {
     });
   }
 
+  Future<void> signInWithEmail(String email, String password) async {
+    final cred = await _auth.signInWithEmailAndPassword(
+      email: email.trim().toLowerCase(),
+      password: password,
+    );
+    final u = cred.user;
+    if (u == null) throw Exception('no_user');
+    await _upsertUserProfile(u);
+  }
+
+  Future<void> signUpWithEmail({
+    required String email,
+    required String password,
+    String? displayName,
+  }) async {
+    final cred = await _auth.createUserWithEmailAndPassword(
+      email: email.trim().toLowerCase(),
+      password: password,
+    );
+    final u = cred.user;
+    if (u == null) throw Exception('no_user');
+
+    final name = displayName?.trim();
+    if (name != null && name.isNotEmpty) {
+      await u.updateDisplayName(name);
+      await u.reload();
+    }
+
+    await _upsertUserProfile(_auth.currentUser ?? u);
+  }
+
+  Future<void> sendPasswordResetEmail(String email) async {
+    await _auth.sendPasswordResetEmail(email: email.trim().toLowerCase());
+  }
+
   Future<void> signInWithGoogle() async {
     final account = await _google.signIn();
     if (account == null) {

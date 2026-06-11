@@ -11,6 +11,7 @@ import '../services/irshadat_bookmark_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
 import '../theme/color_utils.dart';
+import '../widgets/full_screen_image_viewer.dart';
 import '../widgets/gold_card.dart';
 import '../widgets/standard_shell_header.dart';
 import '../widgets/shimmer_placeholder.dart';
@@ -120,7 +121,38 @@ class _IrshadatBookmarksScreenState extends State<IrshadatBookmarksScreen> {
     return 'jpg';
   }
 
-  void _open(IrshadatBookmarkModel bm) {
+  void _openImageFullscreen(
+    List<IrshadatBookmarkModel> items,
+    int index,
+  ) {
+    final urls = <String>[];
+    var galleryIndex = 0;
+    int? targetIndex;
+
+    for (var i = 0; i < items.length; i++) {
+      final url = items[i].imageUrl.trim();
+      if (url.isEmpty) continue;
+      if (i == index) targetIndex = galleryIndex;
+      urls.add(url);
+      galleryIndex++;
+    }
+
+    if (urls.isEmpty || targetIndex == null) return;
+
+    final bm = items[index];
+    FullScreenImageViewer.open(
+      context,
+      imageUrls: urls,
+      initialIndex: targetIndex,
+      caption: '${bm.dateLabel} · ${bm.language.label}',
+    );
+  }
+
+  void _open(
+    IrshadatBookmarkModel bm,
+    List<IrshadatBookmarkModel> list,
+    int index,
+  ) {
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -175,20 +207,49 @@ class _IrshadatBookmarksScreenState extends State<IrshadatBookmarksScreen> {
               if (bm.imageUrl.trim().isNotEmpty) ...[
                 AspectRatio(
                   aspectRatio: 16 / 9,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: CachedNetworkImage(
-                      imageUrl: bm.imageUrl,
-                      fit: BoxFit.cover,
-                      filterQuality: FilterQuality.high,
-                      placeholder: (context, url) => const ShimmerPlaceholder(),
-                      errorWidget: (context, url, error) => Container(
-                        color: c.backgroundInput,
-                        child: Center(
-                          child: Text(
-                            'Image failed to load',
-                            style: AppTheme.lato(color: c.textMuted),
-                          ),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () => _openImageFullscreen(list, index),
+                      borderRadius: BorderRadius.circular(12),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            CachedNetworkImage(
+                              imageUrl: bm.imageUrl,
+                              fit: BoxFit.cover,
+                              filterQuality: FilterQuality.high,
+                              placeholder: (context, url) =>
+                                  const ShimmerPlaceholder(),
+                              errorWidget: (context, url, error) => Container(
+                                color: c.backgroundInput,
+                                child: Center(
+                                  child: Text(
+                                    'Image failed to load',
+                                    style: AppTheme.lato(color: c.textMuted),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              right: 8,
+                              bottom: 8,
+                              child: Container(
+                                padding: const EdgeInsets.all(6),
+                                decoration: BoxDecoration(
+                                  color: c.backgroundPrimary.o(0.55),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Icon(
+                                  Icons.fullscreen_rounded,
+                                  size: 18,
+                                  color: c.accentGold,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -376,51 +437,64 @@ class _IrshadatBookmarksScreenState extends State<IrshadatBookmarksScreen> {
                   separatorBuilder: (context, index) => const SizedBox(height: 10),
                   itemBuilder: (context, i) {
                     final bm = list[i];
-                    return InkWell(
-                      onTap: () => _open(bm),
-                      onLongPress: () => _confirmDelete(bm),
-                      borderRadius: BorderRadius.circular(14),
-                      child: GoldCard(
-                        backgroundColor: c.backgroundSurface,
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            if (bm.imageUrl.trim().isNotEmpty)
-                              ClipRRect(
+                    return GoldCard(
+                      backgroundColor: c.backgroundSurface,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (bm.imageUrl.trim().isNotEmpty)
+                            Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                onTap: () => _openImageFullscreen(list, i),
                                 borderRadius: BorderRadius.circular(12),
-                                child: CachedNetworkImage(
-                                  imageUrl: bm.imageUrl,
-                                  width: 70,
-                                  height: 70,
-                                  fit: BoxFit.cover,
-                                  filterQuality: FilterQuality.high,
-                                  placeholder: (context, url) => Container(
-                                    width: 70,
-                                    height: 70,
-                                    color: c.backgroundInput,
-                                  ),
-                                  errorWidget: (context, url, error) => Container(
-                                    width: 70,
-                                    height: 70,
-                                    color: c.backgroundInput,
-                                    child: Icon(Icons.image_not_supported_outlined,
-                                        color: c.textMuted),
-                                  ),
-                                ),
-                              )
-                            else
-                              Container(
-                                width: 70,
-                                height: 70,
-                                decoration: BoxDecoration(
-                                  color: c.backgroundInput,
+                                child: ClipRRect(
                                   borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(color: c.borderDefault, width: 0.5),
+                                  child: CachedNetworkImage(
+                                    imageUrl: bm.imageUrl,
+                                    width: 70,
+                                    height: 70,
+                                    fit: BoxFit.cover,
+                                    filterQuality: FilterQuality.high,
+                                    placeholder: (context, url) => Container(
+                                      width: 70,
+                                      height: 70,
+                                      color: c.backgroundInput,
+                                    ),
+                                    errorWidget: (context, url, error) =>
+                                        Container(
+                                      width: 70,
+                                      height: 70,
+                                      color: c.backgroundInput,
+                                      child: Icon(
+                                        Icons.image_not_supported_outlined,
+                                        color: c.textMuted,
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                                child: Icon(Icons.format_quote, color: c.accentGold),
                               ),
-                            const SizedBox(width: 12),
-                            Expanded(
+                            )
+                          else
+                            Container(
+                              width: 70,
+                              height: 70,
+                              decoration: BoxDecoration(
+                                color: c.backgroundInput,
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: c.borderDefault,
+                                  width: 0.5,
+                                ),
+                              ),
+                              child: Icon(Icons.format_quote, color: c.accentGold),
+                            ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: InkWell(
+                              onTap: () => _open(bm, list, i),
+                              onLongPress: () => _confirmDelete(bm),
+                              borderRadius: BorderRadius.circular(12),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -476,13 +550,16 @@ class _IrshadatBookmarksScreenState extends State<IrshadatBookmarksScreen> {
                                   const SizedBox(height: 8),
                                   Text(
                                     _formatDate(bm.savedAt),
-                                    style: AppTheme.lato(fontSize: 10, color: c.textFaint),
+                                    style: AppTheme.lato(
+                                      fontSize: 10,
+                                      color: c.textFaint,
+                                    ),
                                   ),
                                 ],
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     );
                   },

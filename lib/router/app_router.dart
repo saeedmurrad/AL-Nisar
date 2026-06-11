@@ -4,6 +4,8 @@ import '../screens/asbaq_screen.dart';
 import '../models/book_model.dart';
 import '../models/book_reader_args.dart';
 import '../models/irshad_firestore_model.dart';
+import '../models/event_firestore_model.dart';
+import '../models/news_firestore_model.dart';
 import '../auth/auth_provider.dart';
 import '../screens/book_detail_screen.dart';
 import '../screens/book_reader_screen.dart';
@@ -35,6 +37,8 @@ import '../screens/admin_shajra_urdu_details_screen.dart';
 import '../screens/admin_upload_shajra_urdu_detail_screen.dart';
 import '../screens/admin_upload_gallery_images_screen.dart';
 import '../screens/login_screen.dart';
+import '../screens/signup_screen.dart';
+import '../screens/forgot_password_screen.dart';
 import '../screens/super_admin_panel_screen.dart';
 import '../screens/super_admin_users_screen.dart';
 import '../screens/admin_upload_asbaq_screen.dart';
@@ -47,15 +51,16 @@ GoRouter createAppRouter(AuthProvider auth) {
     refreshListenable: auth,
     redirect: (context, state) {
       final loc = state.matchedLocation;
-      final loggingIn = loc == '/login';
+      const authRoutes = {'/login', '/signup', '/forgot-password'};
+      final onAuthRoute = authRoutes.contains(loc);
       final isAuthed = auth.isAuthenticated;
 
       if (!isAuthed) {
-        return loggingIn ? null : '/login';
+        return onAuthRoute ? null : '/login';
       }
 
-      // If signed in, keep login inaccessible.
-      if (loggingIn) return '/home';
+      // If signed in, keep auth screens inaccessible.
+      if (onAuthRoute) return '/home';
 
       // Add Data is admin-only.
       if (loc.startsWith('/profile/add-data') && !auth.isAdminOrHigher) {
@@ -83,6 +88,14 @@ GoRouter createAppRouter(AuthProvider auth) {
       GoRoute(
         path: '/login',
         builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: '/signup',
+        builder: (context, state) => const SignupScreen(),
+      ),
+      GoRoute(
+        path: '/forgot-password',
+        builder: (context, state) => const ForgotPasswordScreen(),
       ),
       GoRoute(
         path: '/home',
@@ -192,15 +205,27 @@ GoRouter createAppRouter(AuthProvider auth) {
           GoRoute(
             path: 'news-detail',
             builder: (context, state) {
-              final id = state.uri.queryParameters['id'] ?? 'n1';
-              return NewsDetailScreen(newsId: id);
+              final extra = state.extra;
+              final id = extra is NewsFirestoreModel
+                  ? extra.id
+                  : (state.uri.queryParameters['id'] ?? 'n1');
+              return NewsDetailScreen(
+                newsId: id,
+                initial: extra is NewsFirestoreModel ? extra : null,
+              );
             },
           ),
           GoRoute(
             path: 'event-detail',
             builder: (context, state) {
-              final id = state.uri.queryParameters['id'] ?? 'e1';
-              return EventDetailScreen(eventId: id);
+              final extra = state.extra;
+              final id = extra is EventFirestoreModel
+                  ? extra.id
+                  : (state.uri.queryParameters['id'] ?? 'e1');
+              return EventDetailScreen(
+                eventId: id,
+                initial: extra is EventFirestoreModel ? extra : null,
+              );
             },
           ),
         ],

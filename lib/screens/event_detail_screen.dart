@@ -1,15 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:share_plus/share_plus.dart';
+
 import '../data/dummy_data.dart';
+import '../models/event_firestore_model.dart';
 import '../services/news_events_service.dart';
 import '../theme/app_theme.dart';
 import '../navigation/go_router_helpers.dart';
 import '../theme/app_theme_colors.dart';
 
 class EventDetailScreen extends StatelessWidget {
-  const EventDetailScreen({super.key, required this.eventId});
+  const EventDetailScreen({
+    super.key,
+    required this.eventId,
+    this.initial,
+  });
 
   final String eventId;
+  final EventFirestoreModel? initial;
 
   @override
   Widget build(BuildContext context) {
@@ -18,18 +26,23 @@ class EventDetailScreen extends StatelessWidget {
     final onGold = Theme.of(context).brightness == Brightness.dark
         ? c.backgroundPrimary
         : c.textPrimary;
+    final seed = initial;
 
-    return FutureBuilder(
+    return FutureBuilder<EventFirestoreModel?>(
       future: NewsEventsService().getEventById(eventId),
+      initialData: seed,
       builder: (context, snap) {
-        final doc = snap.data;
+        final doc = snap.data ?? seed;
         final title = doc?.title.isNotEmpty == true ? doc!.title : fallback.title;
         final fullDateLine = doc?.fullDateLine.isNotEmpty == true
             ? doc!.fullDateLine
             : fallback.fullDateLine;
-        final location = doc?.location.isNotEmpty == true ? doc!.location : fallback.location;
-        final timeLabel = doc?.timeLabel.isNotEmpty == true ? doc!.timeLabel : fallback.timeLabel;
-        final organizer = doc?.organizer.isNotEmpty == true ? doc!.organizer : fallback.organizer;
+        final location =
+            doc?.location.isNotEmpty == true ? doc!.location : fallback.location;
+        final timeLabel =
+            doc?.timeLabel.isNotEmpty == true ? doc!.timeLabel : fallback.timeLabel;
+        final organizer =
+            doc?.organizer.isNotEmpty == true ? doc!.organizer : fallback.organizer;
         final lines = (doc?.descriptionLines.isNotEmpty == true)
             ? doc!.descriptionLines
             : (fallback.descriptionLines.isNotEmpty
@@ -147,7 +160,11 @@ class EventDetailScreen extends StatelessWidget {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Share.share(
+                            '$title\n$fullDateLine\n$timeLabel\n$location\nOrganizer: $organizer',
+                          );
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: c.accentGold,
                           foregroundColor: onGold,
@@ -158,34 +175,11 @@ class EventDetailScreen extends StatelessWidget {
                           elevation: 0,
                         ),
                         child: Text(
-                          'Add to Calendar',
-                          style: AppTheme.lato(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w700,
-                            color: onGold,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    SizedBox(
-                      width: double.infinity,
-                      child: OutlinedButton(
-                        onPressed: () {},
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: c.accentGold,
-                          side: BorderSide(color: c.accentGold, width: 1.1),
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: Text(
                           'Share Event',
                           style: AppTheme.lato(
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
-                            color: c.accentGold,
+                            color: onGold,
                           ),
                         ),
                       ),

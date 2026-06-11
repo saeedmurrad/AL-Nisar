@@ -1,28 +1,37 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:share_plus/share_plus.dart';
+
 import '../data/dummy_data.dart';
+import '../models/news_firestore_model.dart';
 import '../services/news_events_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/color_utils.dart';
 import '../theme/app_theme_colors.dart';
 import '../navigation/go_router_helpers.dart';
-import '../widgets/shimmer_placeholder.dart';
+import '../widgets/news_cover_image.dart';
 
 class NewsDetailScreen extends StatelessWidget {
-  const NewsDetailScreen({super.key, required this.newsId});
+  const NewsDetailScreen({
+    super.key,
+    required this.newsId,
+    this.initial,
+  });
 
   final String newsId;
+  final NewsFirestoreModel? initial;
 
   @override
   Widget build(BuildContext context) {
     final c = context.c;
     final fallback = DummyData.newsById(newsId) ?? DummyData.newsFeatured;
+    final seed = initial;
 
-    return FutureBuilder(
+    return FutureBuilder<NewsFirestoreModel?>(
       future: NewsEventsService().getNewsById(newsId),
+      initialData: seed,
       builder: (context, snap) {
-        final doc = snap.data;
+        final doc = snap.data ?? seed;
         final title = doc?.title.isNotEmpty == true ? doc!.title : fallback.title;
         final category =
             doc?.category.isNotEmpty == true ? doc!.category : fallback.category;
@@ -50,13 +59,7 @@ class NewsDetailScreen extends StatelessWidget {
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    CachedNetworkImage(
-                      imageUrl: imageUrl,
-                      fit: BoxFit.cover,
-                      placeholder: (context, url) => const ShimmerPlaceholder(),
-                      errorWidget: (context, url, error) =>
-                          const GoldPatternError(),
-                    ),
+                    NewsCoverImage(imageUrl: imageUrl, fit: BoxFit.cover),
                     Container(
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
@@ -165,7 +168,10 @@ class NewsDetailScreen extends StatelessWidget {
                     SizedBox(
                       width: double.infinity,
                       child: OutlinedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          final body = paragraphs.join('\n\n');
+                          Share.share('$title\n\n$body');
+                        },
                         style: OutlinedButton.styleFrom(
                           foregroundColor: c.accentGold,
                           side: BorderSide(color: c.accentGold, width: 1.1),
