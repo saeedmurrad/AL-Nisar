@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 import '../models/sabaq_pdf_model.dart';
+import '../utils/sabaq_order_utils.dart';
 
 class SabaqService {
   SabaqService({FirebaseFirestore? firestore})
@@ -18,8 +19,7 @@ class SabaqService {
           .map(SabaqPdfModel.fromFirestore)
           .where((d) => d.isActive)
           .toList();
-      list.sort((a, b) => a.uploadedAt.compareTo(b.uploadedAt));
-      return list;
+      return dedupeSabaqList(list);
     });
   }
 }

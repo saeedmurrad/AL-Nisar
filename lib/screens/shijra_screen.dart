@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../data/shajra_pdf_registry.dart';
 import '../models/shajra_entry_model.dart';
 import '../models/shajra_urdu_detail_model.dart';
+import '../services/shajra_bundled_service.dart';
 import '../services/shajra_service.dart';
 import '../services/shajra_urdu_details_service.dart';
 import '../theme/app_theme.dart';
@@ -101,16 +102,28 @@ class _ShijraScreenState extends State<ShijraScreen> {
     context.push('/shajra/detail', extra: ShajraDetailRouteArgs(entry: entry, allEntries: all));
   }
 
-  void _openUrduPdf(ShajraEntryModel entry, ShajraUrduDetailModel? detail) {
-    if (detail == null || detail.storagePath.isEmpty) return;
-    context.push(
-      '/shajra/urdu-pdf',
-      extra: ShajraUrduPdfArgs(
-        number: detail.number,
-        titleUrdu: detail.titleUrdu.isNotEmpty ? detail.titleUrdu : entry.fullTitle,
-        storagePath: detail.storagePath,
-      ),
-    );
+  void _openUrduPdf(
+    ShajraEntryModel entry,
+    ShajraUrduDetailModel? detail,
+    List<ShajraEntryModel> all,
+  ) {
+    if (detail != null && detail.storagePath.isNotEmpty) {
+      context.push(
+        '/shajra/urdu-pdf',
+        extra: ShajraUrduPdfArgs(
+          number: detail.number,
+          titleUrdu: detail.titleUrdu.isNotEmpty ? detail.titleUrdu : entry.fullTitle,
+          storagePath: detail.storagePath,
+        ),
+      );
+      return;
+    }
+    if (ShajraBundledService.hasBundledUrduDetail(entry.number)) {
+      context.push(
+        '/shajra/detail',
+        extra: ShajraDetailRouteArgs(entry: entry, allEntries: all),
+      );
+    }
   }
 
   @override
@@ -179,56 +192,15 @@ class _ShijraScreenState extends State<ShijraScreen> {
                         onOpen: _openDetail,
                       )
                     else
-                      StreamBuilder<List<ShajraUrduDetailModel>>(
-                        stream: _urduDetails.streamAllActive(),
-                        builder: (context, snap) {
-                          final fb = snap.data ?? const <ShajraUrduDetailModel>[];
-                          if (snap.connectionState == ConnectionState.waiting &&
-                              fb.isEmpty) {
-                            return Directionality(
-                              textDirection: TextDirection.rtl,
-                              child: _ShajraListShimmer(c: c),
-                            );
-                          }
-                          if (fb.isNotEmpty) {
-                            final entries = fb
-                                .map(
-                                  (d) => ShajraEntryModel(
-                                    number: d.number,
-                                    fullTitle: d.titleUrdu.trim().isNotEmpty
-                                        ? d.titleUrdu.trim()
-                                        : 'شخصیت ${d.number}',
-                                    shortName: d.titleUrdu.trim().isNotEmpty
-                                        ? d.titleUrdu.trim()
-                                        : '${d.number}',
-                                    detailUrl: '',
-                                    language: ShajraEntryModel.urdu,
-                                  ),
-                                )
-                                .toList();
-                            final map = {for (final d in fb) d.number: d};
-                            return Directionality(
-                              textDirection: TextDirection.rtl,
-                              child: _UrduEntryList(
-                                c: c,
-                                cardBorder: cardBorder,
-                                entries: entries,
-                                detailsByNumber: map,
-                                onOpen: _openUrduPdf,
-                              ),
-                            );
-                          }
-                          return _UrduBody(
-                            c: c,
-                            cardBorder: cardBorder,
-                            loading: _urduLoading,
-                            error: _urduError,
-                            entries: _urduEntries,
-                            onRetry: _loadUrdu,
-                            detailsStream: _urduDetails.streamIndexByNumber(),
-                            onOpen: _openUrduPdf,
-                          );
-                        },
+                      _UrduBody(
+                        c: c,
+                        cardBorder: cardBorder,
+                        loading: _urduLoading,
+                        error: _urduError,
+                        entries: _urduEntries,
+                        onRetry: _loadUrdu,
+                        detailsStream: _urduDetails.streamIndexByNumber(),
+                        onOpen: _openUrduPdf,
                       ),
                   ],
                 ),
@@ -459,7 +431,7 @@ class _UrduBody extends StatelessWidget {
   final List<ShajraEntryModel>? entries;
   final VoidCallback onRetry;
   final Stream<Map<int, ShajraUrduDetailModel>> detailsStream;
-  final void Function(ShajraEntryModel, ShajraUrduDetailModel?) onOpen;
+  final void Function(ShajraEntryModel, ShajraUrduDetailModel?, List<ShajraEntryModel>) onOpen;
 
   @override
   Widget build(BuildContext context) {
@@ -504,7 +476,7 @@ class _UrduEntryList extends StatelessWidget {
   final Color cardBorder;
   final List<ShajraEntryModel> entries;
   final Map<int, ShajraUrduDetailModel> detailsByNumber;
-  final void Function(ShajraEntryModel, ShajraUrduDetailModel?) onOpen;
+  final void Function(ShajraEntryModel, ShajraUrduDetailModel?, List<ShajraEntryModel>) onOpen;
 
   @override
   Widget build(BuildContext context) {
@@ -512,7 +484,9 @@ class _UrduEntryList extends StatelessWidget {
       children: List.generate(entries.length, (i) {
         final e = entries[i];
         final d = detailsByNumber[e.number];
-        final available = d != null && d.storagePath.isNotEmpty;
+        final pdfAvailable = d != null && d.storagePath.isNotEmpty;
+        final bioAvailable = ShajraBundledService.hasBundledUrduDetail(e.number);
+        final canOpen = pdfAvailable || bioAvailable;
         final isFirst = e.number == 1;
         final isLast = i == entries.length - 1;
 
@@ -550,7 +524,7 @@ class _UrduEntryList extends StatelessWidget {
                   child: Material(
                     color: Colors.transparent,
                     child: InkWell(
-                      onTap: available ? () => onOpen(e, d) : null,
+                      onTap: canOpen ? () => onOpen(e, d, entries) : null,
                       borderRadius: BorderRadius.circular(12),
                       child: Ink(
                         decoration: _cardDecoration(c, cardBorder, isFirst),
@@ -559,19 +533,21 @@ class _UrduEntryList extends StatelessWidget {
                           children: [
                             Expanded(
                               child: Text(
-                                e.fullTitle,
-                                maxLines: 2,
+                                e.listDisplayName,
+                                maxLines: 3,
                                 overflow: TextOverflow.ellipsis,
                                 style: AppTheme.amiriUrdu(
                                   fontSize: 16,
                                   height: 1.35,
-                                  color: available ? c.textPrimary : c.textFaint,
+                                  color: canOpen ? c.textPrimary : c.textFaint,
                                 ),
                               ),
                             ),
                             const SizedBox(width: 8),
-                            if (available)
+                            if (pdfAvailable)
                               Icon(Icons.picture_as_pdf_outlined, color: c.accentGold, size: 18)
+                            else if (bioAvailable)
+                              Icon(Icons.menu_book_outlined, color: c.accentGold, size: 18)
                             else
                               Text(
                                 'Not added',
@@ -584,7 +560,7 @@ class _UrduEntryList extends StatelessWidget {
                             CustomPaint(
                               size: const Size(10, 16),
                               painter: _ChevronPainter(
-                                available ? c.accentGold : c.textFaint,
+                                canOpen ? c.accentGold : c.textFaint,
                                 pointRight: false,
                               ),
                             ),
@@ -853,8 +829,8 @@ class _ShajraCardContent extends StatelessWidget {
                 rtl ? CrossAxisAlignment.end : CrossAxisAlignment.start,
             children: [
               Text(
-                e.shortName.isNotEmpty ? e.shortName : e.fullTitle,
-                maxLines: 2,
+                e.listDisplayName,
+                maxLines: 3,
                 overflow: TextOverflow.ellipsis,
                 style: isFirst
                     ? (rtl
@@ -880,25 +856,6 @@ class _ShajraCardContent extends StatelessWidget {
                             color: c.textPrimary,
                           ),
               ),
-              if (e.fullTitle != e.shortName) ...[
-                const SizedBox(height: 4),
-                Text(
-                  e.fullTitle,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: rtl
-                      ? AppTheme.amiriUrdu(
-                          fontSize: 11,
-                          height: 1.45,
-                          color: c.textMuted,
-                        )
-                      : AppTheme.lato(
-                          fontSize: 11,
-                          height: 1.35,
-                          color: c.textMuted,
-                        ),
-                ),
-              ],
             ],
           ),
         ),

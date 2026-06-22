@@ -2,18 +2,22 @@ import 'dart:async';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../data/dummy_data.dart';
 import '../models/irshad_firestore_model.dart';
+import '../services/irshad_daily_picker.dart';
+import '../services/irshad_share_service.dart';
 import '../services/irshadat_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
 import '../theme/color_utils.dart';
 import 'full_screen_image_viewer.dart';
 import 'gold_card.dart';
+import 'ornament_divider.dart';
 import 'shimmer_placeholder.dart';
 
-/// Daily Urdu Irshad photo from `irshadat_ur` (rotates by local calendar date).
+/// Daily Irshad from `irshadat_ur` — random pick seeded by local calendar date.
 class IrshadOfTheDayCard extends StatefulWidget {
   const IrshadOfTheDayCard({super.key});
 
@@ -23,8 +27,10 @@ class IrshadOfTheDayCard extends StatefulWidget {
 
 class _IrshadOfTheDayCardState extends State<IrshadOfTheDayCard> {
   final _service = IrshadatService();
+  final _shareService = IrshadShareService();
   StreamSubscription<List<IrshadFirestoreModel>>? _sub;
   List<IrshadFirestoreModel> _urdu = [];
+  bool _sharing = false;
 
   @override
   void initState() {
@@ -40,16 +46,20 @@ class _IrshadOfTheDayCardState extends State<IrshadOfTheDayCard> {
     super.dispose();
   }
 
-  List<IrshadFirestoreModel> _sortedForDailyPick() {
-    final copy = List<IrshadFirestoreModel>.from(_urdu);
-    copy.sort((a, b) => a.id.compareTo(b.id));
-    return copy;
-  }
-
-  int _pickIndex(int length, DateTime localNow) {
-    if (length <= 0) return 0;
-    final key = localNow.year * 10000 + localNow.month * 100 + localNow.day;
-    return key % length;
+  List<IrshadFirestoreModel> _effectiveList() {
+    if (_urdu.isNotEmpty) return _urdu;
+    return DummyData.irshadList
+        .map(
+          (d) => IrshadFirestoreModel(
+            id: d.dateLabel,
+            dateLabel: d.dateLabel,
+            text: d.urdu,
+            imageUrl: '',
+            createdAt: DateTime.now(),
+            isActive: true,
+          ),
+        )
+        .toList();
   }
 
   String _resolveImageUrl(IrshadFirestoreModel? ir) {
@@ -57,31 +67,51 @@ class _IrshadOfTheDayCardState extends State<IrshadOfTheDayCard> {
     return url.isNotEmpty ? url : DummyData.calligraphyClose;
   }
 
+  Future<void> _share(IrshadFirestoreModel ir) async {
+    if (_sharing) return;
+    setState(() => _sharing = true);
+    try {
+      await _shareService.share(ir: ir, language: IrshadatLanguage.urdu);
+    } finally {
+      if (mounted) setState(() => _sharing = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final sorted = _sortedForDailyPick();
-    final pick = sorted.isEmpty ? null : sorted[_pickIndex(sorted.length, DateTime.now())];
-    final imageUrl = _resolveImageUrl(pick);
+    final list = _effectiveList();
+    final pick = IrshadDailyPicker.pickForDay(list);
+    final loading = _urdu.isEmpty && list.isEmpty;
 
     return _UrduIrshadPhotoCard(
-      imageUrl: imageUrl,
-      loading: sorted.isEmpty && _urdu.isEmpty,
+      ir: pick,
+      imageUrl: _resolveImageUrl(pick),
+      loading: loading,
+      sharing: _sharing,
+      onShare: pick == null ? null : () => _share(pick),
     );
   }
 }
 
 class _UrduIrshadPhotoCard extends StatelessWidget {
   const _UrduIrshadPhotoCard({
+    required this.ir,
     required this.imageUrl,
     required this.loading,
+    required this.sharing,
+    required this.onShare,
   });
 
+  final IrshadFirestoreModel? ir;
   final String imageUrl;
   final bool loading;
+  final bool sharing;
+  final VoidCallback? onShare;
 
   @override
   Widget build(BuildContext context) {
     final c = context.c;
+    final hasText = ir?.text.trim().isNotEmpty == true;
 
     return GoldCard(
       backgroundColor: c.backgroundInput,
@@ -93,14 +123,43 @@ class _UrduIrshadPhotoCard extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
-              child: Text(
-                'Irshad of the Day',
-                style: AppTheme.cinzelHeading(
-                  fontSize: 15,
-                  letterSpacing: 1.1,
-                  color: c.textPrimary,
-                ),
+              padding: const EdgeInsets.fromLTRB(14, 12, 8, 10),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Irshad of the Day',
+                      style: AppTheme.cinzelHeading(
+                        fontSize: 15,
+                        letterSpacing: 1.1,
+                        color: c.textPrimary,
+                      ),
+                    ),
+                  ),
+                  if (!loading && onShare != null)
+                    IconButton(
+                      onPressed: sharing ? null : onShare,
+                      tooltip: 'Share',
+                      icon: sharing
+                          ? SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: c.accentGold,
+                              ),
+                            )
+                          : SvgPicture.string(
+                              _shareSvg,
+                              width: 20,
+                              height: 20,
+                              colorFilter: ColorFilter.mode(
+                                c.accentGold,
+                                BlendMode.srcIn,
+                              ),
+                            ),
+                    ),
+                ],
               ),
             ),
             AspectRatio(
@@ -153,6 +212,47 @@ class _UrduIrshadPhotoCard extends StatelessWidget {
                 ),
               ),
             ),
+            if (!loading && ir != null) ...[
+              const SizedBox(height: 10),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 14),
+                child: Text(
+                  ir!.dateLabel,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: c.textMuted,
+                    fontSize: 12,
+                    letterSpacing: 1.2,
+                  ),
+                ),
+              ),
+              if (hasText) ...[
+                const SizedBox(height: 8),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 14),
+                  child: OrnamentDivider(),
+                ),
+                const SizedBox(height: 10),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
+                  child: Directionality(
+                    textDirection: TextDirection.rtl,
+                    child: Text(
+                      ir!.text,
+                      textAlign: TextAlign.center,
+                      maxLines: 4,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTheme.amiriUrdu(
+                        fontSize: 16,
+                        height: 2.0,
+                        color: c.textSecondary,
+                      ),
+                    ),
+                  ),
+                ),
+              ] else
+                const SizedBox(height: 12),
+            ],
           ],
         ),
       ),
@@ -164,6 +264,10 @@ class _UrduIrshadPhotoCard extends StatelessWidget {
       context,
       imageUrls: [imageUrl],
       initialIndex: 0,
+      caption: ir?.dateLabel,
     );
   }
 }
+
+const _shareSvg =
+    '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M16 7l-8 4 8 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 9.2a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4zM6 13.2a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4zM18 19.2a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>';

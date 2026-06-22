@@ -37,7 +37,9 @@ class _ShajraDetailScreenState extends State<ShajraDetailScreen> {
   @override
   void initState() {
     super.initState();
-    _entries = List<ShajraEntryModel>.from(widget.args.allEntries);
+    _entries = List<ShajraEntryModel>.from(widget.args.allEntries)
+        .where((e) => e.number <= ShajraService.maxEntryNumber)
+        .toList();
     _index = _entries.indexWhere((e) => e.number == widget.args.entry.number);
     if (_index < 0) _index = 0;
     _load();
@@ -51,18 +53,26 @@ class _ShajraDetailScreenState extends State<ShajraDetailScreen> {
     });
 
     final e = _entry;
-    if (e.language == ShajraEntryModel.urdu || e.detailUrl.isEmpty) {
-      await Future<void>.delayed(const Duration(milliseconds: 200));
-      if (!mounted) return;
-      setState(() {
-        _loading = false;
-        _html = _urduPlaceholderHtml(e.fullTitle);
-      });
+    if (e.language == ShajraEntryModel.urdu) {
+      try {
+        final html = await _service.fetchUrduDetailByNumber(e.number);
+        if (!mounted) return;
+        setState(() {
+          _html = html;
+          _loading = false;
+        });
+      } catch (_) {
+        if (!mounted) return;
+        setState(() {
+          _loading = false;
+          _html = _urduPlaceholderHtml(e.fullTitle);
+        });
+      }
       return;
     }
 
     try {
-      final html = await _service.fetchEntryDetail(e.detailUrl);
+      final html = await _service.fetchEntryDetailByNumber(e.number);
       if (!mounted) return;
       setState(() {
         _html = html;
@@ -268,14 +278,22 @@ class _DetailHeader extends StatelessWidget {
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              entry.shortName.isNotEmpty ? entry.shortName : entry.fullTitle,
+              entry.listDisplayName,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: AppTheme.cormorantGaramond(
-                fontSize: 17,
-                fontWeight: FontWeight.w600,
-                color: c.textPrimary,
-              ),
+              textDirection:
+                  entry.language == ShajraEntryModel.urdu ? TextDirection.rtl : TextDirection.ltr,
+              style: entry.language == ShajraEntryModel.urdu
+                  ? AppTheme.amiriUrdu(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: c.textPrimary,
+                    )
+                  : AppTheme.cormorantGaramond(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w600,
+                      color: c.textPrimary,
+                    ),
             ),
           ),
         ],
@@ -385,80 +403,105 @@ class _DetailScroll extends StatelessWidget {
   Widget build(BuildContext context) {
     final latoFamily = GoogleFonts.lato().fontFamily;
     final cgFamily = GoogleFonts.cormorantGaramond().fontFamily;
+    final amiriFamily = GoogleFonts.notoNastaliqUrdu().fontFamily;
     final bodyHtml = _stripLeadingH2(html);
+    final isUrdu = entry.language == ShajraEntryModel.urdu;
+    final bodyFamily = isUrdu ? amiriFamily : latoFamily;
+    final titleFamily = isUrdu ? amiriFamily : cgFamily;
 
     final htmlStyle = <String, Style>{
       'body': Style(
         margin: Margins.zero,
         padding: HtmlPaddings.zero,
         backgroundColor: Colors.transparent,
-        fontFamily: latoFamily,
-        fontSize: FontSize(15),
+        fontFamily: bodyFamily,
+        fontSize: FontSize(isUrdu ? 16 : 15),
         color: c.textSecondary,
-        lineHeight: const LineHeight(1.8),
+        lineHeight: LineHeight(isUrdu ? 2.0 : 1.8),
+        textAlign: isUrdu ? TextAlign.right : TextAlign.left,
       ),
       'p': Style(
         margin: Margins.only(bottom: 12),
-        lineHeight: const LineHeight(1.8),
-        fontFamily: latoFamily,
-        fontSize: FontSize(15),
+        lineHeight: LineHeight(isUrdu ? 2.0 : 1.8),
+        fontFamily: bodyFamily,
+        fontSize: FontSize(isUrdu ? 16 : 15),
         color: c.textSecondary,
+        textAlign: isUrdu ? TextAlign.right : TextAlign.left,
       ),
       'h1': Style(
-        fontFamily: cgFamily,
-        fontSize: FontSize(20),
+        fontFamily: titleFamily,
+        fontSize: FontSize(isUrdu ? 20 : 20),
         color: c.accentGold,
         margin: Margins.only(bottom: 10, top: 8),
+        textAlign: isUrdu ? TextAlign.right : TextAlign.left,
       ),
       'h2': Style(
-        fontFamily: cgFamily,
-        fontSize: FontSize(19),
+        fontFamily: titleFamily,
+        fontSize: FontSize(isUrdu ? 19 : 19),
         color: c.accentGold,
         margin: Margins.only(bottom: 10, top: 8),
+        textAlign: isUrdu ? TextAlign.right : TextAlign.left,
       ),
       'h3': Style(
-        fontFamily: cgFamily,
-        fontSize: FontSize(18),
+        fontFamily: titleFamily,
+        fontSize: FontSize(isUrdu ? 18 : 18),
         color: c.accentGold,
         margin: Margins.only(bottom: 8, top: 6),
+        textAlign: isUrdu ? TextAlign.right : TextAlign.left,
+      ),
+      'em': Style(
+        fontStyle: FontStyle.italic,
+        color: c.accentGold.o(0.9),
       ),
       'img': Style(display: Display.none),
     };
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 96),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Container(
-            padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
-            decoration: BoxDecoration(
-              color: c.accentGold.o(0.12),
-              borderRadius: BorderRadius.circular(12),
-              border: Border(
-                left: BorderSide(color: c.accentGold, width: 4),
+    return Directionality(
+      textDirection: isUrdu ? TextDirection.rtl : TextDirection.ltr,
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 96),
+        child: Column(
+          crossAxisAlignment:
+              isUrdu ? CrossAxisAlignment.stretch : CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
+              decoration: BoxDecoration(
+                color: c.accentGold.o(0.12),
+                borderRadius: BorderRadius.circular(12),
+                border: Border(
+                  left: BorderSide(color: c.accentGold, width: 4),
+                ),
+              ),
+              child: Text(
+                entry.listDisplayName,
+                textAlign: isUrdu ? TextAlign.right : TextAlign.left,
+                style: isUrdu
+                    ? AppTheme.amiriUrdu(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
+                        color: c.textPrimary,
+                        height: 1.9,
+                      )
+                    : AppTheme.cormorantGaramond(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
+                        color: c.textPrimary,
+                        height: 1.8,
+                      ),
               ),
             ),
-            child: Text(
-              entry.fullTitle,
-              style: AppTheme.cormorantGaramond(
-                fontSize: 17,
-                fontWeight: FontWeight.w600,
-                color: c.textPrimary,
-                height: 1.8,
-              ),
+            const SizedBox(height: 12),
+            const OrnamentDivider(),
+            const SizedBox(height: 16),
+            Html(
+              data: bodyHtml.isNotEmpty ? bodyHtml : html,
+              shrinkWrap: true,
+              style: htmlStyle,
+              onLinkTap: (url, attributes, element) {},
             ),
-          ),
-          const SizedBox(height: 12),
-          const OrnamentDivider(),
-          const SizedBox(height: 16),
-          Html(
-            data: bodyHtml.isNotEmpty ? bodyHtml : html,
-            shrinkWrap: true,
-            style: htmlStyle,
-            onLinkTap: (url, attributes, element) {},
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

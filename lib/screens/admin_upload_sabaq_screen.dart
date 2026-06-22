@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 
 import '../models/sabaq_pdf_model.dart';
 import '../services/admin_sabaq_service.dart';
+import '../utils/sabaq_order_utils.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
 import '../theme/color_utils.dart';
@@ -130,9 +131,11 @@ class _AdminUploadSabaqScreenState extends State<AdminUploadSabaqScreen> {
         thumbnailUrl: thumbUrl,
         uploadedAt: DateTime.now(),
         isActive: true,
+        orderNumber: parseSabaqOrderNumber(en, titleUr: ur),
       );
 
       await _service.upsert(model);
+      await _service.deactivateOlderDuplicates(model);
 
       if (!mounted) return;
       _snack('Sabaq PDF uploaded');

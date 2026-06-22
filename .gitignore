@@ -46,3 +46,11 @@ app.*.map.json
 
 # Release signing (never commit)
 /android/key.properties
+
+# Firebase service account keys (never commit)
+*firebase-adminsdk*.json
+
+# Local import tooling / exports (never commit)
+tool/node_modules/
+tool/_fb_export/
+assets/*.zip

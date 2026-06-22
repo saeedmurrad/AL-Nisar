@@ -1,13 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:share_plus/share_plus.dart';
-import 'dart:io';
 
 import '../data/dummy_data.dart';
 import '../models/irshad_firestore_model.dart';
+import '../services/irshad_share_service.dart';
 import '../services/irshadat_bookmark_service.dart';
 import '../services/irshadat_service.dart';
 import '../theme/app_theme.dart';
@@ -30,6 +27,7 @@ class _IrshadatScreenState extends State<IrshadatScreen> {
   IrshadatLanguage _language = IrshadatLanguage.urdu;
   final _service = IrshadatService();
   final _bookmarkService = IrshadatBookmarkService();
+  final _shareService = IrshadShareService();
   final _searchCtrl = TextEditingController();
   Set<String> _bookmarkedKeys = {};
 
@@ -84,56 +82,7 @@ class _IrshadatScreenState extends State<IrshadatScreen> {
   }
 
   Future<void> _shareIrshad(IrshadFirestoreModel ir) async {
-    final text = ir.text.trim();
-    final url = ir.imageUrl.trim();
-    final msg = [
-      'Irshad (${_language.label}) — ${ir.dateLabel}',
-      if (text.isNotEmpty) text,
-      'AL Nisar App',
-    ].join('\n\n');
-
-    if (url.isEmpty) {
-      await Share.share(msg);
-      return;
-    }
-
-    try {
-      final f = await _downloadToTemp(url, 'irshad_${ir.id}');
-      if (f == null) {
-        await Share.share('$msg\n\n$url');
-        return;
-      }
-      await Share.shareXFiles([XFile(f.path)], text: msg);
-    } catch (_) {
-      await Share.share('$msg\n\n$url');
-    }
-  }
-
-  Future<File?> _downloadToTemp(String url, String baseName) async {
-    final uri = Uri.tryParse(url);
-    if (uri == null) return null;
-    final dir = await getTemporaryDirectory();
-    final ext = _guessImageExt(uri.path);
-    final out = File('${dir.path}/$baseName.$ext');
-
-    final client = HttpClient();
-    try {
-      final req = await client.getUrl(uri);
-      final res = await req.close();
-      if (res.statusCode < 200 || res.statusCode >= 300) return null;
-      final bytes = await consolidateHttpClientResponseBytes(res);
-      await out.writeAsBytes(bytes, flush: true);
-      return out;
-    } finally {
-      client.close(force: true);
-    }
-  }
-
-  String _guessImageExt(String path) {
-    final p = path.toLowerCase();
-    if (p.endsWith('.png')) return 'png';
-    if (p.endsWith('.webp')) return 'webp';
-    return 'jpg';
+    await _shareService.share(ir: ir, language: _language);
   }
 
   String _resolveImageUrl(IrshadFirestoreModel ir) {

@@ -108,7 +108,7 @@ class _AdminShajraUrduDetailsScreenState
                                       child: Directionality(
                                         textDirection: TextDirection.rtl,
                                         child: Text(
-                                          e.fullTitle,
+                                          e.listDisplayName,
                                           style: AppTheme.amiriUrdu(
                                             fontSize: 16,
                                             height: 1.6,

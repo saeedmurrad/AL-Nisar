@@ -1,3 +1,5 @@
+import '../services/shajra_scrape_client.dart';
+
 /// One row in the Shajra Pak chain (English from web or Urdu dummy).
 ///
 /// [detailUrl] is for HTTP only — never show in UI, tooltips, or share text.
@@ -20,6 +22,14 @@ class ShajraEntryModel {
 
   static const String english = 'english';
   static const String urdu = 'urdu';
+
+  /// Short label for list rows (never the full alqabat line).
+  String get listDisplayName {
+    final full = fullTitle.trim();
+    return language == urdu
+        ? ShajraScrapeClient.listLabelUrdu(full, number)
+        : ShajraScrapeClient.listLabelEnglish(full, number);
+  }
 
   Map<String, dynamic> toJson() => {
         'number': number,

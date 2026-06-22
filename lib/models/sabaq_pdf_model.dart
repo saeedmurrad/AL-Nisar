@@ -12,6 +12,7 @@ class SabaqPdfModel {
     required this.thumbnailUrl,
     required this.uploadedAt,
     required this.isActive,
+    this.orderNumber,
   });
 
   final String id;
@@ -21,6 +22,7 @@ class SabaqPdfModel {
   final String thumbnailUrl;
   final DateTime uploadedAt;
   final bool isActive;
+  final int? orderNumber;
 
   factory SabaqPdfModel.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
     final data = doc.data() ?? {};
@@ -35,6 +37,7 @@ class SabaqPdfModel {
       thumbnailUrl: data['thumbnailUrl'] as String? ?? '',
       uploadedAt: uploadedAt,
       isActive: data['isActive'] as bool? ?? true,
+      orderNumber: (data['orderNumber'] as num?)?.toInt(),
     );
   }
 
@@ -45,5 +48,6 @@ class SabaqPdfModel {
         'thumbnailUrl': thumbnailUrl,
         'uploadedAt': Timestamp.fromDate(uploadedAt),
         'isActive': isActive,
+        if (orderNumber != null) 'orderNumber': orderNumber,
       };
 }

@@ -12,6 +12,7 @@ import '../models/sabaq_access_request_model.dart';
 import '../models/sabaq_pdf_model.dart';
 import '../services/sabaq_access_service.dart';
 import '../services/sabaq_service.dart';
+import '../utils/sabaq_order_utils.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
 import '../theme/color_utils.dart';
@@ -133,11 +134,7 @@ class _SabaqListScreenState extends State<SabaqListScreen> {
     );
   }
 
-  List<SabaqPdfModel> _ordered(List<SabaqPdfModel> list) {
-    final copy = [...list];
-    copy.sort((a, b) => a.uploadedAt.compareTo(b.uploadedAt));
-    return copy;
-  }
+  List<SabaqPdfModel> _ordered(List<SabaqPdfModel> list) => dedupeSabaqList(list);
 
   Future<void> _openSabaq({
     required BuildContext context,
@@ -310,6 +307,13 @@ class _SabaqListScreenState extends State<SabaqListScreen> {
             child: StreamBuilder<List<SabaqPdfModel>>(
               stream: _sabaq.streamSabaqPdfs(),
               builder: (context, snap) {
+                if (snap.connectionState == ConnectionState.waiting &&
+                    !snap.hasData) {
+                  return Center(
+                    child: CircularProgressIndicator(color: c.accentGold),
+                  );
+                }
+
                 final list = snap.data;
                 final use = (list == null || list.isEmpty)
                     ? DummyData.sabaqList
@@ -317,11 +321,12 @@ class _SabaqListScreenState extends State<SabaqListScreen> {
                           (s) => SabaqPdfModel(
                             id: s.id,
                             titleEn: s.title,
-                            titleUr: '',
+                            titleUr: s.urduTitle ?? '',
                             storagePath: '',
                             thumbnailUrl: s.coverImageUrl,
                             uploadedAt: DateTime.now(),
                             isActive: true,
+                            orderNumber: s.lessonNumber,
                           ),
                         )
                         .toList()
@@ -341,7 +346,6 @@ class _SabaqListScreenState extends State<SabaqListScreen> {
                   separatorBuilder: (context, index) => const SizedBox(height: 12),
                   itemBuilder: (context, i) {
                     final s = ordered[i];
-
                     final isFree = !auth.isAdminOrHigher &&
                         firstId != null &&
                         firstId == s.id &&
