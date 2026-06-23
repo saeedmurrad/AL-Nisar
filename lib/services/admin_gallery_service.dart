@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
+import '../models/gallery_folder.dart';
 import '../models/gallery_image_model.dart';
 
 class AdminGalleryService {
@@ -36,6 +37,13 @@ class AdminGalleryService {
 
   Future<String> getDownloadUrl(String id, {required String extension}) async {
     return imageRef(id, extension: extension).getDownloadURL();
+  }
+
+  Future<void> updateFolder(String id, String folderId) async {
+    await _col.doc(id).set(
+      {'folder': GalleryFolder.normalizeId(folderId)},
+      SetOptions(merge: true),
+    );
   }
 
   Future<void> upsert(GalleryImageModel model) async {

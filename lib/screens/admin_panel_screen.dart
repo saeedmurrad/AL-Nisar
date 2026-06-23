@@ -93,6 +93,13 @@ class AdminPanelScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 _Tile(
+                  icon: Icons.share_outlined,
+                  title: 'Social Links',
+                  subtitle: 'Facebook, YouTube, and live stream banner',
+                  onTap: () => context.push('/admin/social-links'),
+                ),
+                const SizedBox(height: 10),
+                _Tile(
                   icon: Icons.lock_open_outlined,
                   title: 'Manage Asbaq-e-Tareeqat',
                   subtitle: 'Upload Asbaq PDF + titles + thumbnail',

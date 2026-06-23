@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../models/gallery_folder.dart';
 import '../models/gallery_image_model.dart';
 import '../services/admin_gallery_service.dart';
 import '../theme/app_theme.dart';
@@ -27,6 +28,7 @@ class _AdminUploadGalleryImagesScreenState
   bool _saving = false;
   double? _progress;
   String? _label;
+  String _uploadFolder = GalleryFolder.saeenG.id;
 
   List<String> _paths = const [];
   final Set<String> _deletingIds = {};
@@ -100,6 +102,44 @@ class _AdminUploadGalleryImagesScreenState
     }
   }
 
+  Future<void> _changeFolder(GalleryImageModel item) async {
+    final picked = await showDialog<String>(
+      context: context,
+      builder: (ctx) {
+        final cc = ctx.c;
+        return SimpleDialog(
+          backgroundColor: cc.backgroundSurface,
+          title: Text(
+            'Move to folder',
+            style: AppTheme.cormorantGaramond(color: cc.textPrimary),
+          ),
+          children: GalleryFolder.visibleInGallery
+              .map(
+                (f) => SimpleDialogOption(
+                  onPressed: () => Navigator.pop(ctx, f.id),
+                  child: Text(
+                    f.label,
+                    style: AppTheme.lato(
+                      color: item.folder == f.id ? cc.accentGold : cc.textPrimary,
+                      fontWeight:
+                          item.folder == f.id ? FontWeight.w700 : FontWeight.w400,
+                    ),
+                  ),
+                ),
+              )
+              .toList(),
+        );
+      },
+    );
+    if (picked == null || picked == item.folder || !mounted) return;
+    try {
+      await _service.updateFolder(item.id, picked);
+      if (mounted) _snack('Moved to ${GalleryFolder.fromId(picked).label}');
+    } catch (_) {
+      if (mounted) _snack('Could not update folder');
+    }
+  }
+
   String _extFromPath(String path) {
     final p = path.toLowerCase();
     if (p.endsWith('.jpeg')) return 'jpeg';
@@ -115,7 +155,6 @@ class _AdminUploadGalleryImagesScreenState
       return;
     }
 
-    // Limit each file to avoid huge uploads.
     for (final p in _paths) {
       final f = File(p);
       if (!f.existsSync()) {
@@ -171,6 +210,7 @@ class _AdminUploadGalleryImagesScreenState
           downloadUrl: url,
           uploadedAt: DateTime.now(),
           isActive: true,
+          folder: _uploadFolder,
         );
         await _service.upsert(model);
       }
@@ -246,7 +286,8 @@ class _AdminUploadGalleryImagesScreenState
                           final idShort = img.id.length > 10
                               ? '${img.id.substring(0, 10)}…'
                               : img.id;
-                          final label = idShort;
+                          final label =
+                              '${GalleryFolder.fromId(img.folder).label} · $idShort';
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 8),
                             child: Container(
@@ -316,14 +357,29 @@ class _AdminUploadGalleryImagesScreenState
                                       ),
                                     )
                                   else
-                                    IconButton(
-                                      onPressed: _saving
-                                          ? null
-                                          : () => _confirmDeleteGalleryImage(img),
-                                      icon: Icon(
-                                        Icons.delete_outline,
-                                        color: c.textMuted,
-                                      ),
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        IconButton(
+                                          onPressed: _saving
+                                              ? null
+                                              : () => _changeFolder(img),
+                                          icon: Icon(
+                                            Icons.drive_file_move_outline,
+                                            color: c.accentGold,
+                                          ),
+                                          tooltip: 'Change folder',
+                                        ),
+                                        IconButton(
+                                          onPressed: _saving
+                                              ? null
+                                              : () => _confirmDeleteGalleryImage(img),
+                                          icon: Icon(
+                                            Icons.delete_outline,
+                                            color: c.textMuted,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                 ],
                               ),
@@ -360,6 +416,31 @@ class _AdminUploadGalleryImagesScreenState
                     ),
                     const SizedBox(height: 14),
                   ],
+                  DropdownButtonFormField<String>(
+                    value: _uploadFolder,
+                    decoration: InputDecoration(
+                      labelText: 'Folder',
+                      labelStyle: AppTheme.lato(fontSize: 12, color: c.textMuted),
+                      filled: true,
+                      fillColor: c.backgroundInput,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: c.borderDefault, width: 0.5),
+                      ),
+                    ),
+                    dropdownColor: c.backgroundSurface,
+                    style: AppTheme.lato(fontSize: 13, color: c.textPrimary),
+                    items: [
+                      for (final f in GalleryFolder.visibleInGallery)
+                        DropdownMenuItem(value: f.id, child: Text(f.label)),
+                    ],
+                    onChanged: _saving
+                        ? null
+                        : (v) {
+                            if (v != null) setState(() => _uploadFolder = v);
+                          },
+                  ),
+                  const SizedBox(height: 14),
                   Text(
                     'Images',
                     style: AppTheme.lato(
@@ -434,7 +515,9 @@ class _AdminUploadGalleryImagesScreenState
                             ? c.backgroundPrimary
                             : c.textPrimary,
                         padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                         elevation: 0,
                       ),
                       child: _saving
@@ -466,4 +549,3 @@ class _AdminUploadGalleryImagesScreenState
     );
   }
 }
-

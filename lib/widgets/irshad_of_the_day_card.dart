@@ -71,7 +71,12 @@ class _IrshadOfTheDayCardState extends State<IrshadOfTheDayCard> {
     if (_sharing) return;
     setState(() => _sharing = true);
     try {
-      await _shareService.share(ir: ir, language: IrshadatLanguage.urdu);
+      await _shareService.share(
+        ir: ir,
+        language: IrshadatLanguage.urdu,
+        dateLabelOverride: IrshadDailyPicker.todayLabel(),
+        irshadPakOfTheDay: true,
+      );
     } finally {
       if (mounted) setState(() => _sharing = false);
     }
@@ -82,12 +87,14 @@ class _IrshadOfTheDayCardState extends State<IrshadOfTheDayCard> {
     final list = _effectiveList();
     final pick = IrshadDailyPicker.pickForDay(list);
     final loading = _urdu.isEmpty && list.isEmpty;
+    final todayLabel = IrshadDailyPicker.todayLabel();
 
     return _UrduIrshadPhotoCard(
       ir: pick,
       imageUrl: _resolveImageUrl(pick),
       loading: loading,
       sharing: _sharing,
+      todayLabel: todayLabel,
       onShare: pick == null ? null : () => _share(pick),
     );
   }
@@ -99,6 +106,7 @@ class _UrduIrshadPhotoCard extends StatelessWidget {
     required this.imageUrl,
     required this.loading,
     required this.sharing,
+    required this.todayLabel,
     required this.onShare,
   });
 
@@ -106,6 +114,7 @@ class _UrduIrshadPhotoCard extends StatelessWidget {
   final String imageUrl;
   final bool loading;
   final bool sharing;
+  final String todayLabel;
   final VoidCallback? onShare;
 
   @override
@@ -128,7 +137,7 @@ class _UrduIrshadPhotoCard extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      'Irshad of the Day',
+                      'Irshad Pak of the Day',
                       style: AppTheme.cinzelHeading(
                         fontSize: 15,
                         letterSpacing: 1.1,
@@ -217,7 +226,7 @@ class _UrduIrshadPhotoCard extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 14),
                 child: Text(
-                  ir!.dateLabel,
+                  todayLabel,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: c.textMuted,
@@ -264,7 +273,7 @@ class _UrduIrshadPhotoCard extends StatelessWidget {
       context,
       imageUrls: [imageUrl],
       initialIndex: 0,
-      caption: ir?.dateLabel,
+      caption: todayLabel,
     );
   }
 }

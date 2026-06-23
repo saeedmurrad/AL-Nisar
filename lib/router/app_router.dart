@@ -42,6 +42,7 @@ import '../screens/forgot_password_screen.dart';
 import '../screens/super_admin_panel_screen.dart';
 import '../screens/super_admin_users_screen.dart';
 import '../screens/admin_upload_asbaq_screen.dart';
+import '../screens/admin_social_links_screen.dart';
 import '../screens/admin_upload_sabaq_screen.dart';
 import '../screens/admin_sabaq_requests_screen.dart';
 
@@ -317,6 +318,10 @@ GoRouter createAppRouter(AuthProvider auth) {
       GoRoute(
         path: '/admin/sabaq-requests',
         builder: (context, state) => const AdminSabaqRequestsScreen(),
+      ),
+      GoRoute(
+        path: '/admin/social-links',
+        builder: (context, state) => const AdminSocialLinksScreen(),
       ),
       GoRoute(
         path: '/admin/asbaq',

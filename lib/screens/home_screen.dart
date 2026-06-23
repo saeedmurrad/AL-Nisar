@@ -13,6 +13,7 @@ import '../widgets/home_grid_icons.dart';
 import '../widgets/irshad_of_the_day_card.dart';
 import '../widgets/mandala_painter.dart';
 import '../widgets/murshid_avatar.dart';
+import '../widgets/social_connect_section.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -36,6 +37,8 @@ class HomeScreen extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
               children: [
                 const IrshadOfTheDayCard(),
+                const SizedBox(height: 16),
+                const SocialConnectSection(),
                 const SizedBox(height: 16),
                 _HomeGrid(
                   showAdminPanel: auth.isAdminOrHigher,

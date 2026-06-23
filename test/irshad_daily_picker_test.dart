@@ -42,4 +42,11 @@ void main() {
     }
     expect(indices.length, greaterThan(1));
   });
+
+  test('todayLabel formats current calendar date', () {
+    expect(
+      IrshadDailyPicker.todayLabel(DateTime(2026, 6, 23)),
+      '23 Jun 2026',
+    );
+  });
 }

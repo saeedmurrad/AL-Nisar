@@ -10,11 +10,17 @@ class IrshadShareService {
   Future<void> share({
     required IrshadFirestoreModel ir,
     required IrshadatLanguage language,
+    String? dateLabelOverride,
+    bool irshadPakOfTheDay = false,
   }) async {
     final text = ir.text.trim();
     final url = ir.imageUrl.trim();
+    final dateLabel = dateLabelOverride ?? ir.dateLabel;
+    final heading = irshadPakOfTheDay
+        ? 'Irshad Pak of the Day (${language.label}) — $dateLabel'
+        : 'Irshad (${language.label}) — $dateLabel';
     final msg = [
-      'Irshad of the Day (${language.label}) — ${ir.dateLabel}',
+      heading,
       if (text.isNotEmpty) text,
       'AL Nisar App',
     ].join('\n\n');

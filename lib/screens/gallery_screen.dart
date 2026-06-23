@@ -8,96 +8,294 @@ import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 
 import '../data/dummy_data.dart';
+import '../models/gallery_folder.dart';
 import '../models/gallery_image_model.dart';
 import '../services/gallery_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/color_utils.dart';
 import '../theme/app_theme_colors.dart';
+import '../widgets/gold_card.dart';
 import '../widgets/shimmer_placeholder.dart';
 import '../widgets/standard_shell_header.dart';
 
-class GalleryScreen extends StatelessWidget {
+class GalleryScreen extends StatefulWidget {
   const GalleryScreen({super.key});
+
+  @override
+  State<GalleryScreen> createState() => _GalleryScreenState();
+}
+
+class _GalleryScreenState extends State<GalleryScreen> {
+  final _service = GalleryService();
+  GalleryFolder? _openFolder;
 
   @override
   Widget build(BuildContext context) {
     final c = context.c;
-    final service = GalleryService();
 
     return Scaffold(
       body: Column(
         children: [
-          const StandardShellHeader(
-            title: 'Gallery',
-            padding: EdgeInsets.fromLTRB(4, 18, 16, 14),
+          StandardShellHeader(
+            title: _openFolder?.label ?? 'Gallery',
+            padding: const EdgeInsets.fromLTRB(4, 18, 16, 14),
+            onBack: _openFolder == null
+                ? null
+                : () => setState(() => _openFolder = null),
           ),
           Expanded(
             child: StreamBuilder<List<GalleryImageModel>>(
-              stream: service.streamActive(),
+              stream: _service.streamActive(),
               builder: (context, snap) {
                 final list = snap.data ?? const <GalleryImageModel>[];
-                // Fallback to DummyData if Firebase has nothing yet.
-                final urls = list.isNotEmpty
-                    ? list.map((e) => e.downloadUrl).toList()
-                    : DummyData.galleryImages;
 
-                if (snap.connectionState == ConnectionState.waiting && urls.isEmpty) {
-                  return Center(
-                    child: CircularProgressIndicator(color: c.accentGold),
-                  );
+                if (snap.connectionState == ConnectionState.waiting && list.isEmpty) {
+                  return Center(child: CircularProgressIndicator(color: c.accentGold));
                 }
 
-                if (urls.isEmpty) {
-                  return Center(
-                    child: Text('No images yet', style: AppTheme.lato(color: c.textMuted)),
-                  );
-                }
-
-                return GridView.builder(
-                  padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
-                    childAspectRatio: 3 / 4,
-                  ),
-                  itemCount: urls.length,
-                  itemBuilder: (context, i) {
-                    final url = urls[i];
-                    return InkWell(
-                      onTap: () {
-                        Navigator.of(context).push(
-                          PageRouteBuilder(
-                            opaque: false,
-                            pageBuilder: (context, animation, secondaryAnimation) =>
-                                _GalleryViewer(
-                                  images: urls,
-                                  initialIndex: i,
-                                ),
-                            transitionsBuilder: (context, animation, secondaryAnimation, child) =>
-                                FadeTransition(opacity: animation, child: child),
+                if (list.isEmpty) {
+                  return _openFolder == null
+                      ? _FolderGrid(
+                          grouped: _dummyGrouped(),
+                          onOpenFolder: (f) => setState(() => _openFolder = f),
+                          isFallback: true,
+                        )
+                      : Center(
+                          child: Text(
+                            'No images in this folder yet',
+                            style: AppTheme.lato(color: c.textMuted),
                           ),
                         );
-                      },
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: CachedNetworkImage(
-                          imageUrl: url,
-                          fit: BoxFit.cover,
-                          placeholder: (context, url) => ShimmerPlaceholder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          errorWidget: (context, url, error) => const GoldPatternError(),
-                        ),
+                }
+
+                if (_openFolder != null) {
+                  final images = GalleryService.imagesInFolder(list, _openFolder!);
+                  if (images.isEmpty) {
+                    return Center(
+                      child: Text(
+                        'No images in this folder yet',
+                        style: AppTheme.lato(color: c.textMuted),
                       ),
                     );
-                  },
+                  }
+                  return _ImageGrid(
+                    images: images,
+                    onTap: (i) => _openViewer(context, images, i),
+                  );
+                }
+
+                final grouped = GalleryService.groupByFolder(list);
+                return _FolderGrid(
+                  grouped: grouped,
+                  onOpenFolder: (f) => setState(() => _openFolder = f),
                 );
               },
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Map<GalleryFolder, List<GalleryImageModel>> _dummyGrouped() {
+    final urls = DummyData.galleryImages;
+    final general = urls
+        .asMap()
+        .entries
+        .map(
+          (e) => GalleryImageModel(
+            id: 'dummy_${e.key}',
+            storagePath: '',
+            downloadUrl: e.value,
+            uploadedAt: DateTime.now(),
+            isActive: true,
+            folder: GalleryFolder.general.id,
+          ),
+        )
+        .toList();
+    return {GalleryFolder.general: general};
+  }
+
+  void _openViewer(BuildContext context, List<GalleryImageModel> images, int index) {
+    final urls = images.map((e) => e.downloadUrl).toList();
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        opaque: false,
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            _GalleryViewer(images: urls, initialIndex: index),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+            FadeTransition(opacity: animation, child: child),
+      ),
+    );
+  }
+}
+
+class _FolderGrid extends StatelessWidget {
+  const _FolderGrid({
+    required this.grouped,
+    required this.onOpenFolder,
+    this.isFallback = false,
+  });
+
+  final Map<GalleryFolder, List<GalleryImageModel>> grouped;
+  final ValueChanged<GalleryFolder> onOpenFolder;
+  final bool isFallback;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.c;
+    final folders = GalleryFolder.visibleInGallery
+        .where((f) => (grouped[f]?.isNotEmpty ?? false))
+        .toList();
+
+    if (folders.isEmpty) {
+      return Center(
+        child: Text('No albums yet', style: AppTheme.lato(color: c.textMuted)),
+      );
+    }
+
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+      children: [
+        if (isFallback)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: Text(
+              'Showing sample images until Firebase albums load.',
+              style: AppTheme.lato(fontSize: 12, color: c.textMuted),
+            ),
+          ),
+        ...folders.map((folder) {
+          final images = grouped[folder] ?? const <GalleryImageModel>[];
+          final cover = images.isNotEmpty ? images.first.downloadUrl : '';
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: _FolderCard(
+              folder: folder,
+              count: images.length,
+              coverUrl: cover,
+              onTap: () => onOpenFolder(folder),
+            ),
+          );
+        }),
+      ],
+    );
+  }
+}
+
+class _FolderCard extends StatelessWidget {
+  const _FolderCard({
+    required this.folder,
+    required this.count,
+    required this.coverUrl,
+    required this.onTap,
+  });
+
+  final GalleryFolder folder;
+  final int count;
+  final String coverUrl;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.c;
+    return GoldCard(
+      backgroundColor: c.backgroundInput,
+      padding: EdgeInsets.zero,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(14),
+        child: Row(
+          children: [
+            ClipRRect(
+              borderRadius: const BorderRadius.horizontal(left: Radius.circular(14)),
+              child: SizedBox(
+                width: 88,
+                height: 88,
+                child: coverUrl.isEmpty
+                    ? ColoredBox(
+                        color: c.backgroundElevated,
+                        child: Icon(Icons.folder_outlined, color: c.accentGold, size: 32),
+                      )
+                    : CachedNetworkImage(
+                        imageUrl: coverUrl,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => const ShimmerPlaceholder(),
+                        errorWidget: (context, url, error) => ColoredBox(
+                          color: c.backgroundElevated,
+                          child: Icon(Icons.folder_outlined, color: c.accentGold),
+                        ),
+                      ),
+              ),
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(14, 12, 12, 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      folder.label,
+                      style: AppTheme.cormorantGaramond(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: c.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '$count photo${count == 1 ? '' : 's'}',
+                      style: AppTheme.lato(fontSize: 12, color: c.textMuted),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(right: 12),
+              child: Icon(Icons.chevron_right_rounded, color: c.accentGold),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ImageGrid extends StatelessWidget {
+  const _ImageGrid({required this.images, required this.onTap});
+
+  final List<GalleryImageModel> images;
+  final ValueChanged<int> onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.builder(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        childAspectRatio: 3 / 4,
+      ),
+      itemCount: images.length,
+      itemBuilder: (context, i) {
+        final url = images[i].downloadUrl;
+        return InkWell(
+          onTap: () => onTap(i),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: CachedNetworkImage(
+              imageUrl: url,
+              fit: BoxFit.cover,
+              placeholder: (context, url) => ShimmerPlaceholder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              errorWidget: (context, url, error) => const GoldPatternError(),
+            ),
+          ),
+        );
+      },
     );
   }
 }
@@ -165,30 +363,20 @@ class _GalleryViewerState extends State<_GalleryViewer> {
                       decoration: BoxDecoration(
                         color: c.backgroundElevated.o(0.65),
                         borderRadius: BorderRadius.circular(14),
-                        border: Border.all(
-                          color: c.borderDefault,
-                          width: 0.5,
-                        ),
+                        border: Border.all(color: c.borderDefault, width: 0.5),
                       ),
                       child: SvgPicture.string(
                         _closeSvg,
                         width: 18,
                         height: 18,
-                        colorFilter: ColorFilter.mode(
-                          c.accentGold,
-                          BlendMode.srcIn,
-                        ),
+                        colorFilter: ColorFilter.mode(c.accentGold, BlendMode.srcIn),
                       ),
                     ),
                   ),
                   const Spacer(),
                   Text(
                     '${_i + 1}/${widget.images.length}',
-                    style: TextStyle(
-                      color: c.textMuted,
-                      fontSize: 12,
-                      letterSpacing: 1.1,
-                    ),
+                    style: TextStyle(color: c.textMuted, fontSize: 12, letterSpacing: 1.1),
                   ),
                   const SizedBox(width: 10),
                   InkWell(
@@ -198,10 +386,7 @@ class _GalleryViewerState extends State<_GalleryViewer> {
                       decoration: BoxDecoration(
                         color: c.backgroundElevated.o(0.65),
                         borderRadius: BorderRadius.circular(14),
-                        border: Border.all(
-                          color: c.borderDefault,
-                          width: 0.5,
-                        ),
+                        border: Border.all(color: c.borderDefault, width: 0.5),
                       ),
                       child: _sharing
                           ? SizedBox(
@@ -258,4 +443,3 @@ class _GalleryViewerState extends State<_GalleryViewer> {
 
 const _closeSvg =
     '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
-

@@ -161,6 +161,7 @@ async function main() {
           downloadUrl: publicUrl(destPath),
           uploadedAt: Timestamp.fromDate(createdAt),
           isActive: true,
+          folder: 'irshadat',
           source: 'irshadat',
           sourceIrshadId: row.id,
         },
