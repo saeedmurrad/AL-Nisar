@@ -5,6 +5,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 
 import '../models/event_firestore_model.dart';
 import '../models/news_firestore_model.dart';
+import 'user_notifications_service.dart';
 
 class AdminNewsEventsService {
   AdminNewsEventsService({
@@ -67,8 +68,40 @@ class AdminNewsEventsService {
     await _firestore.collection('news').doc(model.id).set(model.toMap());
   }
 
+  Future<void> createNews(
+    NewsFirestoreModel model, {
+    required String creatorUserId,
+  }) async {
+    await upsertNews(model);
+    try {
+      await UserNotificationsService().notifyAllUsersNewNews(
+        newsId: model.id,
+        title: model.title,
+        excludeUserId: creatorUserId,
+      );
+    } catch (_) {
+      // Notification fan-out is best-effort (rules / offline).
+    }
+  }
+
   Future<void> upsertEvent(EventFirestoreModel model) async {
     await _firestore.collection('events').doc(model.id).set(model.toMap());
+  }
+
+  Future<void> createEvent(
+    EventFirestoreModel model, {
+    required String creatorUserId,
+  }) async {
+    await upsertEvent(model);
+    try {
+      await UserNotificationsService().notifyAllUsersNewEvent(
+        eventId: model.id,
+        title: model.title,
+        excludeUserId: creatorUserId,
+      );
+    } catch (_) {
+      // Notification fan-out is best-effort (rules / offline).
+    }
   }
 
   Future<void> setNewsActive(String id, bool active) async {

@@ -7,8 +7,9 @@ import '../data/dummy_data.dart';
 import '../navigation/go_router_helpers.dart';
 import '../models/lesson_model.dart';
 import '../theme/color_utils.dart';
-import '../theme/app_theme_colors.dart';
 import '../theme/app_theme.dart';
+import '../theme/app_theme_colors.dart';
+import '../utils/responsive_layout.dart';
 import '../widgets/gold_card.dart';
 import '../widgets/locked_sabaq_card.dart';
 import '../widgets/shimmer_placeholder.dart';
@@ -86,7 +87,7 @@ class _SabaqReaderScreenState extends State<SabaqReaderScreen> {
                             ),
                             const SizedBox(height: 14),
                             SizedBox(
-                              height: 240,
+                              height: ResponsiveLayout.lessonPageViewportHeight(context),
                               child: PageView.builder(
                                 controller: _pc,
                                 itemCount: pages.length,
@@ -233,7 +234,14 @@ class _TopBar extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 12),
-            Text(title, style: AppTheme.cinzelHeading(fontSize: 18)),
+            Expanded(
+              child: Text(
+                title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: AppTheme.cinzelHeading(fontSize: 18),
+              ),
+            ),
           ],
         ),
       ),
@@ -269,6 +277,8 @@ class _HeaderBanner extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Text(
                   title,
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
                   style: AppTheme.cinzelHeading(
                     fontSize: 18,
                     letterSpacing: 1.6,

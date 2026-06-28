@@ -8,7 +8,6 @@ import 'firebase_options.dart';
 import 'providers/book_provider.dart';
 import 'providers/theme_provider.dart';
 import 'router/app_router.dart';
-import 'theme/app_theme.dart';
 import 'widgets/router_pop_scope.dart';
 
 Future<void> main() async {
@@ -40,15 +39,24 @@ class AlNisarApp extends StatelessWidget {
     return MaterialApp.router(
       title: 'AL Nisar App',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
+      theme: themeProvider.lightTheme,
+      darkTheme: themeProvider.darkTheme,
       themeMode: themeProvider.themeMode,
       routerConfig: router,
-      builder: (context, child) => RouterPopScope(
-        router: router,
-        isAuthenticated: context.watch<AuthProvider>().isAuthenticated,
-        child: child,
-      ),
+      builder: (context, child) {
+        final themeProvider = context.watch<ThemeProvider>();
+        final mq = MediaQuery.of(context);
+        return MediaQuery(
+          data: mq.copyWith(
+            textScaler: TextScaler.linear(themeProvider.fontScale),
+          ),
+          child: RouterPopScope(
+            router: router,
+            isAuthenticated: context.watch<AuthProvider>().isAuthenticated,
+            child: child,
+          ),
+        );
+      },
     );
   }
 }

@@ -154,8 +154,8 @@ class _SignupScreenState extends State<SignupScreen> {
                               setState(() => _hidePassword = !_hidePassword),
                           icon: Icon(
                             _hidePassword
-                                ? Icons.visibility
-                                : Icons.visibility_off,
+                                ? Icons.visibility_off
+                                : Icons.visibility,
                             color: c.textMuted,
                           ),
                         ),
@@ -173,8 +173,8 @@ class _SignupScreenState extends State<SignupScreen> {
                               setState(() => _hideConfirm = !_hideConfirm),
                           icon: Icon(
                             _hideConfirm
-                                ? Icons.visibility
-                                : Icons.visibility_off,
+                                ? Icons.visibility_off
+                                : Icons.visibility,
                             color: c.textMuted,
                           ),
                         ),

@@ -27,8 +27,6 @@ import '../screens/shajra_pdf_screen.dart';
 import '../screens/shajra_urdu_pdf_screen.dart';
 import '../screens/shijra_screen.dart';
 import '../screens/splash_screen.dart';
-import '../screens/add_data_screen.dart';
-import '../screens/add_book_screen.dart';
 import '../screens/admin_panel_screen.dart';
 import '../screens/admin_upload_book_screen.dart';
 import '../screens/admin_irshadat_screen.dart';
@@ -41,9 +39,7 @@ import '../screens/signup_screen.dart';
 import '../screens/forgot_password_screen.dart';
 import '../screens/super_admin_panel_screen.dart';
 import '../screens/super_admin_users_screen.dart';
-import '../screens/admin_upload_asbaq_screen.dart';
 import '../screens/admin_social_links_screen.dart';
-import '../screens/admin_upload_sabaq_screen.dart';
 import '../screens/admin_sabaq_requests_screen.dart';
 
 GoRouter createAppRouter(AuthProvider auth) {
@@ -63,10 +59,15 @@ GoRouter createAppRouter(AuthProvider auth) {
       // If signed in, keep auth screens inaccessible.
       if (onAuthRoute) return '/home';
 
-      // Add Data is admin-only.
-      if (loc.startsWith('/profile/add-data') && !auth.isAdminOrHigher) {
-        return '/home';
+      // Legacy add-data URLs → flat admin routes.
+      if (loc == '/admin/add-data') return '/admin';
+      if (loc.startsWith('/admin/add-data/')) {
+        return loc.replaceFirst('/admin/add-data', '/admin');
       }
+      if (loc == '/profile/add-data' || loc.startsWith('/profile/add-data/')) {
+        return '/books';
+      }
+      if (loc == '/profile/books') return '/books';
 
       // Role-based guards for admin routes.
       if (loc.startsWith('/admin') && !auth.isAdminOrHigher) {
@@ -236,84 +237,40 @@ GoRouter createAppRouter(AuthProvider auth) {
         builder: (context, state) => const ProfileScreen(),
       ),
       GoRoute(
-        path: '/profile/add-data',
-        builder: (context, state) => const AddDataScreen(),
-        routes: [
-          GoRoute(
-            path: 'books',
-            builder: (context, state) => const AddBookScreen(),
-          ),
-        ],
-      ),
-      GoRoute(
         path: '/admin',
         builder: (context, state) => const AdminPanelScreen(),
-      ),
-      GoRoute(
-        path: '/admin/add-data',
-        builder: (context, state) => const AddDataScreen(),
-        routes: [
-          GoRoute(
-            path: 'books',
-            builder: (context, state) => const AdminUploadBookScreen(),
-          ),
-          GoRoute(
-            path: 'shajra-urdu',
-            builder: (context, state) => const AdminShajraUrduDetailsScreen(),
-            routes: [
-              GoRoute(
-                path: 'upload',
-                builder: (context, state) {
-                  final extra = state.extra;
-                  if (extra is! AdminShajraUrduUploadArgs) {
-                    return const _ShajraDetailMissing();
-                  }
-                  return AdminUploadShajraUrduDetailScreen(args: extra);
-                },
-              ),
-            ],
-          ),
-          GoRoute(
-            path: 'irshadat-english',
-            builder: (context, state) => const AdminIrshadatScreen(
-              initialLanguage: IrshadatLanguage.english,
-            ),
-          ),
-          GoRoute(
-            path: 'irshadat-urdu',
-            builder: (context, state) => const AdminIrshadatScreen(
-              initialLanguage: IrshadatLanguage.urdu,
-            ),
-          ),
-          GoRoute(
-            path: 'sabaq',
-            builder: (context, state) => const AdminUploadSabaqScreen(),
-          ),
-          GoRoute(
-            path: 'asbaq',
-            builder: (context, state) => const AdminUploadAsbaqScreen(),
-          ),
-          GoRoute(
-            path: 'news-events',
-            builder: (context, state) => const AdminNewsEventsScreen(),
-          ),
-          GoRoute(
-            path: 'gallery',
-            builder: (context, state) => const AdminUploadGalleryImagesScreen(),
-          ),
-        ],
       ),
       GoRoute(
         path: '/admin/books',
         builder: (context, state) => const AdminUploadBookScreen(),
       ),
       GoRoute(
-        path: '/admin/irshadat',
-        builder: (context, state) => const AdminIrshadatScreen(),
+        path: '/admin/gallery',
+        builder: (context, state) => const AdminUploadGalleryImagesScreen(),
       ),
       GoRoute(
-        path: '/admin/sabaq',
-        builder: (context, state) => const AdminUploadSabaqScreen(),
+        path: '/admin/news-events',
+        builder: (context, state) => const AdminNewsEventsScreen(),
+      ),
+      GoRoute(
+        path: '/admin/shajra-urdu',
+        builder: (context, state) => const AdminShajraUrduDetailsScreen(),
+        routes: [
+          GoRoute(
+            path: 'upload',
+            builder: (context, state) {
+              final extra = state.extra;
+              if (extra is! AdminShajraUrduUploadArgs) {
+                return const _ShajraDetailMissing();
+              }
+              return AdminUploadShajraUrduDetailScreen(args: extra);
+            },
+          ),
+        ],
+      ),
+      GoRoute(
+        path: '/admin/irshadat',
+        builder: (context, state) => const AdminIrshadatScreen(),
       ),
       GoRoute(
         path: '/admin/sabaq-requests',
@@ -322,10 +279,6 @@ GoRouter createAppRouter(AuthProvider auth) {
       GoRoute(
         path: '/admin/social-links',
         builder: (context, state) => const AdminSocialLinksScreen(),
-      ),
-      GoRoute(
-        path: '/admin/asbaq',
-        builder: (context, state) => const AdminUploadAsbaqScreen(),
       ),
       GoRoute(
         path: '/super-admin',

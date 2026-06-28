@@ -11,6 +11,8 @@ import '../theme/app_theme_colors.dart';
 import '../widgets/standard_shell_header.dart';
 import '../widgets/gold_card.dart';
 import '../widgets/theme_toggle_button.dart';
+import '../widgets/theme_palette_picker.dart';
+import '../widgets/font_scale_control.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -173,6 +175,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         const SizedBox(height: 2),
                         Text(
                           email,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                           style: AppTheme.lato(
                             fontSize: 12,
                             color: c.textMuted,
@@ -250,85 +254,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     );
                   },
                 ),
-                const SizedBox(height: 12),
-                if (auth.isAdminOrHigher)
-                  // InkWell(
-                  //   onTap: () => context.push('/profile/add-data'),
-                  //   borderRadius: BorderRadius.circular(14),
-                  //   child: GoldCard(
-                  //     backgroundColor: c.backgroundSurface,
-                  //     child: Row(
-                  //       children: [
-                  //         Expanded(
-                  //           child: Column(
-                  //             crossAxisAlignment: CrossAxisAlignment.start,
-                  //             children: [
-                  //               Text(
-                  //                 'Add Data',
-                  //                 style: TextStyle(
-                  //                   color: c.textPrimary,
-                  //                   fontSize: 14,
-                  //                   letterSpacing: 0.4,
-                  //                 ),
-                  //               ),
-                  //               const SizedBox(height: 8),
-                  //               Text(
-                  //                 'Add relevant app content/data',
-                  //                 style: TextStyle(
-                  //                   color: c.textMuted,
-                  //                   fontSize: 12,
-                  //                 ),
-                  //               ),
-                  //             ],
-                  //           ),
-                  //         ),
-                  //         Icon(
-                  //           Icons.chevron_right,
-                  //           color: c.accentGold,
-                  //         ),
-                  //       ],
-                  //     ),
-                  //   ),
-                  // ),
-                  // if (auth.isSuperAdmin) ...[
-                  //   const SizedBox(height: 12),
-                  //   InkWell(
-                  //     onTap: () => context.push('/super-admin/users'),
-                  //     borderRadius: BorderRadius.circular(14),
-                  //     child: GoldCard(
-                  //       backgroundColor: c.backgroundSurface,
-                  //       child: Row(
-                  //         children: [
-                  //           Expanded(
-                  //             child: Column(
-                  //               crossAxisAlignment: CrossAxisAlignment.start,
-                  //               children: [
-                  //                 Text(
-                  //                   'Members List',
-                  //                   style: TextStyle(
-                  //                     color: c.textPrimary,
-                  //                     fontSize: 14,
-                  //                     letterSpacing: 0.4,
-                  //                   ),
-                  //                 ),
-                  //                 const SizedBox(height: 8),
-                  //                 Text(
-                  //                   'View users and promote to Admin',
-                  //                   style: TextStyle(
-                  //                     color: c.textMuted,
-                  //                     fontSize: 12,
-                  //                   ),
-                  //                 ),
-                  //               ],
-                  //             ),
-                  //           ),
-                  //           Icon(Icons.people_outline, color: c.accentGold),
-                  //         ],
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ],
-                  const SizedBox(height: 16),
+                const SizedBox(height: 16),
                 Text(
                   'Bookmarks',
                   style: TextStyle(
@@ -446,6 +372,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const ThemeToggleButton(),
                   ],
                 ),
+                const SizedBox(height: 10),
+                Text(
+                  'Color theme',
+                  style: TextStyle(
+                    color: c.textMuted,
+                    fontSize: 12,
+                    letterSpacing: 0.6,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                const ThemePalettePicker(compact: false),
+                const SizedBox(height: 14),
+                Text(
+                  'Text size',
+                  style: TextStyle(
+                    color: c.textMuted,
+                    fontSize: 12,
+                    letterSpacing: 0.6,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const FontScaleControl(),
                 if (context.watch<AuthProvider>().isAdminOrHigher) ...[
                   const SizedBox(height: 12),
                   InkWell(
@@ -487,32 +435,61 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                 ],
-                const SizedBox(height: 14),
+                const SizedBox(height: 20),
+                Text(
+                  'Account',
+                  style: TextStyle(
+                    color: c.textMuted,
+                    fontSize: 12,
+                    letterSpacing: 0.6,
+                  ),
+                ),
+                const SizedBox(height: 10),
                 InkWell(
                   onTap: () async {
                     final router = GoRouter.of(context);
                     await context.read<AuthProvider>().signOut();
                     router.go('/login');
                   },
+                  borderRadius: BorderRadius.circular(14),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 15),
                     decoration: BoxDecoration(
-                      color: Colors.transparent,
+                      color: c.backgroundSurface,
                       borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: c.accentGold, width: 1.0),
-                    ),
-                    child: Center(
-                      child: Text(
-                        'Sign out',
-                        style: TextStyle(
-                          color: c.accentGold,
-                          fontSize: 13,
-                          letterSpacing: 1.4,
+                      border: Border.all(color: c.accentGold, width: 1.5),
+                      boxShadow: [
+                        BoxShadow(
+                          color: c.accentGold.o(0.12),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
                         ),
-                      ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.logout_rounded,
+                          size: 20,
+                          color: c.accentGold,
+                        ),
+                        const SizedBox(width: 10),
+                        Text(
+                          'Sign out',
+                          style: AppTheme.lato(
+                            color: c.accentGold,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.6,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
+                SizedBox(height: MediaQuery.paddingOf(context).bottom + 8),
               ],
             ),
           ),

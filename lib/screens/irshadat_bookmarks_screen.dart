@@ -11,6 +11,7 @@ import '../services/irshadat_bookmark_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
 import '../theme/color_utils.dart';
+import '../utils/responsive_layout.dart';
 import '../widgets/full_screen_image_viewer.dart';
 import '../widgets/gold_card.dart';
 import '../widgets/standard_shell_header.dart';
@@ -162,13 +163,8 @@ class _IrshadatBookmarksScreenState extends State<IrshadatBookmarksScreen> {
       ),
       builder: (ctx) {
         final c = ctx.c;
-        return Padding(
-          padding: EdgeInsets.only(
-            left: 16,
-            right: 16,
-            top: 14,
-            bottom: 16 + MediaQuery.viewInsetsOf(ctx).bottom,
-          ),
+        return ResponsiveLayout.scrollableSheet(
+          context: ctx,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -257,9 +253,8 @@ class _IrshadatBookmarksScreenState extends State<IrshadatBookmarksScreen> {
                 ),
                 const SizedBox(height: 12),
               ],
-              Flexible(
-                child: SingleChildScrollView(
-                  child: bm.language.isRtl
+              SingleChildScrollView(
+                child: bm.language.isRtl
                       ? Directionality(
                           textDirection: TextDirection.rtl,
                           child: Text(
@@ -282,7 +277,6 @@ class _IrshadatBookmarksScreenState extends State<IrshadatBookmarksScreen> {
                           ),
                           textAlign: TextAlign.center,
                         ),
-                ),
               ),
               const SizedBox(height: 14),
               Row(

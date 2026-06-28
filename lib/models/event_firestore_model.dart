@@ -1,3 +1,5 @@
+import '../config/news_event_defaults.dart';
+import '../utils/event_date_labels.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class EventFirestoreModel {
@@ -47,17 +49,41 @@ class EventFirestoreModel {
       }
     }
 
+    var fullDateLine = data['fullDateLine'] as String? ?? '';
+    var day = (data['day'] as num?)?.toInt() ?? 1;
+    var monthAbbr = data['monthAbbr'] as String? ?? '';
+    var shortDateLabel = data['shortDateLabel'] as String? ?? '';
+
+    if (fullDateLine.trim().isNotEmpty) {
+      final parsed = EventDateLabels.parse(
+        fullDateLine: fullDateLine,
+        day: day,
+        monthAbbr: monthAbbr,
+      );
+      day = EventDateLabels.day(parsed);
+      monthAbbr = EventDateLabels.monthAbbr(parsed);
+      shortDateLabel = EventDateLabels.shortDateLabel(parsed);
+    } else if (day > 0 && monthAbbr.trim().isNotEmpty) {
+      final parsed = EventDateLabels.parse(
+        fullDateLine: fullDateLine,
+        day: day,
+        monthAbbr: monthAbbr,
+      );
+      fullDateLine = EventDateLabels.fullDateLine(parsed);
+      shortDateLabel = EventDateLabels.shortDateLabel(parsed);
+    }
+
     return EventFirestoreModel(
       id: doc.id,
       title: data['title'] as String? ?? '',
       urduTitle: data['urduTitle'] as String? ?? '',
-      day: (data['day'] as num?)?.toInt() ?? 1,
-      monthAbbr: data['monthAbbr'] as String? ?? '',
-      fullDateLine: data['fullDateLine'] as String? ?? '',
-      shortDateLabel: data['shortDateLabel'] as String? ?? '',
+      day: day,
+      monthAbbr: monthAbbr,
+      fullDateLine: fullDateLine,
+      shortDateLabel: shortDateLabel,
       location: data['location'] as String? ?? '',
       timeLabel: data['timeLabel'] as String? ?? '',
-      organizer: data['organizer'] as String? ?? 'Darbar Sharif',
+      organizer: data['organizer'] as String? ?? NewsEventDefaults.eventOrganizer,
       descriptionLines: lines,
       createdAt: createdAt,
       isActive: data['isActive'] as bool? ?? true,

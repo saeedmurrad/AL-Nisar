@@ -75,7 +75,7 @@ class _AdminShajraUrduDetailsScreenState
                             padding: const EdgeInsets.only(bottom: 10),
                             child: InkWell(
                               onTap: () => context.push(
-                                '/admin/add-data/shajra-urdu/upload',
+                                '/admin/shajra-urdu/upload',
                                 extra: AdminShajraUrduUploadArgs(entry: e),
                               ),
                               borderRadius: BorderRadius.circular(14),

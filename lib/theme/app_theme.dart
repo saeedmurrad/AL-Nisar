@@ -1,42 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'app_colors.dart';
+import 'app_color_palettes.dart';
 import 'app_theme_colors.dart';
 
 class AppTheme {
-  static ThemeData get darkTheme => _buildTheme(
-        brightness: Brightness.dark,
-        colors: const AppThemeColors(
-          backgroundPrimary: AppColorsDark.backgroundPrimary,
-          backgroundSurface: AppColorsDark.backgroundSurface,
-          backgroundElevated: AppColorsDark.backgroundElevated,
-          backgroundInput: AppColorsDark.backgroundInput,
-          accentGold: AppColorsDark.accentGold,
-          textPrimary: AppColorsDark.textPrimary,
-          textSecondary: AppColorsDark.textSecondary,
-          textMuted: AppColorsDark.textMuted,
-          textFaint: AppColorsDark.textFaint,
-          borderDefault: AppColorsDark.borderDefault,
-          borderFaint: AppColorsDark.borderFaint,
-        ),
-      );
-
-  static ThemeData get lightTheme => _buildTheme(
-        brightness: Brightness.light,
-        colors: const AppThemeColors(
-          backgroundPrimary: AppColorsLight.backgroundPrimary,
-          backgroundSurface: AppColorsLight.backgroundSurface,
-          backgroundElevated: AppColorsLight.backgroundElevated,
-          backgroundInput: AppColorsLight.backgroundInput,
-          accentGold: AppColorsLight.accentGold,
-          textPrimary: AppColorsLight.textPrimary,
-          textSecondary: AppColorsLight.textSecondary,
-          textMuted: AppColorsLight.textMuted,
-          textFaint: AppColorsLight.textFaint,
-          borderDefault: AppColorsLight.borderDefault,
-          borderFaint: AppColorsLight.borderFaint,
-        ),
+  static ThemeData themeFor({
+    required AppColorPalette palette,
+    required Brightness brightness,
+  }) =>
+      _buildTheme(
+        brightness: brightness,
+        colors: palette.colorsFor(brightness),
       );
 
   static ThemeData _buildTheme({

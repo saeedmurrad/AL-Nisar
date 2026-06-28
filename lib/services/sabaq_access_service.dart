@@ -48,7 +48,11 @@ class SabaqAccessService {
 
     final id = requestDocId(user.uid, sabaq.id);
     final name = (displayName ?? user.displayName ?? '').trim();
-    await _requests.doc(id).set({
+    final existing = await _requests.doc(id).get();
+    final existingStatus =
+        (existing.data()?['status'] as String? ?? '').toLowerCase();
+
+    final payload = <String, dynamic>{
       'userId': user.uid,
       'sabaqId': sabaq.id,
       'titleEn': sabaq.titleEn,
@@ -58,7 +62,24 @@ class SabaqAccessService {
       'message': message?.trim() ?? '',
       'status': 'pending',
       'createdAt': FieldValue.serverTimestamp(),
-    }, SetOptions(merge: true));
+    };
+
+    if (!existing.exists) {
+      await _requests.doc(id).set(payload);
+    } else if (existingStatus == 'denied') {
+      await _requests.doc(id).update({
+        'userName': name,
+        'userEmail': user.email ?? '',
+        'message': message?.trim() ?? '',
+        'status': 'pending',
+        'decidedAt': FieldValue.delete(),
+        'resubmittedAt': FieldValue.serverTimestamp(),
+      });
+    } else if (existingStatus == 'pending' || existingStatus == 'approved') {
+      throw StateError('request_already_active');
+    } else {
+      throw StateError('request_already_active');
+    }
 
     try {
       await AdminNotificationsService().notifySabaqRequestSubmitted(
@@ -111,6 +132,12 @@ class SabaqAccessService {
     await batch.commit();
 
     try {
+      await AdminNotificationsService().dismissSabaqRequestNotification(requestId);
+    } catch (_) {
+      // Best-effort (rules / offline).
+    }
+
+    try {
       await UserNotificationsService().notifySabaqRequestApproved(
         userId: userId,
         requestId: requestId,
@@ -133,6 +160,12 @@ class SabaqAccessService {
       {'status': 'denied', 'decidedAt': FieldValue.serverTimestamp()},
       SetOptions(merge: true),
     );
+
+    try {
+      await AdminNotificationsService().dismissSabaqRequestNotification(requestId);
+    } catch (_) {
+      // Best-effort (rules / offline).
+    }
 
     if (userId.isNotEmpty) {
       try {

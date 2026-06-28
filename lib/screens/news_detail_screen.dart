@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:share_plus/share_plus.dart';
 
-import '../data/dummy_data.dart';
 import '../models/news_firestore_model.dart';
 import '../services/news_events_service.dart';
 import '../theme/app_theme.dart';
@@ -24,30 +23,50 @@ class NewsDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.c;
-    final fallback = DummyData.newsById(newsId) ?? DummyData.newsFeatured;
     final seed = initial;
 
     return FutureBuilder<NewsFirestoreModel?>(
       future: NewsEventsService().getNewsById(newsId),
       initialData: seed,
       builder: (context, snap) {
+        if (snap.connectionState == ConnectionState.waiting && snap.data == null) {
+          return Scaffold(
+            body: Center(child: CircularProgressIndicator(color: c.accentGold)),
+          );
+        }
+
         final doc = snap.data ?? seed;
-        final title = doc?.title.isNotEmpty == true ? doc!.title : fallback.title;
-        final category =
-            doc?.category.isNotEmpty == true ? doc!.category : fallback.category;
-        final dateLabel =
-            doc?.dateLabel.isNotEmpty == true ? doc!.dateLabel : fallback.dateLabel;
-        final imageUrl =
-            doc?.imageUrl.isNotEmpty == true ? doc!.imageUrl : fallback.imageUrl;
-        final paragraphs = (doc?.bodyParagraphs.isNotEmpty == true)
-            ? doc!.bodyParagraphs
-            : (fallback.bodyParagraphs.isNotEmpty
-                ? fallback.bodyParagraphs
-                : [
-                    'This is placeholder body text for the article.',
-                    'It will be replaced when content is available.',
-                    'May your reading be blessed and calm.',
-                  ]);
+        if (doc == null || doc.title.trim().isEmpty) {
+          return Scaffold(
+            body: SafeArea(
+              child: Column(
+                children: [
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(10, 8, 16, 0),
+                      child: _BackButton(colors: c),
+                    ),
+                  ),
+                  Expanded(
+                    child: Center(
+                      child: Text(
+                        'News article not found.',
+                        style: AppTheme.lato(fontSize: 14, color: c.textMuted),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
+        final title = doc.title;
+        final category = doc.category;
+        final dateLabel = doc.dateLabel;
+        final imageUrl = doc.imageUrl;
+        final paragraphs = doc.bodyParagraphs;
 
         return Scaffold(
           body: Column(
@@ -77,29 +96,7 @@ class NewsDetailScreen extends StatelessWidget {
                         alignment: Alignment.topLeft,
                         child: Padding(
                           padding: const EdgeInsets.fromLTRB(10, 8, 16, 0),
-                          child: InkWell(
-                            onTap: () => popOrGoHome(context),
-                            child: Container(
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: c.backgroundElevated.o(0.82),
-                                borderRadius: BorderRadius.circular(14),
-                                border: Border.all(
-                                  color: c.borderDefault,
-                                  width: 0.5,
-                                ),
-                              ),
-                              child: SvgPicture.string(
-                                _backSvg,
-                                width: 18,
-                                height: 18,
-                                colorFilter: ColorFilter.mode(
-                                  c.accentGold,
-                                  BlendMode.srcIn,
-                                ),
-                              ),
-                            ),
-                          ),
+                          child: _BackButton(colors: c),
                         ),
                       ),
                     ),
@@ -112,34 +109,36 @@ class NewsDetailScreen extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 5,
-                          ),
-                          decoration: BoxDecoration(
-                            color: c.accentGold.o(0.22),
-                            borderRadius: BorderRadius.circular(999),
-                            border: Border.all(color: c.accentGold.o(0.45)),
-                          ),
-                          child: Text(
-                            category,
-                            style: AppTheme.lato(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w700,
-                              color: c.accentGold,
-                              letterSpacing: 0.6,
+                        if (category.isNotEmpty)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 5,
+                            ),
+                            decoration: BoxDecoration(
+                              color: c.accentGold.o(0.22),
+                              borderRadius: BorderRadius.circular(999),
+                              border: Border.all(color: c.accentGold.o(0.45)),
+                            ),
+                            child: Text(
+                              category,
+                              style: AppTheme.lato(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                                color: c.accentGold,
+                                letterSpacing: 0.6,
+                              ),
                             ),
                           ),
-                        ),
                         const Spacer(),
-                        Text(
-                          dateLabel,
-                          style: AppTheme.lato(
-                            fontSize: 12,
-                            color: c.textMuted,
+                        if (dateLabel.isNotEmpty)
+                          Text(
+                            dateLabel,
+                            style: AppTheme.lato(
+                              fontSize: 12,
+                              color: c.textMuted,
+                            ),
                           ),
-                        ),
                       ],
                     ),
                     const SizedBox(height: 14),
@@ -204,6 +203,39 @@ class NewsDetailScreen extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class _BackButton extends StatelessWidget {
+  const _BackButton({required this.colors});
+
+  final AppThemeColors colors;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () => popOrGoHome(context),
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: colors.backgroundElevated.o(0.82),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: colors.borderDefault,
+            width: 0.5,
+          ),
+        ),
+        child: SvgPicture.string(
+          _backSvg,
+          width: 18,
+          height: 18,
+          colorFilter: ColorFilter.mode(
+            colors.accentGold,
+            BlendMode.srcIn,
+          ),
+        ),
+      ),
     );
   }
 }

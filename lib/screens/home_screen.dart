@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import '../widgets/notification_bell_button.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -7,6 +7,7 @@ import '../auth/auth_provider.dart';
 import '../theme/app_theme.dart';
 import '../theme/color_utils.dart';
 import '../theme/app_theme_colors.dart';
+import '../utils/responsive_layout.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/gold_card.dart';
 import '../widgets/home_grid_icons.dart';
@@ -102,6 +103,9 @@ class _Header extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     memberName,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
                     style: AppTheme.cinzelHeading(
                       fontSize: 16,
                       letterSpacing: 1.2,
@@ -111,28 +115,8 @@ class _Header extends StatelessWidget {
                 ],
               ),
             ),
-            InkWell(
+            NotificationBellButton(
               onTap: onBellTap,
-              child: Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: c.backgroundElevated,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                    color: c.borderDefault,
-                    width: 0.5,
-                  ),
-                ),
-                child: SvgPicture.string(
-                  _bellSvg,
-                  width: 18,
-                  height: 18,
-                  colorFilter: ColorFilter.mode(
-                    c.accentGold,
-                    BlendMode.srcIn,
-                  ),
-                ),
-              ),
             ),
           ],
         ),
@@ -175,11 +159,11 @@ class _HomeGrid extends StatelessWidget {
       mainAxisSpacing: 12,
       crossAxisSpacing: 12,
       physics: const NeverScrollableScrollPhysics(),
-      childAspectRatio: 1.12,
+      childAspectRatio: ResponsiveLayout.homeGridAspectRatio(context),
       children: [
         if (showAdminPanel)
           _HomeGridCard(
-            label: 'Admin panel',
+            label: 'Admin Panel',
             sublabel: 'Manage content',
             iconKind: HomeGridIconKind.adminPanel,
             accent: c.accentGold,
@@ -269,6 +253,7 @@ class _HomeGridCard extends StatelessWidget {
               right: -10,
               child: CustomPaint(
                 painter: MandalaPainter(
+                  color: c.accentGold,
                   opacity: 0.06,
                   strokeWidth: 0.9,
                   rings: 4,
@@ -285,6 +270,8 @@ class _HomeGridCard extends StatelessWidget {
                 const SizedBox(height: 10),
                 Text(
                   label,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style: AppTheme.cinzelHeading(
                     fontSize: 15,
                     letterSpacing: 1.2,
@@ -294,6 +281,8 @@ class _HomeGridCard extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   sublabel,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: c.textMuted,
                     fontSize: 11,
@@ -307,7 +296,4 @@ class _HomeGridCard extends StatelessWidget {
     );
   }
 }
-
-const _bellSvg =
-    '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M18 16H6c1.1-1.3 1.5-2.8 1.5-4.8 0-3 1.7-5.2 4.5-5.9 2.8.7 4.5 2.9 4.5 5.9 0 2 .4 3.5 1.5 4.8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M10 17.5c.4 1.2 1.2 2 2 2s1.6-.8 2-2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
 

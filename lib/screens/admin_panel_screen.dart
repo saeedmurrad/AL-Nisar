@@ -42,73 +42,85 @@ class AdminPanelScreen extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
               children: [
                 if (auth.isSuperAdmin) ...[
+                  _SectionLabel('Administration'),
                   _Tile(
                     icon: Icons.verified_user_outlined,
                     title: 'Super Admin Panel',
-                    subtitle: 'Users, roles, and elevated controls',
+                    subtitle: 'Users, roles, and member requests',
                     onTap: () => context.push('/super-admin'),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 16),
                 ],
+                const _SectionLabel('Content'),
                 _Tile(
-                  icon: Icons.menu_book_outlined,
-                  title: 'Upload Books',
-                  subtitle: 'Upload PDFs + metadata to Firebase',
-                  onTap: () => context.push('/admin/books'),
+                  icon: Icons.auto_stories_outlined,
+                  title: 'Manage Irshadat',
+                  subtitle: 'Create and edit Irshad Pak cards (Urdu & English)',
+                  onTap: () => context.push('/admin/irshadat'),
                 ),
                 const SizedBox(height: 10),
                 _Tile(
-                  icon: Icons.cloud_upload_outlined,
-                  title: 'Add Data',
-                  subtitle: 'Books, Irshadat, Sabaq/Asbaq, News & Events',
-                  onTap: () => context.push('/admin/add-data'),
+                  icon: Icons.photo_library_outlined,
+                  title: 'Upload Gallery Images',
+                  subtitle: 'Upload images and organize albums',
+                  onTap: () => context.push('/admin/gallery'),
+                ),
+                const SizedBox(height: 10),
+                _Tile(
+                  icon: Icons.menu_book_outlined,
+                  title: 'Books',
+                  subtitle: 'Upload PDFs and book metadata',
+                  onTap: () => context.push('/admin/books'),
                 ),
                 const SizedBox(height: 10),
                 _Tile(
                   icon: Icons.event_note_outlined,
                   title: 'News & Events',
-                  subtitle: 'Create and manage news articles and events',
-                  onTap: () => context.push('/admin/add-data/news-events'),
+                  subtitle: 'Publish news articles and event announcements',
+                  onTap: () => context.push('/admin/news-events'),
                 ),
                 const SizedBox(height: 10),
                 _Tile(
-                  icon: Icons.auto_stories_outlined,
-                  title: 'Manage Irshadat',
-                  subtitle: 'Create daily guidance cards',
-                  onTap: () => context.push('/admin/irshadat'),
+                  icon: Icons.account_tree_outlined,
+                  title: 'Shajra Urdu Details',
+                  subtitle: 'Upload Urdu biography PDFs by personality',
+                  onTap: () => context.push('/admin/shajra-urdu'),
                 ),
-                const SizedBox(height: 10),
-                _Tile(
-                  icon: Icons.library_books_outlined,
-                  title: 'Manage Sabaq',
-                  subtitle: 'Upload Sabaq PDF + titles + thumbnail',
-                  onTap: () => context.push('/admin/sabaq'),
-                ),
-                const SizedBox(height: 10),
-                _Tile(
-                  icon: Icons.mark_email_unread_outlined,
-                  title: 'Sabaq Access Requests',
-                  subtitle: 'Approve member requests to unlock Sabaq PDFs',
-                  onTap: () => context.push('/admin/sabaq-requests'),
-                ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 16),
+                const _SectionLabel('App settings'),
                 _Tile(
                   icon: Icons.share_outlined,
                   title: 'Social Links',
                   subtitle: 'Facebook, YouTube, and live stream banner',
                   onTap: () => context.push('/admin/social-links'),
                 ),
-                const SizedBox(height: 10),
-                _Tile(
-                  icon: Icons.lock_open_outlined,
-                  title: 'Manage Asbaq-e-Tareeqat',
-                  subtitle: 'Upload Asbaq PDF + titles + thumbnail',
-                  onTap: () => context.push('/admin/asbaq'),
-                ),
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _SectionLabel extends StatelessWidget {
+  const _SectionLabel(this.text);
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.c;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Text(
+        text.toUpperCase(),
+        style: AppTheme.lato(
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          color: c.textMuted,
+          letterSpacing: 1.4,
+        ),
       ),
     );
   }
@@ -175,4 +187,3 @@ class _Tile extends StatelessWidget {
     );
   }
 }
-

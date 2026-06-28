@@ -25,6 +25,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final _email = TextEditingController();
   bool _loading = false;
   bool _sent = false;
+  String? _lastSentEmail;
 
   @override
   void dispose() {
@@ -43,20 +44,19 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     try {
       await context.read<AuthProvider>().sendPasswordResetEmail(email);
       if (!mounted) return;
-      setState(() => _sent = true);
-      _showMessage(
-        'Password reset link sent. Check your inbox.',
-        isSuccess: true,
-      );
+      setState(() {
+        _sent = true;
+        _lastSentEmail = email.trim().toLowerCase();
+      });
     } catch (e) {
       if (!mounted) return;
-      _showMessage(authErrorMessage(e));
+      _showMessage(passwordResetErrorMessage(e));
     } finally {
       if (mounted) setState(() => _loading = false);
     }
   }
 
-  void _showMessage(String message, {bool isSuccess = false}) {
+  void _showMessage(String message) {
     final c = context.c;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -64,7 +64,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           message,
           style: AppTheme.lato(color: c.textPrimary),
         ),
-        backgroundColor: isSuccess ? c.accentGold.o(0.9) : c.backgroundElevated,
+        backgroundColor: c.backgroundElevated,
       ),
     );
   }
@@ -97,7 +97,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'We will email you a link to reset your password',
+                  'For accounts created with email and password',
                   style: AppTheme.lato(
                     fontSize: 12,
                     color: c.textMuted.o(0.95),
@@ -120,7 +120,21 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         ),
                         const SizedBox(height: 10),
                         Text(
-                          'Check your email for a password reset link. If you do not see it, check your spam folder.',
+                          _lastSentEmail == null
+                              ? 'If an account exists for that email, a reset link has been sent.'
+                              : 'If an account exists for $_lastSentEmail, a reset link has been sent.',
+                          style: AppTheme.lato(
+                            fontSize: 12,
+                            color: c.textPrimary,
+                            height: 1.45,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          'Check your inbox and spam/promotions folders. The email is sent from Firebase (noreply address).\n\n'
+                          'If you originally signed in with Google, use Continue with Google on the sign-in screen — password reset does not change your Google password.',
                           style: AppTheme.lato(
                             fontSize: 12,
                             color: c.textMuted,
@@ -129,7 +143,53 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 16),
+                        AuthPrimaryButton(
+                          label: 'Resend link',
+                          loading: _loading,
+                          onPressed: _submit,
+                        ),
+                        const SizedBox(height: 8),
+                        TextButton(
+                          onPressed: _loading
+                              ? null
+                              : () => setState(() => _sent = false),
+                          child: Text(
+                            'Use a different email',
+                            style: AppTheme.lato(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              color: c.accentGold,
+                            ),
+                          ),
+                        ),
                       ] else ...[
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: c.backgroundInput,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: c.borderDefault, width: 0.5),
+                          ),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Icon(Icons.info_outline, size: 18, color: c.accentGold),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  'Use this only if you signed up with email and password. '
+                                  'Google sign-in accounts should use Continue with Google instead.',
+                                  style: AppTheme.lato(
+                                    fontSize: 11,
+                                    color: c.textMuted,
+                                    height: 1.4,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 14),
                         AuthTextField(
                           label: 'Email',
                           controller: _email,

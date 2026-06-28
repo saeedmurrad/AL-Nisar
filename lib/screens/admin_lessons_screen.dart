@@ -6,6 +6,7 @@ import '../theme/app_theme_colors.dart';
 import '../theme/color_utils.dart';
 import '../widgets/gold_card.dart';
 import '../widgets/screen_navigation_header.dart';
+import '../utils/responsive_layout.dart';
 
 class AdminLessonsScreen extends StatelessWidget {
   const AdminLessonsScreen({
@@ -252,13 +253,8 @@ class _LessonEditorState extends State<_LessonEditor> {
   @override
   Widget build(BuildContext context) {
     final c = context.c;
-    return Padding(
-      padding: EdgeInsets.only(
-        left: 16,
-        right: 16,
-        top: 14,
-        bottom: 16 + MediaQuery.viewInsetsOf(context).bottom,
-      ),
+    return ResponsiveLayout.scrollableSheet(
+      context: context,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -431,13 +427,8 @@ class _PageEditorState extends State<_PageEditor> {
   @override
   Widget build(BuildContext context) {
     final c = context.c;
-    return Padding(
-      padding: EdgeInsets.only(
-        left: 16,
-        right: 16,
-        top: 14,
-        bottom: 16 + MediaQuery.viewInsetsOf(context).bottom,
-      ),
+    return ResponsiveLayout.scrollableSheet(
+      context: context,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,

@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../data/dummy_data.dart';
 import '../models/event_firestore_model.dart';
 import '../models/news_firestore_model.dart';
-import '../models/news_model.dart';
 import '../services/news_events_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/color_utils.dart';
@@ -43,43 +41,6 @@ class _NewsEventsScreenState extends State<NewsEventsScreen>
     return Theme.of(context).brightness == Brightness.dark
         ? c.backgroundPrimary
         : c.textPrimary;
-  }
-
-  List<NewsFirestoreModel> _demoNews() {
-    NewsFirestoreModel from(NewsModel n) => NewsFirestoreModel(
-          id: n.id,
-          title: n.title,
-          category: n.category,
-          dateLabel: n.dateLabel,
-          imageUrl: n.imageUrl,
-          readTime: n.readTime,
-          bodyParagraphs: n.bodyParagraphs,
-          createdAt: DateTime.now(),
-          isActive: true,
-        );
-    return [from(DummyData.newsFeatured), ...DummyData.newsList.map(from)];
-  }
-
-  List<EventFirestoreModel> _demoEvents() {
-    return DummyData.eventsList
-        .map(
-          (e) => EventFirestoreModel(
-            id: e.id,
-            title: e.title,
-            urduTitle: e.urduTitle,
-            day: e.day,
-            monthAbbr: e.monthAbbr,
-            fullDateLine: e.fullDateLine,
-            shortDateLabel: e.shortDateLabel,
-            location: e.location,
-            timeLabel: e.timeLabel,
-            organizer: e.organizer,
-            descriptionLines: e.descriptionLines,
-            createdAt: DateTime.now(),
-            isActive: true,
-          ),
-        )
-        .toList();
   }
 
   Widget _loadingState(AppThemeColors c) {
@@ -176,12 +137,7 @@ class _NewsEventsScreenState extends State<NewsEventsScreen>
                       );
                     }
 
-                    final list = snap.data;
-                    final use = (list != null && list.isNotEmpty)
-                        ? list
-                        : (!_service.isFirebaseReady
-                            ? _demoNews()
-                            : const <NewsFirestoreModel>[]);
+                    final use = snap.data ?? const <NewsFirestoreModel>[];
 
                     if (use.isEmpty) {
                       return _emptyState(c, 'No news articles yet.');
@@ -212,12 +168,7 @@ class _NewsEventsScreenState extends State<NewsEventsScreen>
                       );
                     }
 
-                    final list = snap.data;
-                    final use = (list != null && list.isNotEmpty)
-                        ? list
-                        : (!_service.isFirebaseReady
-                            ? _demoEvents()
-                            : const <EventFirestoreModel>[]);
+                    final use = snap.data ?? const <EventFirestoreModel>[];
 
                     if (use.isEmpty) {
                       return _emptyState(c, 'No events scheduled yet.');
@@ -226,7 +177,6 @@ class _NewsEventsScreenState extends State<NewsEventsScreen>
                     return _EventsTabFirestore(
                       nextEvent: use.first,
                       events: use,
-                      onGold: onGold,
                     );
                   },
                 ),
@@ -469,12 +419,10 @@ class _EventsTabFirestore extends StatelessWidget {
   const _EventsTabFirestore({
     required this.nextEvent,
     required this.events,
-    required this.onGold,
   });
 
   final EventFirestoreModel nextEvent;
   final List<EventFirestoreModel> events;
-  final Color onGold;
 
   @override
   Widget build(BuildContext context) {
@@ -485,40 +433,52 @@ class _EventsTabFirestore extends StatelessWidget {
         Container(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
           decoration: BoxDecoration(
-            color: c.accentGold,
+            color: c.backgroundSurface,
             borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: c.accentGold.o(0.35), width: 0.8),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'NEXT EVENT',
-                style: AppTheme.lato(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 1.6,
-                  color: onGold,
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(
+                  color: c.accentGold.o(0.12),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Text(
+                  'NEXT EVENT',
+                  style: AppTheme.lato(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1.6,
+                    color: c.accentGold,
+                  ),
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 10),
               Text(
                 nextEvent.title,
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
                 style: AppTheme.cormorantGaramond(
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
-                  color: onGold,
+                  color: c.textPrimary,
                 ),
               ),
               const SizedBox(height: 10),
               Row(
                 children: [
-                  Icon(Icons.calendar_today_outlined, size: 16, color: onGold),
+                  Icon(Icons.calendar_today_outlined, size: 16, color: c.accentGold),
                   const SizedBox(width: 8),
-                  Text(
-                    nextEvent.fullDateLine,
-                    style: AppTheme.lato(
-                      fontSize: 13,
-                      color: onGold,
+                  Expanded(
+                    child: Text(
+                      nextEvent.fullDateLine,
+                      style: AppTheme.lato(
+                        fontSize: 13,
+                        color: c.textSecondary,
+                      ),
                     ),
                   ),
                 ],
@@ -527,14 +487,14 @@ class _EventsTabFirestore extends StatelessWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.location_on_outlined, size: 16, color: onGold),
+                  Icon(Icons.location_on_outlined, size: 16, color: c.accentGold),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       nextEvent.location,
                       style: AppTheme.lato(
                         fontSize: 13,
-                        color: onGold,
+                        color: c.textSecondary,
                       ),
                     ),
                   ),
@@ -549,8 +509,8 @@ class _EventsTabFirestore extends StatelessWidget {
                     extra: nextEvent,
                   ),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: onGold,
-                    side: BorderSide(color: onGold, width: 1.1),
+                    foregroundColor: c.accentGold,
+                    side: BorderSide(color: c.accentGold.o(0.55), width: 1.0),
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -561,7 +521,7 @@ class _EventsTabFirestore extends StatelessWidget {
                     style: AppTheme.lato(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
-                      color: onGold,
+                      color: c.accentGold,
                     ),
                   ),
                 ),
@@ -590,8 +550,9 @@ class _EventsTabFirestore extends StatelessWidget {
                       width: 60,
                       height: 60,
                       decoration: BoxDecoration(
-                        color: c.accentGold,
+                        color: c.accentGold.o(0.12),
                         borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: c.accentGold.o(0.30), width: 0.8),
                       ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -601,14 +562,15 @@ class _EventsTabFirestore extends StatelessWidget {
                             style: AppTheme.lato(
                               fontSize: 22,
                               fontWeight: FontWeight.w800,
-                              color: onGold,
+                              color: c.accentGold,
                             ),
                           ),
                           Text(
                             e.monthAbbr,
-                            style: TextStyle(
-                              color: onGold.o(0.85),
+                            style: AppTheme.lato(
+                              color: c.textMuted,
                               fontSize: 10,
+                              fontWeight: FontWeight.w600,
                               letterSpacing: 1,
                             ),
                           ),
@@ -622,6 +584,8 @@ class _EventsTabFirestore extends StatelessWidget {
                         children: [
                           Text(
                             e.title,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                             style: AppTheme.cormorantGaramond(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
@@ -646,7 +610,7 @@ class _EventsTabFirestore extends StatelessWidget {
                               Icon(
                                 Icons.location_on_outlined,
                                 size: 14,
-                                color: c.textMuted,
+                                color: c.accentGold.o(0.75),
                               ),
                               const SizedBox(width: 4),
                               Expanded(
@@ -654,7 +618,7 @@ class _EventsTabFirestore extends StatelessWidget {
                                   e.location,
                                   style: AppTheme.lato(
                                     fontSize: 12,
-                                    color: c.textMuted,
+                                    color: c.textSecondary,
                                   ),
                                 ),
                               ),
@@ -666,13 +630,13 @@ class _EventsTabFirestore extends StatelessWidget {
                               Icon(
                                 Icons.schedule_outlined,
                                 size: 14,
-                                color: c.textMuted,
+                                color: c.accentGold.o(0.75),
                               ),
                               const SizedBox(width: 4),
                               Text(
                                 e.timeLabel,
                                 style: AppTheme.lato(
-                                  fontSize: 11,
+                                  fontSize: 12,
                                   color: c.textMuted,
                                 ),
                               ),

@@ -36,13 +36,64 @@ class AdminNotificationsService {
     }, SetOptions(merge: true));
   }
 
+  /// Clears the super-admin alert for a resolved Sabaq access request.
+  Future<void> dismissSabaqRequestNotification(String requestId) async {
+    if (!_ready || requestId.trim().isEmpty) return;
+    try {
+      await _col.doc(requestId).delete();
+    } catch (_) {
+      // Rules may disallow delete; mark read so list + badge update.
+      await _col.doc(requestId).set({'read': true}, SetOptions(merge: true));
+    }
+  }
+
+  Future<void> markAsRead(String notificationId) async {
+    if (!_ready || notificationId.trim().isEmpty) return;
+    await _col.doc(notificationId).set({'read': true}, SetOptions(merge: true));
+  }
+
   Stream<List<AdminNotificationDoc>> streamRecent({int limit = 40}) {
     if (!_ready) return Stream.value(const []);
+    // Equality filter only — no composite index required; sort client-side.
     return _col
-        .orderBy('createdAt', descending: true)
+        .where('read', isEqualTo: false)
         .limit(limit)
         .snapshots()
-        .map((snap) => snap.docs.map(AdminNotificationDoc.fromFirestore).toList());
+        .map((snap) {
+          final list = snap.docs.map(AdminNotificationDoc.fromFirestore).toList();
+          list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+          return list;
+        });
+  }
+
+  /// Removes admin alerts for Sabaq requests that are no longer pending.
+  Future<void> pruneResolvedSabaqRequestNotifications() async {
+    if (!_ready) return;
+    final snap = await _col.where('read', isEqualTo: false).get();
+    for (final doc in snap.docs) {
+      final data = doc.data();
+      if (data['type'] != 'sabaq_request') continue;
+      final requestId =
+          (data['requestId'] as String?)?.trim().isNotEmpty == true
+              ? data['requestId'] as String
+              : doc.id;
+      final req = await _firestore
+          .collection('sabaq_access_requests')
+          .doc(requestId)
+          .get();
+      final status = req.data()?['status'] as String? ?? '';
+      if (!req.exists || status != 'pending') {
+        await dismissSabaqRequestNotification(requestId);
+      }
+    }
+  }
+
+  Stream<int> streamUnreadCount() {
+    if (!_ready) return Stream.value(0);
+    return _col
+        .where('read', isEqualTo: false)
+        .snapshots()
+        .map((snap) => snap.docs.length);
   }
 }
 

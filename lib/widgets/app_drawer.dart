@@ -6,6 +6,9 @@ import '../auth/auth_provider.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
 import '../theme/color_utils.dart';
+import '../widgets/theme_palette_picker.dart';
+import '../widgets/theme_toggle_button.dart';
+import '../widgets/font_scale_control.dart';
 
 class _DrawerDestination {
   const _DrawerDestination({
@@ -35,7 +38,7 @@ List<_DrawerDestination> _memberDestinationsFor(AuthProvider auth) => [
 
 const _adminPanelDestination = _DrawerDestination(
   route: '/admin',
-  label: 'Admin panel',
+  label: 'Admin Panel',
   icon: Icons.admin_panel_settings_outlined,
 );
 
@@ -108,6 +111,34 @@ class AppDrawer extends StatelessWidget {
                         Navigator.of(context).pop();
                       },
                     ),
+                ],
+              ),
+            ),
+            Divider(height: 1, color: c.borderDefault),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Appearance',
+                    style: AppTheme.lato(
+                      fontSize: 12,
+                      color: c.textMuted,
+                      letterSpacing: 0.6,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: const [
+                      ThemeToggleButton(),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  const ThemePalettePicker(compact: true),
+                  const SizedBox(height: 12),
+                  const FontScaleControl(compact: true),
                 ],
               ),
             ),

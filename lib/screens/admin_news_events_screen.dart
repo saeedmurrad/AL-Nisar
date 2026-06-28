@@ -2,12 +2,16 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../auth/auth_provider.dart';
+import '../config/news_event_defaults.dart';
 import '../models/event_firestore_model.dart';
 import '../models/news_firestore_model.dart';
 import '../services/admin_news_events_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
 import '../theme/color_utils.dart';
+import '../utils/event_date_labels.dart';
 import '../widgets/gold_card.dart';
 import '../widgets/screen_navigation_header.dart';
 
@@ -27,6 +31,9 @@ class _AdminNewsEventsScreenState extends State<AdminNewsEventsScreen>
   void initState() {
     super.initState();
     _tab = TabController(length: 2, vsync: this);
+    _tab.addListener(() {
+      if (mounted) setState(() {});
+    });
   }
 
   @override
@@ -36,6 +43,7 @@ class _AdminNewsEventsScreenState extends State<AdminNewsEventsScreen>
   }
 
   Future<void> _createNews() async {
+    final creatorId = context.read<AuthProvider>().user?.uid ?? '';
     final created = await showModalBottomSheet<NewsFirestoreModel?>(
       context: context,
       isScrollControlled: true,
@@ -59,10 +67,11 @@ class _AdminNewsEventsScreenState extends State<AdminNewsEventsScreen>
       ),
     );
     if (created == null) return;
-    await _service.upsertNews(created);
+    await _service.createNews(created, creatorUserId: creatorId);
   }
 
   Future<void> _createEvent() async {
+    final creatorId = context.read<AuthProvider>().user?.uid ?? '';
     final created = await showModalBottomSheet<EventFirestoreModel?>(
       context: context,
       isScrollControlled: true,
@@ -81,7 +90,7 @@ class _AdminNewsEventsScreenState extends State<AdminNewsEventsScreen>
           shortDateLabel: '',
           location: '',
           timeLabel: '',
-          organizer: 'Darbar Sharif',
+          organizer: NewsEventDefaults.eventOrganizer,
           descriptionLines: const [],
           createdAt: DateTime.now(),
           isActive: true,
@@ -90,7 +99,7 @@ class _AdminNewsEventsScreenState extends State<AdminNewsEventsScreen>
       ),
     );
     if (created == null) return;
-    await _service.upsertEvent(created);
+    await _service.createEvent(created, creatorUserId: creatorId);
   }
 
   @override
@@ -386,22 +395,40 @@ class _NewsEditor extends StatefulWidget {
 
 class _NewsEditorState extends State<_NewsEditor> {
   late final _title = TextEditingController(text: widget.initial.title);
-  late final _category = TextEditingController(text: widget.initial.category);
-  late final _dateLabel = TextEditingController(text: widget.initial.dateLabel);
-  late final _readTime = TextEditingController(text: widget.initial.readTime);
+  late String _category = widget.initial.category.trim().isNotEmpty
+      ? widget.initial.category.trim()
+      : NewsEventDefaults.newsCategories.first;
+  late DateTime _date = _parseNewsDate(widget.initial.dateLabel);
   late final _body = TextEditingController(text: widget.initial.bodyParagraphs.join('\n\n'));
 
   String? _imagePath;
   bool _saving = false;
 
+  static DateTime _parseNewsDate(String label) {
+    return EventDateLabels.parse(
+      fullDateLine: label,
+      day: int.tryParse(label.trim().split(RegExp(r'\s+')).first) ?? 1,
+      monthAbbr: label.trim().split(RegExp(r'\s+')).length > 1
+          ? label.trim().split(RegExp(r'\s+')).elementAt(1)
+          : '',
+    );
+  }
+
   @override
   void dispose() {
     _title.dispose();
-    _category.dispose();
-    _dateLabel.dispose();
-    _readTime.dispose();
     _body.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _date,
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2100),
+    );
+    if (picked != null) setState(() => _date = picked);
   }
 
   Future<void> _pickImage() async {
@@ -426,17 +453,16 @@ class _NewsEditorState extends State<_NewsEditor> {
 
   Future<void> _save() async {
     final title = _title.text.trim();
-    final category = _category.text.trim();
-    final dateLabel = _dateLabel.text.trim();
-    final readTime = _readTime.text.trim().isEmpty ? '5 min read' : _readTime.text.trim();
+    final category = _category.trim();
+    final dateLabel = EventDateLabels.newsDateLabel(_date);
     final body = _body.text
         .split(RegExp(r'\n\s*\n'))
         .map((s) => s.trim())
         .where((s) => s.isNotEmpty)
         .toList();
 
-    if (title.isEmpty || category.isEmpty || dateLabel.isEmpty || body.isEmpty) {
-      _snack('Please fill title, category, date, and body');
+    if (title.isEmpty || category.isEmpty || body.isEmpty) {
+      _snack('Please fill title, category, and body');
       return;
     }
 
@@ -462,7 +488,7 @@ class _NewsEditorState extends State<_NewsEditor> {
           category: category,
           dateLabel: dateLabel,
           imageUrl: imageUrl,
-          readTime: readTime,
+          readTime: NewsEventDefaults.defaultReadTime,
           bodyParagraphs: body,
           createdAt: widget.initial.createdAt,
           isActive: widget.initial.isActive,
@@ -481,6 +507,7 @@ class _NewsEditorState extends State<_NewsEditor> {
     final imgName = _imagePath == null
         ? 'No image selected (optional)'
         : _imagePath!.split(Platform.pathSeparator).last;
+    final dateLabel = EventDateLabels.newsDateLabel(_date);
 
     final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
     final maxHeight = MediaQuery.sizeOf(context).height * 0.92;
@@ -497,98 +524,155 @@ class _NewsEditorState extends State<_NewsEditor> {
             children: [
               Text(
                 'News',
-            style: AppTheme.cormorantGaramond(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-              color: c.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 12),
-          _Field(label: 'Title', controller: _title, hintText: 'Headline'),
-          const SizedBox(height: 10),
-          _Field(label: 'Category', controller: _category, hintText: 'Announcement / Update'),
-          const SizedBox(height: 10),
-          _Field(label: 'Date label', controller: _dateLabel, hintText: 'e.g., 14 Apr 2026'),
-          const SizedBox(height: 10),
-          _Field(label: 'Read time (optional)', controller: _readTime, hintText: 'e.g., 5 min read'),
-          const SizedBox(height: 10),
-          Text(
-            'Image (optional)',
-            style: AppTheme.lato(
-              fontSize: 12,
-              color: c.textMuted.o(0.95),
-              letterSpacing: 1.2,
-            ),
-          ),
-          const SizedBox(height: 8),
-          InkWell(
-            onTap: _saving ? null : _pickImage,
-            borderRadius: BorderRadius.circular(14),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-              decoration: BoxDecoration(
-                color: c.backgroundInput,
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: c.borderDefault, width: 0.5),
+                style: AppTheme.cormorantGaramond(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: c.textPrimary,
+                ),
               ),
-              child: Row(
-                children: [
-                  Icon(Icons.image_outlined, color: c.accentGold),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      imgName,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppTheme.lato(fontSize: 13, color: c.textPrimary),
-                    ),
+              const SizedBox(height: 12),
+              _Field(label: 'Title', controller: _title, hintText: 'Headline'),
+              const SizedBox(height: 10),
+              Text(
+                'Category',
+                style: AppTheme.lato(
+                  fontSize: 12,
+                  color: c.textMuted.o(0.95),
+                  letterSpacing: 1.2,
+                ),
+              ),
+              const SizedBox(height: 8),
+              DropdownButtonFormField<String>(
+                value: _category,
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: c.backgroundInput,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide(color: c.borderDefault, width: 0.5),
                   ),
-                  Text(
-                    'Choose',
-                    style: AppTheme.lato(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                      color: c.accentGold,
-                    ),
-                  ),
+                ),
+                dropdownColor: c.backgroundSurface,
+                style: AppTheme.lato(fontSize: 13, color: c.textPrimary),
+                items: [
+                  for (final cat in {
+                    ...NewsEventDefaults.newsCategories,
+                    if (!NewsEventDefaults.newsCategories.contains(_category)) _category,
+                  })
+                    DropdownMenuItem(value: cat, child: Text(cat)),
                 ],
+                onChanged: _saving ? null : (v) {
+                  if (v != null) setState(() => _category = v);
+                },
               ),
-            ),
-          ),
-          const SizedBox(height: 10),
-          _Field(
-            label: 'Body (separate paragraphs with blank line)',
-            controller: _body,
-            hintText: 'Write the article...',
-            maxLines: 6,
-          ),
-          const SizedBox(height: 14),
-          ElevatedButton(
-            onPressed: _saving ? null : _save,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: c.accentGold,
-              foregroundColor: Theme.of(context).brightness == Brightness.dark
-                  ? c.backgroundPrimary
-                  : c.textPrimary,
-              padding: const EdgeInsets.symmetric(vertical: 14),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+              const SizedBox(height: 10),
+              Text(
+                'Date',
+                style: AppTheme.lato(
+                  fontSize: 12,
+                  color: c.textMuted.o(0.95),
+                  letterSpacing: 1.2,
+                ),
               ),
-              elevation: 0,
-            ),
-            child: _saving
-                ? SizedBox(
-                    height: 18,
-                    width: 18,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? c.backgroundPrimary
-                          : c.textPrimary,
-                    ),
-                  )
-                : Text('Save', style: AppTheme.lato(fontWeight: FontWeight.w700)),
-          ),
+              const SizedBox(height: 8),
+              InkWell(
+                onTap: _saving ? null : _pickDate,
+                borderRadius: BorderRadius.circular(14),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                  decoration: BoxDecoration(
+                    color: c.backgroundInput,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: c.borderDefault, width: 0.5),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.calendar_today_outlined, color: c.accentGold, size: 18),
+                      const SizedBox(width: 10),
+                      Text(dateLabel, style: AppTheme.lato(fontSize: 13, color: c.textPrimary)),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'Cover image (optional)',
+                style: AppTheme.lato(
+                  fontSize: 12,
+                  color: c.textMuted.o(0.95),
+                  letterSpacing: 1.2,
+                ),
+              ),
+              const SizedBox(height: 8),
+              InkWell(
+                onTap: _saving ? null : _pickImage,
+                borderRadius: BorderRadius.circular(14),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                  decoration: BoxDecoration(
+                    color: c.backgroundInput,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: c.borderDefault, width: 0.5),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.image_outlined, color: c.accentGold),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          imgName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTheme.lato(fontSize: 13, color: c.textPrimary),
+                        ),
+                      ),
+                      Text(
+                        'Choose',
+                        style: AppTheme.lato(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: c.accentGold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              _Field(
+                label: 'Body (blank line between paragraphs)',
+                controller: _body,
+                hintText: 'Write the article...',
+                maxLines: 8,
+              ),
+              const SizedBox(height: 14),
+              ElevatedButton(
+                onPressed: _saving ? null : _save,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: c.accentGold,
+                  foregroundColor: Theme.of(context).brightness == Brightness.dark
+                      ? c.backgroundPrimary
+                      : c.textPrimary,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 0,
+                ),
+                child: _saving
+                    ? SizedBox(
+                        height: 18,
+                        width: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? c.backgroundPrimary
+                              : c.textPrimary,
+                        ),
+                      )
+                    : Text('Save', style: AppTheme.lato(fontWeight: FontWeight.w700)),
+              ),
               const SizedBox(height: 8),
             ],
           ),
@@ -611,42 +695,35 @@ class _EventEditor extends StatefulWidget {
 class _EventEditorState extends State<_EventEditor> {
   late final _title = TextEditingController(text: widget.initial.title);
   late final _urduTitle = TextEditingController(text: widget.initial.urduTitle);
-  late final _day = TextEditingController(text: widget.initial.day.toString());
-  late final _month = TextEditingController(text: widget.initial.monthAbbr);
-  late final _fullDate = TextEditingController(text: widget.initial.fullDateLine);
-  late final _shortDate = TextEditingController(text: widget.initial.shortDateLabel);
+  late DateTime _date = EventDateLabels.parse(
+    fullDateLine: widget.initial.fullDateLine,
+    day: widget.initial.day,
+    monthAbbr: widget.initial.monthAbbr,
+  );
   late final _location = TextEditingController(text: widget.initial.location);
   late final _time = TextEditingController(text: widget.initial.timeLabel);
-  late final _organizer = TextEditingController(text: widget.initial.organizer);
   late final _desc = TextEditingController(text: widget.initial.descriptionLines.join('\n'));
 
-  String? _imagePath;
   bool _saving = false;
 
   @override
   void dispose() {
     _title.dispose();
     _urduTitle.dispose();
-    _day.dispose();
-    _month.dispose();
-    _fullDate.dispose();
-    _shortDate.dispose();
     _location.dispose();
     _time.dispose();
-    _organizer.dispose();
     _desc.dispose();
     super.dispose();
   }
 
-  Future<void> _pickImage() async {
-    final res = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: const ['jpg', 'jpeg', 'png', 'webp'],
-      withData: false,
+  Future<void> _pickDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _date,
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2100),
     );
-    final path = res?.files.single.path;
-    if (path == null || path.trim().isEmpty) return;
-    setState(() => _imagePath = path);
+    if (picked != null) setState(() => _date = picked);
   }
 
   void _snack(String msg) {
@@ -661,45 +738,21 @@ class _EventEditorState extends State<_EventEditor> {
   Future<void> _save() async {
     final title = _title.text.trim();
     final urduTitle = _urduTitle.text.trim();
-    final day = int.tryParse(_day.text.trim()) ?? 0;
-    final monthAbbr = _month.text.trim();
-    final fullDateLine = _fullDate.text.trim();
-    final shortDateLabel = _shortDate.text.trim();
     final location = _location.text.trim();
     final timeLabel = _time.text.trim();
-    final organizer = _organizer.text.trim().isEmpty ? 'Darbar Sharif' : _organizer.text.trim();
     final descLines = _desc.text
         .split('\n')
         .map((s) => s.trim())
         .where((s) => s.isNotEmpty)
         .toList();
 
-    if (title.isEmpty ||
-        urduTitle.isEmpty ||
-        day <= 0 ||
-        monthAbbr.isEmpty ||
-        fullDateLine.isEmpty ||
-        shortDateLabel.isEmpty ||
-        location.isEmpty ||
-        timeLabel.isEmpty) {
-      _snack('Please fill all required fields');
+    if (title.isEmpty || urduTitle.isEmpty || location.isEmpty || timeLabel.isEmpty) {
+      _snack('Please fill title, Urdu title, location, and time');
       return;
     }
 
     setState(() => _saving = true);
     try {
-      // We currently store only a single imageUrl in news; events screen uses no image.
-      // Image upload is still supported for future use / consistency.
-      final img = _imagePath;
-      if (img != null && img.trim().isNotEmpty && File(img).existsSync()) {
-        final bytes = File(img).lengthSync();
-        if (bytes > 10 * 1024 * 1024) {
-          _snack('Image is too large (max 10 MB)');
-          return;
-        }
-        await widget.service.uploadEventImage(eventId: widget.initial.id, imagePath: img);
-      }
-
       if (!mounted) return;
       Navigator.pop(
         context,
@@ -707,13 +760,13 @@ class _EventEditorState extends State<_EventEditor> {
           id: widget.initial.id,
           title: title,
           urduTitle: urduTitle,
-          day: day,
-          monthAbbr: monthAbbr,
-          fullDateLine: fullDateLine,
-          shortDateLabel: shortDateLabel,
+          day: EventDateLabels.day(_date),
+          monthAbbr: EventDateLabels.monthAbbr(_date),
+          fullDateLine: EventDateLabels.fullDateLine(_date),
+          shortDateLabel: EventDateLabels.shortDateLabel(_date),
           location: location,
           timeLabel: timeLabel,
-          organizer: organizer,
+          organizer: NewsEventDefaults.eventOrganizer,
           descriptionLines: descLines,
           createdAt: widget.initial.createdAt,
           isActive: widget.initial.isActive,
@@ -729,10 +782,6 @@ class _EventEditorState extends State<_EventEditor> {
   @override
   Widget build(BuildContext context) {
     final c = context.c;
-    final imgName = _imagePath == null
-        ? 'No image selected (optional)'
-        : _imagePath!.split(Platform.pathSeparator).last;
-
     final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
     final maxHeight = MediaQuery.sizeOf(context).height * 0.92;
 
@@ -748,118 +797,99 @@ class _EventEditorState extends State<_EventEditor> {
             children: [
               Text(
                 'Event',
-            style: AppTheme.cormorantGaramond(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-              color: c.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 12),
-          _Field(label: 'Title', controller: _title, hintText: 'Event title'),
-          const SizedBox(height: 10),
-          _Field(
-            label: 'Urdu title',
-            controller: _urduTitle,
-            hintText: 'اردو عنوان',
-            textDirection: TextDirection.rtl,
-          ),
-          const SizedBox(height: 10),
-          _Field(
-            label: 'Day (1-31)',
-            controller: _day,
-            hintText: 'e.g., 25',
-            keyboardType: TextInputType.number,
-          ),
-          const SizedBox(height: 10),
-          _Field(label: 'Month abbr', controller: _month, hintText: 'e.g., APR'),
-          const SizedBox(height: 10),
-          _Field(label: 'Full date line', controller: _fullDate, hintText: 'e.g., 25 April 2026'),
-          const SizedBox(height: 10),
-          _Field(label: 'Short date label', controller: _shortDate, hintText: 'e.g., 25 Apr'),
-          const SizedBox(height: 10),
-          _Field(label: 'Location', controller: _location, hintText: 'Venue'),
-          const SizedBox(height: 10),
-          _Field(label: 'Time', controller: _time, hintText: 'e.g., After Maghrib'),
-          const SizedBox(height: 10),
-          _Field(label: 'Organizer (optional)', controller: _organizer, hintText: 'Darbar Sharif'),
-          const SizedBox(height: 10),
-          Text(
-            'Image (optional)',
-            style: AppTheme.lato(
-              fontSize: 12,
-              color: c.textMuted.o(0.95),
-              letterSpacing: 1.2,
-            ),
-          ),
-          const SizedBox(height: 8),
-          InkWell(
-            onTap: _saving ? null : _pickImage,
-            borderRadius: BorderRadius.circular(14),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-              decoration: BoxDecoration(
-                color: c.backgroundInput,
+                style: AppTheme.cormorantGaramond(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: c.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 12),
+              _Field(label: 'Title (English)', controller: _title, hintText: 'Event title'),
+              const SizedBox(height: 10),
+              _Field(
+                label: 'Title (Urdu)',
+                controller: _urduTitle,
+                hintText: 'اردو عنوان',
+                textDirection: TextDirection.rtl,
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'Date',
+                style: AppTheme.lato(
+                  fontSize: 12,
+                  color: c.textMuted.o(0.95),
+                  letterSpacing: 1.2,
+                ),
+              ),
+              const SizedBox(height: 8),
+              InkWell(
+                onTap: _saving ? null : _pickDate,
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: c.borderDefault, width: 0.5),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.image_outlined, color: c.accentGold),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      imgName,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppTheme.lato(fontSize: 13, color: c.textPrimary),
-                    ),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                  decoration: BoxDecoration(
+                    color: c.backgroundInput,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: c.borderDefault, width: 0.5),
                   ),
-                  Text(
-                    'Choose',
-                    style: AppTheme.lato(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                      color: c.accentGold,
-                    ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.calendar_today_outlined, color: c.accentGold, size: 18),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          EventDateLabels.fullDateLine(_date),
+                          style: AppTheme.lato(fontSize: 13, color: c.textPrimary),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
-            ),
-          ),
-          const SizedBox(height: 10),
-          _Field(
-            label: 'Description (optional, one line per bullet)',
-            controller: _desc,
-            hintText: 'Details...',
-            maxLines: 4,
-          ),
-          const SizedBox(height: 14),
-          ElevatedButton(
-            onPressed: _saving ? null : _save,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: c.accentGold,
-              foregroundColor: Theme.of(context).brightness == Brightness.dark
-                  ? c.backgroundPrimary
-                  : c.textPrimary,
-              padding: const EdgeInsets.symmetric(vertical: 14),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+              const SizedBox(height: 10),
+              _Field(label: 'Location', controller: _location, hintText: 'Venue'),
+              const SizedBox(height: 10),
+              _Field(label: 'Time', controller: _time, hintText: 'e.g., After Maghrib'),
+              const SizedBox(height: 10),
+              _Field(
+                label: 'Description (optional)',
+                controller: _desc,
+                hintText: 'One line per paragraph',
+                maxLines: 5,
               ),
-              elevation: 0,
-            ),
-            child: _saving
-                ? SizedBox(
-                    height: 18,
-                    width: 18,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Theme.of(context).brightness == Brightness.dark
-                          ? c.backgroundPrimary
-                          : c.textPrimary,
-                    ),
-                  )
-                : Text('Save', style: AppTheme.lato(fontWeight: FontWeight.w700)),
-          ),
+              const SizedBox(height: 8),
+              Text(
+                'Organizer: ${NewsEventDefaults.eventOrganizer}',
+                style: AppTheme.lato(fontSize: 11, color: c.textMuted, height: 1.35),
+              ),
+              const SizedBox(height: 14),
+              ElevatedButton(
+                onPressed: _saving ? null : _save,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: c.accentGold,
+                  foregroundColor: Theme.of(context).brightness == Brightness.dark
+                      ? c.backgroundPrimary
+                      : c.textPrimary,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 0,
+                ),
+                child: _saving
+                    ? SizedBox(
+                        height: 18,
+                        width: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? c.backgroundPrimary
+                              : c.textPrimary,
+                        ),
+                      )
+                    : Text('Save', style: AppTheme.lato(fontWeight: FontWeight.w700)),
+              ),
               const SizedBox(height: 8),
             ],
           ),

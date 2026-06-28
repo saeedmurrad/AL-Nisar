@@ -90,23 +90,39 @@ class AdminBooksService {
   Future<({bool pdfOk, bool coverOk})> deleteBook(BookModel book) async {
     var pdfOk = true;
     var coverOk = true;
-    final sp = book.storagePath.trim();
-    if (sp.isNotEmpty) {
+
+    final pathsToTry = <String>{
+      book.storagePath.trim(),
+      bookPdfRef(book.id).fullPath,
+    }..removeWhere((p) => p.isEmpty);
+
+    for (final sp in pathsToTry) {
       try {
         await _storage.ref(sp).delete();
       } catch (_) {
         pdfOk = false;
       }
     }
-    final cu = book.coverImageUrl.trim();
-    if (cu.isNotEmpty) {
+
+    final hadCover = book.coverImageUrl.trim().isNotEmpty;
+    if (hadCover) {
       try {
-        await _storage.refFromURL(cu).delete();
+        await _storage.refFromURL(book.coverImageUrl.trim()).delete();
       } catch (_) {
         coverOk = false;
       }
     }
+
+    for (final ext in const ['png', 'jpg', 'jpeg']) {
+      try {
+        await bookCoverRef(book.id, extension: ext).delete();
+      } catch (_) {
+        // Ignore missing cover variants.
+      }
+    }
+
     await _firestore.collection('books').doc(book.id).delete();
+    if (!hadCover) coverOk = true;
     return (pdfOk: pdfOk, coverOk: coverOk);
   }
 }

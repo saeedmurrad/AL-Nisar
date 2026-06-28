@@ -77,6 +77,7 @@ class _SplashScreenState extends State<SplashScreen> {
               opacity: 0.07,
               child: CustomPaint(
                 painter: MandalaPainter(
+                  color: c.accentGold,
                   opacity: 0.07,
                   strokeWidth: 1.0,
                   rings: 6,

@@ -60,7 +60,23 @@ class AuthService {
   }
 
   Future<void> sendPasswordResetEmail(String email) async {
-    await _auth.sendPasswordResetEmail(email: email.trim().toLowerCase());
+    final normalized = email.trim().toLowerCase();
+    if (normalized.isEmpty) {
+      throw FirebaseAuthException(
+        code: 'missing-email',
+        message: 'Email is required.',
+      );
+    }
+
+    await _auth.sendPasswordResetEmail(
+      email: normalized,
+      actionCodeSettings: ActionCodeSettings(
+        url: 'https://al-nisar-app.firebaseapp.com',
+        handleCodeInApp: false,
+        androidPackageName: 'com.alnisar.alnisarapp',
+        androidInstallApp: false,
+      ),
+    );
   }
 
   Future<void> signInWithGoogle() async {
@@ -120,6 +136,7 @@ class AuthService {
         'displayName': u.displayName ?? '',
         'photoUrl': u.photoURL ?? '',
         'role': AppRole.fromString(role).firestoreValue,
+        'authProviders': u.providerData.map((p) => p.providerId).toList(),
         'createdAt': Timestamp.fromDate(createdAt),
         'lastLoginAt': Timestamp.fromDate(now),
       },

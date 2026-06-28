@@ -16,50 +16,6 @@ class BookService {
 
   bool get _firebaseReady => Firebase.apps.isNotEmpty;
 
-  String _safeIdFromStoragePath(String storagePath) {
-    return storagePath
-        .replaceAll('\\', '/')
-        .replaceAll('/', '__')
-        .replaceAll(RegExp(r'[^a-zA-Z0-9_\-\.]'), '_');
-  }
-
-  String _titleFromFilename(String name) {
-    final withoutExt = name.replaceAll(RegExp(r'\.pdf$', caseSensitive: false), '');
-    return withoutExt.replaceAll('_', ' ').trim();
-  }
-
-  Future<List<BookModel>> listBooksFromStorage({String folder = 'books'}) async {
-    if (!_firebaseReady) return [];
-    final ref = _storage.ref().child(folder);
-    final result = await ref.listAll();
-
-    final now = DateTime.now();
-    final items = result.items;
-    final books = <BookModel>[];
-    for (final item in items) {
-      final path = item.fullPath; // e.g. books/file.pdf
-      final name = item.name; // e.g. file.pdf
-      books.add(
-        BookModel(
-          id: _safeIdFromStoragePath(path),
-          title: _titleFromFilename(name),
-          titleUrdu: '',
-          author: '',
-          category: 'Books',
-          description: '',
-          storagePath: path,
-          coverImageUrl: '',
-          totalPages: 0,
-          uploadedAt: now,
-          isActive: true,
-        ),
-      );
-    }
-    // Deterministic order: newest-ish first by filename (if you embed date), else alpha.
-    books.sort((a, b) => b.title.compareTo(a.title));
-    return books;
-  }
-
   Stream<List<BookModel>> getBooksStream() {
     if (!_firebaseReady) {
       return Stream.value(<BookModel>[]);

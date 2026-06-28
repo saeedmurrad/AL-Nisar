@@ -11,6 +11,7 @@ import '../theme/color_utils.dart';
 import '../widgets/gold_card.dart';
 import '../widgets/screen_navigation_header.dart';
 import '../widgets/shimmer_placeholder.dart';
+import '../utils/responsive_layout.dart';
 
 class AdminIrshadatScreen extends StatefulWidget {
   const AdminIrshadatScreen({
@@ -463,13 +464,8 @@ class _IrshadEditorState extends State<_IrshadEditor> {
     final imgName = _imagePath == null
         ? 'No image selected (optional)'
         : _imagePath!.split(Platform.pathSeparator).last;
-    return Padding(
-      padding: EdgeInsets.only(
-        left: 16,
-        right: 16,
-        top: 14,
-        bottom: 16 + MediaQuery.viewInsetsOf(context).bottom,
-      ),
+    return ResponsiveLayout.scrollableSheet(
+      context: context,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,

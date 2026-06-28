@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:share_plus/share_plus.dart';
 
-import '../data/dummy_data.dart';
 import '../models/event_firestore_model.dart';
 import '../services/news_events_service.dart';
 import '../theme/app_theme.dart';
@@ -22,7 +21,6 @@ class EventDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.c;
-    final fallback = DummyData.eventById(eventId) ?? DummyData.eventsList.first;
     final onGold = Theme.of(context).brightness == Brightness.dark
         ? c.backgroundPrimary
         : c.textPrimary;
@@ -32,26 +30,45 @@ class EventDetailScreen extends StatelessWidget {
       future: NewsEventsService().getEventById(eventId),
       initialData: seed,
       builder: (context, snap) {
+        if (snap.connectionState == ConnectionState.waiting && snap.data == null) {
+          return Scaffold(
+            body: Center(child: CircularProgressIndicator(color: c.accentGold)),
+          );
+        }
+
         final doc = snap.data ?? seed;
-        final title = doc?.title.isNotEmpty == true ? doc!.title : fallback.title;
-        final fullDateLine = doc?.fullDateLine.isNotEmpty == true
-            ? doc!.fullDateLine
-            : fallback.fullDateLine;
-        final location =
-            doc?.location.isNotEmpty == true ? doc!.location : fallback.location;
-        final timeLabel =
-            doc?.timeLabel.isNotEmpty == true ? doc!.timeLabel : fallback.timeLabel;
-        final organizer =
-            doc?.organizer.isNotEmpty == true ? doc!.organizer : fallback.organizer;
-        final lines = (doc?.descriptionLines.isNotEmpty == true)
-            ? doc!.descriptionLines
-            : (fallback.descriptionLines.isNotEmpty
-                ? fallback.descriptionLines
-                : [
-                    'Details will be confirmed closer to the date.',
-                    'Please travel with adab and patience.',
-                    'Contact the organizers for accessibility needs.',
-                  ]);
+        if (doc == null || doc.title.trim().isEmpty) {
+          return Scaffold(
+            body: SafeArea(
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(10, 8, 16, 0),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: _BackButton(colors: c),
+                    ),
+                  ),
+                  Expanded(
+                    child: Center(
+                      child: Text(
+                        'Event not found.',
+                        style: AppTheme.lato(fontSize: 14, color: c.textMuted),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+
+        final title = doc.title;
+        final fullDateLine = doc.fullDateLine;
+        final location = doc.location;
+        final timeLabel = doc.timeLabel;
+        final organizer = doc.organizer;
+        final lines = doc.descriptionLines;
 
         return Scaffold(
           body: Column(
@@ -64,29 +81,7 @@ class EventDetailScreen extends StatelessWidget {
                   bottom: false,
                   child: Row(
                     children: [
-                      InkWell(
-                        onTap: () => popOrGoHome(context),
-                        child: Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: c.backgroundElevated,
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(
-                              color: c.borderDefault,
-                              width: 0.5,
-                            ),
-                          ),
-                          child: SvgPicture.string(
-                            _backSvg,
-                            width: 18,
-                            height: 18,
-                            colorFilter: ColorFilter.mode(
-                              c.accentGold,
-                              BlendMode.srcIn,
-                            ),
-                          ),
-                        ),
-                      ),
+                      _BackButton(colors: c),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Column(
@@ -100,35 +95,39 @@ class EventDetailScreen extends StatelessWidget {
                                 color: c.textPrimary,
                               ),
                             ),
-                            const SizedBox(height: 4),
-                            Text(
-                              fullDateLine,
-                              style: AppTheme.lato(
-                                fontSize: 13,
-                                color: c.textMuted,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Icon(
-                                  Icons.location_on_outlined,
-                                  size: 16,
+                            if (fullDateLine.isNotEmpty) ...[
+                              const SizedBox(height: 4),
+                              Text(
+                                fullDateLine,
+                                style: AppTheme.lato(
+                                  fontSize: 13,
                                   color: c.textMuted,
                                 ),
-                                const SizedBox(width: 4),
-                                Expanded(
-                                  child: Text(
-                                    location,
-                                    style: AppTheme.lato(
-                                      fontSize: 13,
-                                      color: c.textMuted,
+                              ),
+                            ],
+                            if (location.isNotEmpty) ...[
+                              const SizedBox(height: 2),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Icon(
+                                    Icons.location_on_outlined,
+                                    size: 16,
+                                    color: c.textMuted,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Expanded(
+                                    child: Text(
+                                      location,
+                                      style: AppTheme.lato(
+                                        fontSize: 13,
+                                        color: c.textMuted,
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
+                                ],
+                              ),
+                            ],
                           ],
                         ),
                       ),
@@ -152,10 +151,14 @@ class EventDetailScreen extends StatelessWidget {
                       const SizedBox(height: 12),
                     ],
                     const SizedBox(height: 8),
-                    _InfoRow(label: 'Date', value: fullDateLine),
-                    _InfoRow(label: 'Time', value: timeLabel),
-                    _InfoRow(label: 'Location', value: location),
-                    _InfoRow(label: 'Organizer', value: organizer),
+                    if (fullDateLine.isNotEmpty)
+                      _InfoRow(label: 'Date', value: fullDateLine),
+                    if (timeLabel.isNotEmpty)
+                      _InfoRow(label: 'Time', value: timeLabel),
+                    if (location.isNotEmpty)
+                      _InfoRow(label: 'Location', value: location),
+                    if (organizer.isNotEmpty)
+                      _InfoRow(label: 'Organizer', value: organizer),
                     const SizedBox(height: 16),
                     SizedBox(
                       width: double.infinity,
@@ -191,6 +194,39 @@ class EventDetailScreen extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class _BackButton extends StatelessWidget {
+  const _BackButton({required this.colors});
+
+  final AppThemeColors colors;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () => popOrGoHome(context),
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: colors.backgroundElevated,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: colors.borderDefault,
+            width: 0.5,
+          ),
+        ),
+        child: SvgPicture.string(
+          _backSvg,
+          width: 18,
+          height: 18,
+          colorFilter: ColorFilter.mode(
+            colors.accentGold,
+            BlendMode.srcIn,
+          ),
+        ),
+      ),
     );
   }
 }

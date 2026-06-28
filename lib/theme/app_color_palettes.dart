@@ -1,0 +1,226 @@
+import 'package:flutter/material.dart';
+
+import 'app_colors.dart';
+import 'app_theme_colors.dart';
+
+enum AppColorPalette {
+  emerald,
+  gold,
+  sapphire,
+  amethyst,
+  rose,
+  teal,
+  sunset;
+
+  static const AppColorPalette defaultPalette = AppColorPalette.emerald;
+
+  String get label => switch (this) {
+        AppColorPalette.emerald => 'Emerald',
+        AppColorPalette.gold => 'Gold',
+        AppColorPalette.sapphire => 'Sapphire',
+        AppColorPalette.amethyst => 'Amethyst',
+        AppColorPalette.rose => 'Rose',
+        AppColorPalette.teal => 'Teal',
+        AppColorPalette.sunset => 'Sunset',
+      };
+
+  static AppColorPalette fromName(String? name) {
+    if (name == null) return defaultPalette;
+    for (final p in AppColorPalette.values) {
+      if (p.name == name) return p;
+    }
+    return defaultPalette;
+  }
+
+  AppThemeColors colorsFor(Brightness brightness) {
+    return brightness == Brightness.dark ? darkColors : lightColors;
+  }
+
+  AppThemeColors get lightColors => switch (this) {
+        AppColorPalette.emerald => const AppThemeColors(
+            backgroundPrimary: Color(0xFFE4F2E8),
+            backgroundSurface: Color(0xFFD4E8DC),
+            backgroundElevated: Color(0xFFC2DEC8),
+            backgroundInput: Color(0xFFDAEDE0),
+            accentGold: Color(0xFF2E8B57),
+            textPrimary: Color(0xFF0A2818),
+            textSecondary: Color(0xFF1A4830),
+            textMuted: Color(0xFF3A6850),
+            textFaint: Color(0xFF5A8868),
+            borderDefault: Color(0xFF8AB898),
+            borderFaint: Color(0xFFA8CCB0),
+          ),
+        AppColorPalette.gold => const AppThemeColors(
+            backgroundPrimary: AppColorsLight.backgroundPrimary,
+            backgroundSurface: AppColorsLight.backgroundSurface,
+            backgroundElevated: AppColorsLight.backgroundElevated,
+            backgroundInput: AppColorsLight.backgroundInput,
+            accentGold: AppColorsLight.accentGold,
+            textPrimary: AppColorsLight.textPrimary,
+            textSecondary: AppColorsLight.textSecondary,
+            textMuted: AppColorsLight.textMuted,
+            textFaint: AppColorsLight.textFaint,
+            borderDefault: AppColorsLight.borderDefault,
+            borderFaint: AppColorsLight.borderFaint,
+          ),
+        AppColorPalette.sapphire => const AppThemeColors(
+            backgroundPrimary: Color(0xFFE4ECF8),
+            backgroundSurface: Color(0xFFD4E0F4),
+            backgroundElevated: Color(0xFFC2D4F0),
+            backgroundInput: Color(0xFFDAE6F6),
+            accentGold: Color(0xFF2563EB),
+            textPrimary: Color(0xFF0A1830),
+            textSecondary: Color(0xFF1A3058),
+            textMuted: Color(0xFF3A5080),
+            textFaint: Color(0xFF5A70A0),
+            borderDefault: Color(0xFF8AA8D8),
+            borderFaint: Color(0xFFA8C0E8),
+          ),
+        AppColorPalette.amethyst => const AppThemeColors(
+            backgroundPrimary: Color(0xFFEDE4F8),
+            backgroundSurface: Color(0xFFE0D4F4),
+            backgroundElevated: Color(0xFFD4C2F0),
+            backgroundInput: Color(0xFFE8DAF6),
+            accentGold: Color(0xFF7C3AED),
+            textPrimary: Color(0xFF180A30),
+            textSecondary: Color(0xFF301A58),
+            textMuted: Color(0xFF503A80),
+            textFaint: Color(0xFF705AA0),
+            borderDefault: Color(0xFFA898D8),
+            borderFaint: Color(0xFFC0A8E8),
+          ),
+        AppColorPalette.rose => const AppThemeColors(
+            backgroundPrimary: Color(0xFFF8E4E8),
+            backgroundSurface: Color(0xFFF4D4DC),
+            backgroundElevated: Color(0xFFF0C2CE),
+            backgroundInput: Color(0xFFF6DAE0),
+            accentGold: Color(0xFFE11D48),
+            textPrimary: Color(0xFF300A18),
+            textSecondary: Color(0xFF581A30),
+            textMuted: Color(0xFF803A50),
+            textFaint: Color(0xFFA05A70),
+            borderDefault: Color(0xFFD898A8),
+            borderFaint: Color(0xFFE8A8B8),
+          ),
+        AppColorPalette.teal => const AppThemeColors(
+            backgroundPrimary: Color(0xFFE0F4F4),
+            backgroundSurface: Color(0xFFCEECEC),
+            backgroundElevated: Color(0xFFB8E2E2),
+            backgroundInput: Color(0xFFD6F0F0),
+            accentGold: Color(0xFF0D9488),
+            textPrimary: Color(0xFF082828),
+            textSecondary: Color(0xFF184848),
+            textMuted: Color(0xFF386868),
+            textFaint: Color(0xFF588888),
+            borderDefault: Color(0xFF88B8B8),
+            borderFaint: Color(0xFFA8D0D0),
+          ),
+        AppColorPalette.sunset => const AppThemeColors(
+            backgroundPrimary: Color(0xFFF8EDE4),
+            backgroundSurface: Color(0xFFF4E0D0),
+            backgroundElevated: Color(0xFFECD0B8),
+            backgroundInput: Color(0xFFF6E8DA),
+            accentGold: Color(0xFFEA580C),
+            textPrimary: Color(0xFF281408),
+            textSecondary: Color(0xFF482818),
+            textMuted: Color(0xFF684838),
+            textFaint: Color(0xFF886858),
+            borderDefault: Color(0xFFC8A088),
+            borderFaint: Color(0xFFD8B8A0),
+          ),
+      };
+
+  AppThemeColors get darkColors => switch (this) {
+        AppColorPalette.emerald => const AppThemeColors(
+            backgroundPrimary: Color(0xFF040F0A),
+            backgroundSurface: Color(0xFF081A12),
+            backgroundElevated: Color(0xFF0C2418),
+            backgroundInput: Color(0xFF061E14),
+            accentGold: Color(0xFF3CB371),
+            textPrimary: Color(0xFFB0E8C8),
+            textSecondary: Color(0xFF98D8B0),
+            textMuted: Color(0xFF408060),
+            textFaint: Color(0xFF286048),
+            borderDefault: Color(0xFF1A4030),
+            borderFaint: Color(0xFF102818),
+          ),
+        AppColorPalette.gold => const AppThemeColors(
+            backgroundPrimary: AppColorsDark.backgroundPrimary,
+            backgroundSurface: AppColorsDark.backgroundSurface,
+            backgroundElevated: AppColorsDark.backgroundElevated,
+            backgroundInput: AppColorsDark.backgroundInput,
+            accentGold: AppColorsDark.accentGold,
+            textPrimary: AppColorsDark.textPrimary,
+            textSecondary: AppColorsDark.textSecondary,
+            textMuted: AppColorsDark.textMuted,
+            textFaint: AppColorsDark.textFaint,
+            borderDefault: AppColorsDark.borderDefault,
+            borderFaint: AppColorsDark.borderFaint,
+          ),
+        AppColorPalette.sapphire => const AppThemeColors(
+            backgroundPrimary: Color(0xFF040A14),
+            backgroundSurface: Color(0xFF08121E),
+            backgroundElevated: Color(0xFF0C1828),
+            backgroundInput: Color(0xFF061422),
+            accentGold: Color(0xFF3B82F6),
+            textPrimary: Color(0xFFB0C8F0),
+            textSecondary: Color(0xFF98B8E8),
+            textMuted: Color(0xFF406090),
+            textFaint: Color(0xFF284870),
+            borderDefault: Color(0xFF1A3050),
+            borderFaint: Color(0xFF102038),
+          ),
+        AppColorPalette.amethyst => const AppThemeColors(
+            backgroundPrimary: Color(0xFF0A040F),
+            backgroundSurface: Color(0xFF12081A),
+            backgroundElevated: Color(0xFF180C24),
+            backgroundInput: Color(0xFF140A1E),
+            accentGold: Color(0xFF8B5CF6),
+            textPrimary: Color(0xFFD0B0F0),
+            textSecondary: Color(0xFFC098E8),
+            textMuted: Color(0xFF684090),
+            textFaint: Color(0xFF482870),
+            borderDefault: Color(0xFF301A50),
+            borderFaint: Color(0xFF201038),
+          ),
+        AppColorPalette.rose => const AppThemeColors(
+            backgroundPrimary: Color(0xFF0F0408),
+            backgroundSurface: Color(0xFF1A0810),
+            backgroundElevated: Color(0xFF240C18),
+            backgroundInput: Color(0xFF1E0612),
+            accentGold: Color(0xFFF43F5E),
+            textPrimary: Color(0xFFF0B0C0),
+            textSecondary: Color(0xFFE898A8),
+            textMuted: Color(0xFF904060),
+            textFaint: Color(0xFF702848),
+            borderDefault: Color(0xFF501A30),
+            borderFaint: Color(0xFF381020),
+          ),
+        AppColorPalette.teal => const AppThemeColors(
+            backgroundPrimary: Color(0xFF040E0E),
+            backgroundSurface: Color(0xFF081818),
+            backgroundElevated: Color(0xFF0C2222),
+            backgroundInput: Color(0xFF061C1C),
+            accentGold: Color(0xFF2DD4BF),
+            textPrimary: Color(0xFFA8E8E0),
+            textSecondary: Color(0xFF90D8D0),
+            textMuted: Color(0xFF388080),
+            textFaint: Color(0xFF286060),
+            borderDefault: Color(0xFF1A4040),
+            borderFaint: Color(0xFF102828),
+          ),
+        AppColorPalette.sunset => const AppThemeColors(
+            backgroundPrimary: Color(0xFF0F0804),
+            backgroundSurface: Color(0xFF1A1008),
+            backgroundElevated: Color(0xFF24180C),
+            backgroundInput: Color(0xFF1E1206),
+            accentGold: Color(0xFFFB923C),
+            textPrimary: Color(0xFFF0C8A8),
+            textSecondary: Color(0xFFE8B890),
+            textMuted: Color(0xFF906040),
+            textFaint: Color(0xFF704830),
+            borderDefault: Color(0xFF503018),
+            borderFaint: Color(0xFF382010),
+          ),
+      };
+}

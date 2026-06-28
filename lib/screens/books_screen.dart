@@ -8,7 +8,6 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
-import '../auth/auth_provider.dart';
 import '../models/book_model.dart';
 import '../models/book_reader_args.dart';
 import '../providers/book_provider.dart';
@@ -16,6 +15,7 @@ import '../theme/app_theme.dart';
 import '../theme/color_utils.dart';
 import '../theme/app_theme_colors.dart';
 import '../utils/connectivity_helper.dart';
+import '../utils/responsive_layout.dart';
 import '../widgets/book_feature_icons.dart';
 import '../widgets/shimmer_placeholder.dart';
 import '../widgets/standard_shell_header.dart';
@@ -84,7 +84,6 @@ class _BooksScreenState extends State<BooksScreen> {
         final books = bp.books;
         final categories = bp.categories;
         final active = bp.selectedCategory;
-        final canAdd = context.watch<AuthProvider>().isAdminOrHigher;
 
         return Scaffold(
           body: Column(
@@ -144,28 +143,6 @@ class _BooksScreenState extends State<BooksScreen> {
                     ),
                   ],
                 ),
-                trailing: canAdd
-                    ? InkWell(
-                        onTap: () => context.push('/profile/add-data/books'),
-                        borderRadius: BorderRadius.circular(14),
-                        child: Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: c.backgroundElevated,
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(
-                              color: c.borderDefault,
-                              width: 0.5,
-                            ),
-                          ),
-                          child: Icon(
-                            Icons.add,
-                            size: 20,
-                            color: c.accentGold,
-                          ),
-                        ),
-                      )
-                    : null,
                 bottom: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -318,11 +295,11 @@ class _BooksBody extends StatelessWidget {
 
     return GridView.builder(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         crossAxisSpacing: 12,
         mainAxisSpacing: 14,
-        childAspectRatio: 0.58,
+        childAspectRatio: ResponsiveLayout.booksGridAspectRatio(context),
       ),
       itemCount: books.length,
       itemBuilder: (context, i) {
@@ -445,11 +422,11 @@ class _BooksShimmerGrid extends StatelessWidget {
     final c = context.c;
     return GridView.builder(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         crossAxisSpacing: 12,
         mainAxisSpacing: 14,
-        childAspectRatio: 0.58,
+        childAspectRatio: ResponsiveLayout.booksGridAspectRatio(context),
       ),
       itemCount: 6,
       itemBuilder: (context, i) {

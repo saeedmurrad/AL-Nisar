@@ -50,23 +50,58 @@ class NotificationsScreen extends StatelessWidget {
   }
 }
 
-class _AdminNotificationsList extends StatelessWidget {
+class _AdminNotificationsList extends StatefulWidget {
   const _AdminNotificationsList({required this.colors});
 
   final AppThemeColors colors;
 
   @override
+  State<_AdminNotificationsList> createState() => _AdminNotificationsListState();
+}
+
+class _AdminNotificationsListState extends State<_AdminNotificationsList> {
+  final _service = AdminNotificationsService();
+  final Set<String> _markingIds = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _service.pruneResolvedSabaqRequestNotifications();
+  }
+
+  Future<void> _markRead(String id) async {
+    setState(() => _markingIds.add(id));
+    try {
+      await _service.markAsRead(id);
+    } finally {
+      if (mounted) setState(() => _markingIds.remove(id));
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final service = AdminNotificationsService();
     return StreamBuilder(
-      stream: service.streamRecent(),
+      stream: _service.streamRecent(),
       builder: (context, snap) {
+        if (snap.hasError) {
+          return Center(
+            child: Text(
+              'Could not load notifications',
+              style: AppTheme.lato(color: widget.colors.textMuted),
+            ),
+          );
+        }
         final list = snap.data ?? const [];
+        if (snap.connectionState == ConnectionState.waiting && list.isEmpty) {
+          return Center(
+            child: CircularProgressIndicator(color: widget.colors.accentGold),
+          );
+        }
         if (list.isEmpty) {
           return Center(
             child: Text(
               'No notifications yet',
-              style: AppTheme.lato(color: colors.textMuted),
+              style: AppTheme.lato(color: widget.colors.textMuted),
             ),
           );
         }
@@ -76,8 +111,9 @@ class _AdminNotificationsList extends StatelessWidget {
           separatorBuilder: (context, index) => const SizedBox(height: 10),
           itemBuilder: (context, i) {
             final n = list[i];
+            final marking = _markingIds.contains(n.id);
             return GoldCard(
-              backgroundColor: colors.backgroundSurface,
+              backgroundColor: widget.colors.backgroundSurface,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -86,7 +122,7 @@ class _AdminNotificationsList extends StatelessWidget {
                     style: AppTheme.lato(
                       fontSize: 13,
                       fontWeight: FontWeight.w800,
-                      color: colors.textPrimary,
+                      color: widget.colors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -94,21 +130,49 @@ class _AdminNotificationsList extends StatelessWidget {
                     n.body,
                     style: AppTheme.lato(
                       fontSize: 12,
-                      color: colors.textMuted,
+                      color: widget.colors.textMuted,
                       height: 1.35,
                     ),
                   ),
                   const SizedBox(height: 10),
-                  TextButton(
-                    onPressed: () => context.push('/admin/sabaq-requests'),
-                    child: Text(
-                      'Open Sabaq requests',
-                      style: AppTheme.lato(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        color: colors.accentGold,
+                  Row(
+                    children: [
+                      TextButton(
+                        onPressed: marking
+                            ? null
+                            : () => context.push('/admin/sabaq-requests'),
+                        child: Text(
+                          'Open Sabaq requests',
+                          style: AppTheme.lato(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: widget.colors.accentGold,
+                          ),
+                        ),
                       ),
-                    ),
+                      const Spacer(),
+                      if (marking)
+                        SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: widget.colors.accentGold,
+                          ),
+                        )
+                      else
+                        TextButton(
+                          onPressed: () => _markRead(n.id),
+                          child: Text(
+                            'Mark as read',
+                            style: AppTheme.lato(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: widget.colors.textMuted,
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                 ],
               ),
@@ -120,7 +184,7 @@ class _AdminNotificationsList extends StatelessWidget {
   }
 }
 
-class _MemberNotificationsList extends StatelessWidget {
+class _MemberNotificationsList extends StatefulWidget {
   const _MemberNotificationsList({
     required this.colors,
     required this.userId,
@@ -130,17 +194,33 @@ class _MemberNotificationsList extends StatelessWidget {
   final String userId;
 
   @override
+  State<_MemberNotificationsList> createState() => _MemberNotificationsListState();
+}
+
+class _MemberNotificationsListState extends State<_MemberNotificationsList> {
+  final _service = UserNotificationsService();
+  final Set<String> _markingIds = {};
+
+  Future<void> _markRead(String id) async {
+    setState(() => _markingIds.add(id));
+    try {
+      await _service.markAsRead(widget.userId, id);
+    } finally {
+      if (mounted) setState(() => _markingIds.remove(id));
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final service = UserNotificationsService();
     return StreamBuilder(
-      stream: service.streamForUser(userId),
+      stream: _service.streamForUser(widget.userId),
       builder: (context, snap) {
         final list = snap.data ?? const [];
         if (list.isEmpty) {
           return Center(
             child: Text(
               'No notifications yet',
-              style: AppTheme.lato(color: colors.textMuted),
+              style: AppTheme.lato(color: widget.colors.textMuted),
             ),
           );
         }
@@ -151,43 +231,126 @@ class _MemberNotificationsList extends StatelessWidget {
           itemBuilder: (context, i) {
             final n = list[i];
             final showSabaqLink = n.type == 'sabaq_approved';
+            final showNewsLink =
+                n.type == 'news_published' && (n.newsId?.isNotEmpty ?? false);
+            final showEventLink =
+                n.type == 'event_published' && (n.eventId?.isNotEmpty ?? false);
+            final showContentLink = showSabaqLink || showNewsLink || showEventLink;
+            final marking = _markingIds.contains(n.id);
+            final isUnread = !n.read;
             return GoldCard(
-              backgroundColor: colors.backgroundSurface,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    n.title,
-                    style: AppTheme.lato(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w800,
-                      color: colors.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    n.body,
-                    style: AppTheme.lato(
-                      fontSize: 12,
-                      color: colors.textMuted,
-                      height: 1.35,
-                    ),
-                  ),
-                  if (showSabaqLink) ...[
-                    const SizedBox(height: 10),
-                    TextButton(
-                      onPressed: () => context.go('/sabaq'),
-                      child: Text(
-                        'View Sabaq',
-                        style: AppTheme.lato(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          color: colors.accentGold,
+              backgroundColor: widget.colors.backgroundSurface,
+              child: Opacity(
+                opacity: isUnread ? 1 : 0.65,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            n.title,
+                            style: AppTheme.lato(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w800,
+                              color: widget.colors.textPrimary,
+                            ),
+                          ),
                         ),
+                        if (isUnread)
+                          Container(
+                            width: 8,
+                            height: 8,
+                            margin: const EdgeInsets.only(top: 4, left: 8),
+                            decoration: BoxDecoration(
+                              color: widget.colors.accentGold,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      n.body,
+                      style: AppTheme.lato(
+                        fontSize: 12,
+                        color: widget.colors.textMuted,
+                        height: 1.35,
                       ),
                     ),
+                    if (showContentLink || isUnread) ...[
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          if (showSabaqLink)
+                            TextButton(
+                              onPressed: () => context.go('/sabaq'),
+                              child: Text(
+                                'View Sabaq',
+                                style: AppTheme.lato(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                  color: widget.colors.accentGold,
+                                ),
+                              ),
+                            ),
+                          if (showNewsLink)
+                            TextButton(
+                              onPressed: () => context.go(
+                                '/news-events/news-detail?id=${n.newsId}',
+                              ),
+                              child: Text(
+                                'View news',
+                                style: AppTheme.lato(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                  color: widget.colors.accentGold,
+                                ),
+                              ),
+                            ),
+                          if (showEventLink)
+                            TextButton(
+                              onPressed: () => context.go(
+                                '/news-events/event-detail?id=${n.eventId}',
+                              ),
+                              child: Text(
+                                'View event',
+                                style: AppTheme.lato(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                  color: widget.colors.accentGold,
+                                ),
+                              ),
+                            ),
+                          const Spacer(),
+                          if (isUnread)
+                            if (marking)
+                              SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: widget.colors.accentGold,
+                                ),
+                              )
+                            else
+                              TextButton(
+                                onPressed: () => _markRead(n.id),
+                                child: Text(
+                                  'Mark as read',
+                                  style: AppTheme.lato(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: widget.colors.textMuted,
+                                  ),
+                                ),
+                              ),
+                        ],
+                      ),
+                    ],
                   ],
-                ],
+                ),
               ),
             );
           },

@@ -12,6 +12,7 @@ import '../models/sabaq_access_request_model.dart';
 import '../models/sabaq_pdf_model.dart';
 import '../services/sabaq_access_service.dart';
 import '../services/sabaq_service.dart';
+import '../utils/firestore_error_messages.dart';
 import '../utils/sabaq_order_utils.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
@@ -280,11 +281,12 @@ class _SabaqListScreenState extends State<SabaqListScreen> {
           backgroundColor: c.backgroundElevated,
         ),
       );
-    } catch (_) {
+    } catch (e) {
       if (!context.mounted) return;
+      final msg = sabaqAccessRequestErrorMessage(e);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Could not send request (rules/auth)', style: AppTheme.lato(color: c.textPrimary)),
+          content: Text(msg, style: AppTheme.lato(color: c.textPrimary)),
           backgroundColor: c.backgroundElevated,
         ),
       );

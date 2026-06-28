@@ -47,7 +47,7 @@ void main() {
   test('Entry 39 and 40 list Muhammad Arif and Nisar Ahmad', () async {
     final urdu = await service.loadUrduList();
     expect(urdu[38].fullTitle, contains('محمد عارف'));
-    expect(urdu[39].fullTitle, contains('نثار احمد'));
+    expect(urdu[39].fullTitle, contains('سائیں صوفی نثار احمد'));
   });
 
   test('Urdu list uses short names for list display', () async {

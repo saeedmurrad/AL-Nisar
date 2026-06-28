@@ -85,7 +85,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                   suffix: IconButton(
                     onPressed: () => setState(() => _hide = !_hide),
                     icon: Icon(
-                      _hide ? Icons.visibility : Icons.visibility_off,
+                      _hide ? Icons.visibility_off : Icons.visibility,
                       color: c.textMuted,
                     ),
                   ),
