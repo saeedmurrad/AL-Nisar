@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../navigation/go_router_helpers.dart';
+import '../theme/app_layout.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
+import 'app_shell_chrome.dart';
 
 /// Top bar with working **Back** (pop or dashboard) and **Home**, plus title and optional trailing.
 class ScreenNavigationHeader extends StatelessWidget {
@@ -11,7 +13,7 @@ class ScreenNavigationHeader extends StatelessWidget {
     required this.title,
     this.titleWidget,
     this.trailing,
-    this.padding = const EdgeInsets.fromLTRB(4, 18, 16, 12),
+    this.padding = AppLayout.shellPadding,
     this.onBack,
     this.onHome,
     this.backEnabled = true,
@@ -33,37 +35,33 @@ class ScreenNavigationHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.c;
-    return Container(
-      color: c.backgroundSurface,
+    return AppShellChrome(
       padding: padding,
-      child: SafeArea(
-        bottom: false,
-        child: Row(
-          children: [
-            if (backEnabled)
-              IconButton(
-                tooltip: 'Back',
-                onPressed: disableBack
-                    ? null
-                    : (onBack ?? () => popOrGoHome(context)),
-                icon: Icon(Icons.arrow_back, color: c.accentGold),
-              ),
-            if (homeEnabled)
-              IconButton(
-                tooltip: 'Home',
-                onPressed: onHome ?? () => goAppHome(context),
-                icon: Icon(Icons.home_outlined, color: c.accentGold),
-              ),
-            Expanded(
-              child: titleWidget ??
-                  Text(
-                    title,
-                    style: AppTheme.cinzelHeading(fontSize: 18),
-                  ),
+      child: Row(
+        children: [
+          if (backEnabled)
+            IconButton(
+              tooltip: 'Back',
+              onPressed: disableBack
+                  ? null
+                  : (onBack ?? () => popOrGoHome(context)),
+              icon: Icon(Icons.arrow_back, color: c.accentGold),
             ),
-            if (trailing case final t?) t,
-          ],
-        ),
+          if (homeEnabled)
+            IconButton(
+              tooltip: 'Home',
+              onPressed: onHome ?? () => goAppHome(context),
+              icon: Icon(Icons.home_outlined, color: c.accentGold),
+            ),
+          Expanded(
+            child: titleWidget ??
+                Text(
+                  title,
+                  style: AppTheme.displayTitle(color: c.textPrimary),
+                ),
+          ),
+          if (trailing case final t?) t,
+        ],
       ),
     );
   }

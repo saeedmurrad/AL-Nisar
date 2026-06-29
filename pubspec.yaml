@@ -126,15 +126,17 @@ flutter:
 
 # App launcher icon (run: dart run flutter_launcher_icons)
 flutter_launcher_icons:
-  image_path: assets/images/icon.png
+  image_path: assets/images/sufi_nisar.jpg
   android: true
   ios: true
   remove_alpha_ios: true
+  adaptive_icon_background: "#1a1a2e"
+  adaptive_icon_foreground: assets/images/sufi_nisar.jpg
   web:
     generate: true
-    image_path: assets/images/icon.png
+    image_path: assets/images/sufi_nisar.jpg
     background_color: "#1a1a2e"
     theme_color: "#1a1a2e"
   macos:
     generate: true
-    image_path: assets/images/icon.png
+    image_path: assets/images/sufi_nisar.jpg

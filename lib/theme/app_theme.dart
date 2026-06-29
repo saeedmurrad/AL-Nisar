@@ -28,9 +28,9 @@ class AppTheme {
     return base.copyWith(
       extensions: <ThemeExtension<dynamic>>[colors],
       scaffoldBackgroundColor: colors.backgroundPrimary,
-      splashColor: Colors.transparent,
-      highlightColor: Colors.transparent,
-      hoverColor: Colors.transparent,
+      splashColor: colors.accentGold.withValues(alpha: 0.08),
+      highlightColor: colors.accentGold.withValues(alpha: 0.05),
+      hoverColor: colors.accentGold.withValues(alpha: 0.04),
       dividerColor: colors.borderDefault,
       textSelectionTheme: TextSelectionThemeData(
         cursorColor: colors.accentGold,
@@ -88,20 +88,57 @@ class AppTheme {
     );
   }
 
-  // Kept method name to avoid touching screen structure.
+  /// Display headings — Cormorant Garamond (kept name for call-site compatibility).
   static TextStyle cinzelHeading({
     double fontSize = 18,
     FontWeight fontWeight = FontWeight.w500,
     Color? color,
     double letterSpacing = 1.5,
   }) {
-    return GoogleFonts.poppins(
+    return cormorantGaramond(
       fontSize: fontSize,
       fontWeight: fontWeight,
       color: color,
       letterSpacing: letterSpacing,
     );
   }
+
+  static TextStyle displayTitle({
+    double fontSize = 20,
+    FontWeight fontWeight = FontWeight.w600,
+    Color? color,
+    double letterSpacing = 0.5,
+  }) =>
+      cormorantGaramond(
+        fontSize: fontSize,
+        fontWeight: fontWeight,
+        color: color,
+        letterSpacing: letterSpacing,
+      );
+
+  static TextStyle sectionCaption({
+    Color? color,
+    double fontSize = 11,
+    double letterSpacing = 1.8,
+  }) =>
+      lato(
+        fontSize: fontSize,
+        fontWeight: FontWeight.w600,
+        color: color,
+        letterSpacing: letterSpacing,
+      );
+
+  static TextStyle uiLabel({
+    Color? color,
+    double fontSize = 14,
+    FontWeight fontWeight = FontWeight.w500,
+  }) =>
+      lato(
+        fontSize: fontSize,
+        fontWeight: fontWeight,
+        color: color,
+        letterSpacing: 0.4,
+      );
 
   static TextStyle amiriUrdu({
     double fontSize = 18,

@@ -11,6 +11,7 @@ import '../widgets/auth_primary_button.dart';
 import '../widgets/auth_screen_decor.dart';
 import '../widgets/auth_text_field.dart';
 import '../widgets/gold_card.dart';
+import '../widgets/google_logo.dart';
 import '../widgets/murshid_avatar.dart';
 import '../widgets/ornament_divider.dart';
 
@@ -239,11 +240,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             : Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(
-                                    Icons.g_mobiledata,
-                                    size: 26,
-                                    color: c.textPrimary,
-                                  ),
+                                  const GoogleLogo(size: 20),
                                   const SizedBox(width: 10),
                                   Text(
                                     'Continue with Google',

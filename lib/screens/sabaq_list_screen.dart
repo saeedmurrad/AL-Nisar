@@ -17,6 +17,7 @@ import '../utils/sabaq_order_utils.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
 import '../theme/color_utils.dart';
+import '../widgets/branded_state_view.dart';
 import '../widgets/gold_card.dart';
 import '../widgets/standard_shell_header.dart';
 import '../widgets/shimmer_placeholder.dart';
@@ -311,8 +312,11 @@ class _SabaqListScreenState extends State<SabaqListScreen> {
               builder: (context, snap) {
                 if (snap.connectionState == ConnectionState.waiting &&
                     !snap.hasData) {
-                  return Center(
-                    child: CircularProgressIndicator(color: c.accentGold),
+                  return const BrandedStateView(
+                    icon: Icons.menu_book_outlined,
+                    title: 'Loading',
+                    message: 'Preparing lessons…',
+                    loading: true,
                   );
                 }
 

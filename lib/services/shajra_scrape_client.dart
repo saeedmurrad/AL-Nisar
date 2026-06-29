@@ -200,6 +200,14 @@ class ShajraScrapeClient {
   static const int listHonorificEndEntry = 38;
 
   static String listLabelEnglish(String fullTitle, int number) {
+    if (number == 1) {
+      return 'Hazrat Muhammad Rasool Allah SAW';
+    }
+    if (number == 39 || number == 40) {
+      final base = extractShortName(fullTitle);
+      if (base.toLowerCase().startsWith('hazrat')) return base;
+      return 'Hazrat $base';
+    }
     if (number > listHonorificEndEntry) {
       return extractShortName(fullTitle);
     }
@@ -209,6 +217,14 @@ class ShajraScrapeClient {
   }
 
   static String listLabelUrdu(String fullTitle, int number) {
+    if (number == 1) {
+      return 'حضرت محمد رسول اللہ صلی اللہ علیہ وآلہ وسلم';
+    }
+    if (number == 39 || number == 40) {
+      final base = extractUrduShortName(fullTitle);
+      if (base.startsWith('حضرت')) return base;
+      return 'حضرت $base';
+    }
     if (number > listHonorificEndEntry) {
       return extractUrduShortName(fullTitle);
     }

@@ -13,6 +13,7 @@ import '../widgets/gold_card.dart';
 import '../widgets/theme_toggle_button.dart';
 import '../widgets/theme_palette_picker.dart';
 import '../widgets/font_scale_control.dart';
+import '../widgets/section_label.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -117,10 +118,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         height: 92,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: c.backgroundElevated,
-                          border: Border.all(color: c.accentGold, width: 1.5),
+                          border: Border.all(color: c.accentGold.o(0.35), width: 3),
                         ),
-                        child: photoUrl.trim().isNotEmpty
+                        padding: const EdgeInsets.all(3),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: c.backgroundElevated,
+                            border: Border.all(color: c.accentGold, width: 1.5),
+                          ),
+                          child: photoUrl.trim().isNotEmpty
                             ? ClipOval(
                                 child: Image.network(
                                   photoUrl,
@@ -129,9 +136,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       Center(
                                         child: Text(
                                           initials,
-                                          style: AppTheme.cinzelHeading(
+                                          style: AppTheme.displayTitle(
                                             fontSize: 34,
-                                            letterSpacing: 1.2,
                                             color: c.textPrimary,
                                           ),
                                         ),
@@ -141,13 +147,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             : Center(
                                 child: Text(
                                   initials,
-                                  style: AppTheme.cinzelHeading(
+                                  style: AppTheme.displayTitle(
                                     fontSize: 34,
-                                    letterSpacing: 1.2,
                                     color: c.textPrimary,
                                   ),
                                 ),
                               ),
+                        ),
                       ),
                       const SizedBox(height: 12),
                       Row(
@@ -157,7 +163,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             child: Text(
                               displayName,
                               overflow: TextOverflow.ellipsis,
-                              style: AppTheme.cinzelHeading(fontSize: 18),
+                              style: AppTheme.displayTitle(fontSize: 18),
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -199,9 +205,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         child: Text(
                           roleLabel,
-                          style: TextStyle(
+                          style: AppTheme.lato(
                             color: c.textPrimary,
                             fontSize: 12,
+                            fontWeight: FontWeight.w600,
                             letterSpacing: 0.8,
                           ),
                         ),
@@ -228,20 +235,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 children: [
                                   Text(
                                     'My Bookmarks',
-                                    style: TextStyle(
-                                      color: c.textPrimary,
-                                      fontSize: 14,
-                                      letterSpacing: 0.4,
-                                    ),
+                                    style: AppTheme.uiLabel(color: c.textPrimary),
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
                                     pages == 0
                                         ? 'No book pages bookmarked yet'
                                         : '$pages pages bookmarked across $books books',
-                                    style: TextStyle(
-                                      color: c.textMuted,
+                                    style: AppTheme.lato(
                                       fontSize: 12,
+                                      color: c.textMuted,
                                     ),
                                   ),
                                 ],
@@ -255,14 +258,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   },
                 ),
                 const SizedBox(height: 16),
-                Text(
-                  'Bookmarks',
-                  style: TextStyle(
-                    color: c.textMuted.o(0.95),
-                    letterSpacing: 2.2,
-                    fontSize: 11,
-                  ),
-                ),
+                const SectionLabel('Bookmarks'),
                 const SizedBox(height: 10),
                 Row(
                   children: [
@@ -291,17 +287,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     children: [
                       Text(
                         _tab == 0 ? 'Saved Sabaq' : 'Saved Irshadat',
-                        style: TextStyle(
-                          color: c.textPrimary,
-                          fontSize: 14,
-                          letterSpacing: 0.4,
-                        ),
+                        style: AppTheme.uiLabel(color: c.textPrimary),
                       ),
                       const SizedBox(height: 10),
                       if (_tab == 0)
                         Text(
                           'Coming soon.',
-                          style: TextStyle(color: c.textMuted, fontSize: 12),
+                          style: AppTheme.lato(fontSize: 12, color: c.textMuted),
                         )
                       else
                         FutureBuilder<({int total, int urdu, int english})>(
@@ -360,14 +352,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Row(
                   children: [
                     Expanded(
-                      child: Text(
-                        'Appearance',
-                        style: TextStyle(
-                          color: c.textMuted,
-                          fontSize: 12,
-                          letterSpacing: 0.6,
-                        ),
-                      ),
+                      child: SectionLabel('Appearance'),
                     ),
                     const ThemeToggleButton(),
                   ],
@@ -375,22 +360,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(height: 10),
                 Text(
                   'Color theme',
-                  style: TextStyle(
-                    color: c.textMuted,
-                    fontSize: 12,
-                    letterSpacing: 0.6,
-                  ),
+                  style: AppTheme.sectionCaption(color: c.textMuted, letterSpacing: 0.6),
                 ),
                 const SizedBox(height: 6),
                 const ThemePalettePicker(compact: false),
                 const SizedBox(height: 14),
                 Text(
                   'Text size',
-                  style: TextStyle(
-                    color: c.textMuted,
-                    fontSize: 12,
-                    letterSpacing: 0.6,
-                  ),
+                  style: AppTheme.sectionCaption(color: c.textMuted, letterSpacing: 0.6),
                 ),
                 const SizedBox(height: 8),
                 const FontScaleControl(),
@@ -409,19 +386,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               children: [
                                 Text(
                                   'Admin Panel',
-                                  style: TextStyle(
-                                    color: c.textPrimary,
-                                    fontSize: 14,
-                                    letterSpacing: 0.4,
-                                  ),
+                                  style: AppTheme.uiLabel(color: c.textPrimary),
                                 ),
                                 const SizedBox(height: 6),
                                 Text(
                                   'Upload and manage app content',
-                                  style: TextStyle(
-                                    color: c.textMuted,
-                                    fontSize: 12,
-                                  ),
+                                  style: AppTheme.lato(fontSize: 12, color: c.textMuted),
                                 ),
                               ],
                             ),
@@ -436,14 +406,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ],
                 const SizedBox(height: 20),
-                Text(
-                  'Account',
-                  style: TextStyle(
-                    color: c.textMuted,
-                    fontSize: 12,
-                    letterSpacing: 0.6,
-                  ),
-                ),
+                const SectionLabel('Account'),
                 const SizedBox(height: 10),
                 InkWell(
                   onTap: () async {
@@ -513,25 +476,29 @@ class _TabPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.c;
+    final onGold = Theme.of(context).brightness == Brightness.dark
+        ? c.backgroundPrimary
+        : c.textPrimary;
     return InkWell(
       onTap: onTap,
+      borderRadius: BorderRadius.circular(999),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 10),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
         decoration: BoxDecoration(
-          color: selected ? c.backgroundElevated : c.backgroundInput,
+          color: selected ? c.accentGold : Colors.transparent,
           borderRadius: BorderRadius.circular(999),
           border: Border.all(
-            color: selected ? c.accentGold.o(0.55) : c.borderDefault,
-            width: 0.5,
+            color: selected ? c.accentGold : c.accentGold.o(0.55),
+            width: 0.8,
           ),
         ),
         child: Center(
           child: Text(
             label,
-            style: TextStyle(
-              color: selected ? c.textPrimary : c.textMuted,
-              fontSize: 12,
-              letterSpacing: 0.8,
+            style: AppTheme.lato(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: selected ? onGold : c.textMuted,
             ),
           ),
         ),

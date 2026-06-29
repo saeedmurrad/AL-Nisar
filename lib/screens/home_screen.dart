@@ -8,11 +8,11 @@ import '../theme/app_theme.dart';
 import '../theme/color_utils.dart';
 import '../theme/app_theme_colors.dart';
 import '../utils/responsive_layout.dart';
+import '../widgets/app_shell_chrome.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/gold_card.dart';
 import '../widgets/home_grid_icons.dart';
 import '../widgets/irshad_of_the_day_card.dart';
-import '../widgets/mandala_painter.dart';
 import '../widgets/murshid_avatar.dart';
 import '../widgets/social_connect_section.dart';
 
@@ -74,52 +74,46 @@ class _Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.c;
-    return Container(
-      color: c.backgroundSurface,
+    return AppShellChrome(
       padding: const EdgeInsets.fromLTRB(16, 18, 16, 14),
-      child: SafeArea(
-        bottom: false,
-        child: Row(
-          children: [
-            const DrawerMenuButton(),
-            const SizedBox(width: 10),
-            const MurshidAvatar(
-              diameter: 40,
-              goldRingWidth: 1.5,
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text(
-                    'As-Salaam-Alaikum',
-                    style: TextStyle(
-                      color: c.textMuted.o(0.95),
-                      fontSize: 12,
-                      letterSpacing: 1.0,
-                    ),
+      child: Row(
+        children: [
+          const DrawerMenuButton(),
+          const SizedBox(width: 10),
+          const MurshidAvatar(
+            diameter: 40,
+            goldRingWidth: 1.5,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  'As-Salaam-Alaikum',
+                  style: AppTheme.sectionCaption(
+                    color: c.textMuted.o(0.95),
+                    letterSpacing: 1.0,
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    memberName,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                    style: AppTheme.cinzelHeading(
-                      fontSize: 16,
-                      letterSpacing: 1.2,
-                      color: c.textPrimary,
-                    ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  memberName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: AppTheme.displayTitle(
+                    fontSize: 16,
+                    color: c.textPrimary,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-            NotificationBellButton(
-              onTap: onBellTap,
-            ),
-          ],
-        ),
+          ),
+          NotificationBellButton(
+            onTap: onBellTap,
+          ),
+        ],
       ),
     );
   }
@@ -246,49 +240,32 @@ class _HomeGridCard extends StatelessWidget {
       onTap: onTap,
       child: GoldCard(
         backgroundColor: c.backgroundSurface,
-        child: Stack(
+        showWatermark: true,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Positioned(
-              top: -18,
-              right: -10,
-              child: CustomPaint(
-                painter: MandalaPainter(
-                  color: c.accentGold,
-                  opacity: 0.06,
-                  strokeWidth: 0.9,
-                  rings: 4,
-                  petals: 12,
-                ),
-                size: const Size(120, 120),
+            HomeGridIcon(kind: iconKind, color: accent, size: 40),
+            const SizedBox(height: 10),
+            Text(
+              label,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: AppTheme.cinzelHeading(
+                fontSize: 15,
+                letterSpacing: 1.2,
+                color: c.textPrimary,
               ),
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                HomeGridIcon(kind: iconKind, color: accent, size: 40),
-                const SizedBox(height: 10),
-                Text(
-                  label,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTheme.cinzelHeading(
-                    fontSize: 15,
-                    letterSpacing: 1.2,
-                    color: c.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  sublabel,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: c.textMuted,
-                    fontSize: 11,
-                  ),
-                ),
-              ],
+            const SizedBox(height: 4),
+            Text(
+              sublabel,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: AppTheme.lato(
+                color: c.textMuted,
+                fontSize: 11,
+              ),
             ),
           ],
         ),

@@ -18,6 +18,7 @@ import '../utils/connectivity_helper.dart';
 import '../utils/responsive_layout.dart';
 import '../widgets/book_feature_icons.dart';
 import '../widgets/shimmer_placeholder.dart';
+import '../widgets/gold_card.dart';
 import '../widgets/standard_shell_header.dart';
 
 class BooksScreen extends StatefulWidget {
@@ -306,20 +307,17 @@ class _BooksBody extends StatelessWidget {
         final b = books[i];
         return InkWell(
           onTap: () => onOpenBook(b),
-          borderRadius: BorderRadius.circular(12),
-          child: Container(
-            decoration: BoxDecoration(
-              color: c.backgroundSurface,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: c.borderDefault, width: 0.5),
-            ),
+          borderRadius: BorderRadius.circular(14),
+          child: GoldCard(
+            clipChild: true,
+            padding: EdgeInsets.zero,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 ClipRRect(
                   borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(12),
-                    topRight: Radius.circular(12),
+                    topLeft: Radius.circular(14),
+                    topRight: Radius.circular(14),
                   ),
                   child: Stack(
                     children: [

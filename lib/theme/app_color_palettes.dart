@@ -12,7 +12,7 @@ enum AppColorPalette {
   teal,
   sunset;
 
-  static const AppColorPalette defaultPalette = AppColorPalette.emerald;
+  static const AppColorPalette defaultPalette = AppColorPalette.gold;
 
   String get label => switch (this) {
         AppColorPalette.emerald => 'Emerald',

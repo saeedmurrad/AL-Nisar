@@ -415,16 +415,16 @@ class _DetailScroll extends StatelessWidget {
         padding: HtmlPaddings.zero,
         backgroundColor: Colors.transparent,
         fontFamily: bodyFamily,
-        fontSize: FontSize(isUrdu ? 16 : 15),
+        fontSize: FontSize(isUrdu ? 17 : 15),
         color: c.textSecondary,
-        lineHeight: LineHeight(isUrdu ? 2.0 : 1.8),
+        lineHeight: LineHeight(isUrdu ? 2.15 : 1.85),
         textAlign: isUrdu ? TextAlign.right : TextAlign.left,
       ),
       'p': Style(
-        margin: Margins.only(bottom: 12),
-        lineHeight: LineHeight(isUrdu ? 2.0 : 1.8),
+        margin: Margins.only(bottom: 14),
+        lineHeight: LineHeight(isUrdu ? 2.15 : 1.85),
         fontFamily: bodyFamily,
-        fontSize: FontSize(isUrdu ? 16 : 15),
+        fontSize: FontSize(isUrdu ? 17 : 15),
         color: c.textSecondary,
         textAlign: isUrdu ? TextAlign.right : TextAlign.left,
       ),
@@ -439,15 +439,44 @@ class _DetailScroll extends StatelessWidget {
         fontFamily: titleFamily,
         fontSize: FontSize(isUrdu ? 19 : 19),
         color: c.accentGold,
-        margin: Margins.only(bottom: 10, top: 8),
+        margin: Margins.only(bottom: 12, top: 4),
+        lineHeight: LineHeight(isUrdu ? 2.0 : 1.7),
         textAlign: isUrdu ? TextAlign.right : TextAlign.left,
       ),
       'h3': Style(
         fontFamily: titleFamily,
-        fontSize: FontSize(isUrdu ? 18 : 18),
+        fontSize: FontSize(isUrdu ? 18 : 17),
+        fontWeight: FontWeight.w600,
         color: c.accentGold,
-        margin: Margins.only(bottom: 8, top: 6),
+        margin: Margins.only(bottom: 10, top: 22),
+        padding: HtmlPaddings.only(bottom: 6),
+        border: Border(
+          bottom: BorderSide(color: c.accentGold.o(0.35), width: 1),
+        ),
+        lineHeight: LineHeight(isUrdu ? 2.0 : 1.65),
         textAlign: isUrdu ? TextAlign.right : TextAlign.left,
+      ),
+      'blockquote': Style(
+        margin: Margins.symmetric(vertical: 12, horizontal: isUrdu ? 0 : 4),
+        padding: HtmlPaddings.only(
+          left: isUrdu ? 12 : 14,
+          top: 12,
+          right: isUrdu ? 14 : 12,
+          bottom: 12,
+        ),
+        backgroundColor: c.accentGold.o(0.08),
+        border: Border(
+          right: isUrdu
+              ? BorderSide(color: c.accentGold, width: 3)
+              : BorderSide.none,
+          left: isUrdu
+              ? BorderSide.none
+              : BorderSide(color: c.accentGold, width: 3),
+        ),
+      ),
+      'strong': Style(
+        fontWeight: FontWeight.w700,
+        color: c.textPrimary,
       ),
       'em': Style(
         fontStyle: FontStyle.italic,
@@ -470,7 +499,12 @@ class _DetailScroll extends StatelessWidget {
                 color: c.accentGold.o(0.12),
                 borderRadius: BorderRadius.circular(12),
                 border: Border(
-                  left: BorderSide(color: c.accentGold, width: 4),
+                  left: isUrdu
+                      ? BorderSide.none
+                      : BorderSide(color: c.accentGold, width: 4),
+                  right: isUrdu
+                      ? BorderSide(color: c.accentGold, width: 4)
+                      : BorderSide.none,
                 ),
               ),
               child: Text(

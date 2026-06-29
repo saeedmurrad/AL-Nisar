@@ -7,7 +7,9 @@ import '../services/news_events_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/color_utils.dart';
 import '../theme/app_theme_colors.dart';
+import '../widgets/gold_card.dart';
 import '../widgets/news_cover_image.dart';
+import '../widgets/branded_state_view.dart';
 import '../widgets/standard_shell_header.dart';
 
 class NewsEventsScreen extends StatefulWidget {
@@ -44,32 +46,27 @@ class _NewsEventsScreenState extends State<NewsEventsScreen>
   }
 
   Widget _loadingState(AppThemeColors c) {
-    return Center(child: CircularProgressIndicator(color: c.accentGold));
+    return BrandedStateView(
+      icon: Icons.article_outlined,
+      title: 'Loading',
+      message: 'Fetching latest updates…',
+      loading: true,
+    );
   }
 
   Widget _emptyState(AppThemeColors c, String label) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Text(
-          label,
-          textAlign: TextAlign.center,
-          style: AppTheme.lato(fontSize: 14, color: c.textMuted),
-        ),
-      ),
+    return BrandedStateView(
+      icon: Icons.article_outlined,
+      title: 'Nothing here yet',
+      message: label,
     );
   }
 
   Widget _errorState(AppThemeColors c, String label) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Text(
-          label,
-          textAlign: TextAlign.center,
-          style: AppTheme.lato(fontSize: 14, color: c.textMuted, height: 1.45),
-        ),
-      ),
+    return BrandedStateView(
+      icon: Icons.wifi_off_rounded,
+      title: 'Could not load',
+      message: label,
     );
   }
 
@@ -349,16 +346,10 @@ class _NewsTabFirestore extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 12),
             child: InkWell(
               onTap: () => context.push('/news-events/news-detail', extra: n),
-              child: Container(
-                padding: const EdgeInsets.only(bottom: 12),
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(
-                      color: c.accentGold.o(0.35),
-                      width: 0.8,
-                    ),
-                  ),
-                ),
+              borderRadius: BorderRadius.circular(14),
+              child: GoldCard(
+                clipChild: true,
+                padding: const EdgeInsets.all(12),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -378,15 +369,16 @@ class _NewsTabFirestore extends StatelessWidget {
                         children: [
                           Text(
                             n.category.toUpperCase(),
-                            style: TextStyle(
+                            style: AppTheme.sectionCaption(
                               color: c.accentGold,
-                              fontSize: 10,
                               letterSpacing: 1,
                             ),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             n.title,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                             style: AppTheme.cormorantGaramond(
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
@@ -535,14 +527,9 @@ class _EventsTabFirestore extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 12),
             child: InkWell(
               onTap: () => context.push('/news-events/event-detail', extra: e),
-              borderRadius: BorderRadius.circular(12),
-              child: Container(
+              borderRadius: BorderRadius.circular(14),
+              child: GoldCard(
                 padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: c.backgroundSurface,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: c.borderDefault, width: 0.5),
-                ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

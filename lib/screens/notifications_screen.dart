@@ -7,6 +7,7 @@ import '../services/admin_notifications_service.dart';
 import '../services/user_notifications_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
+import '../widgets/branded_state_view.dart';
 import '../widgets/gold_card.dart';
 import '../widgets/standard_shell_header.dart';
 
@@ -93,16 +94,18 @@ class _AdminNotificationsListState extends State<_AdminNotificationsList> {
         }
         final list = snap.data ?? const [];
         if (snap.connectionState == ConnectionState.waiting && list.isEmpty) {
-          return Center(
-            child: CircularProgressIndicator(color: widget.colors.accentGold),
+          return const BrandedStateView(
+            icon: Icons.notifications_none_outlined,
+            title: 'Loading',
+            message: 'Checking for updates…',
+            loading: true,
           );
         }
         if (list.isEmpty) {
-          return Center(
-            child: Text(
-              'No notifications yet',
-              style: AppTheme.lato(color: widget.colors.textMuted),
-            ),
+          return const BrandedStateView(
+            icon: Icons.notifications_none_outlined,
+            title: 'All caught up',
+            message: 'No notifications yet.',
           );
         }
         return ListView.separated(
@@ -217,11 +220,10 @@ class _MemberNotificationsListState extends State<_MemberNotificationsList> {
       builder: (context, snap) {
         final list = snap.data ?? const [];
         if (list.isEmpty) {
-          return Center(
-            child: Text(
-              'No notifications yet',
-              style: AppTheme.lato(color: widget.colors.textMuted),
-            ),
+          return const BrandedStateView(
+            icon: Icons.notifications_none_outlined,
+            title: 'All caught up',
+            message: 'No notifications yet.',
           );
         }
         return ListView.separated(

@@ -9,6 +9,7 @@ import '../theme/color_utils.dart';
 import '../widgets/theme_palette_picker.dart';
 import '../widgets/theme_toggle_button.dart';
 import '../widgets/font_scale_control.dart';
+import '../widgets/mandala_painter.dart';
 
 class _DrawerDestination {
   const _DrawerDestination({
@@ -86,16 +87,38 @@ class AppDrawer extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
-              child: Text(
-                'AL Nisar',
-                style: AppTheme.cinzelHeading(
-                  fontSize: 20,
-                  letterSpacing: 1.4,
-                  color: c.textPrimary,
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Positioned(
+                  right: -20,
+                  top: -10,
+                  child: Opacity(
+                    opacity: 0.08,
+                    child: CustomPaint(
+                      painter: MandalaPainter(
+                        color: c.accentGold,
+                        opacity: 0.08,
+                        strokeWidth: 0.8,
+                        rings: 3,
+                        petals: 10,
+                      ),
+                      size: const Size(100, 100),
+                    ),
+                  ),
                 ),
-              ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
+                  child: Text(
+                    'AL Nisar',
+                    style: AppTheme.displayTitle(
+                      fontSize: 20,
+                      letterSpacing: 1.2,
+                      color: c.textPrimary,
+                    ),
+                  ),
+                ),
+              ],
             ),
             Divider(height: 1, color: c.borderDefault),
             Expanded(
