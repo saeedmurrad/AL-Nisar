@@ -83,7 +83,8 @@ class EventFirestoreModel {
       shortDateLabel: shortDateLabel,
       location: data['location'] as String? ?? '',
       timeLabel: data['timeLabel'] as String? ?? '',
-      organizer: data['organizer'] as String? ?? NewsEventDefaults.eventOrganizer,
+      organizer:
+          data['organizer'] as String? ?? NewsEventDefaults.eventOrganizer,
       descriptionLines: lines,
       createdAt: createdAt,
       isActive: data['isActive'] as bool? ?? true,
@@ -107,4 +108,3 @@ class EventFirestoreModel {
     };
   }
 }
-

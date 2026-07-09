@@ -6,10 +6,7 @@ import '../theme/color_utils.dart';
 import '../theme/app_theme_colors.dart';
 
 class ShimmerPlaceholder extends StatefulWidget {
-  const ShimmerPlaceholder({
-    super.key,
-    this.borderRadius,
-  });
+  const ShimmerPlaceholder({super.key, this.borderRadius});
 
   final BorderRadius? borderRadius;
 
@@ -88,9 +85,7 @@ class GoldPatternError extends StatelessWidget {
         background: c.backgroundSurface,
         stroke: c.accentGold.o(0.35),
       ),
-      child: Container(
-        color: c.backgroundSurface,
-      ),
+      child: Container(color: c.backgroundSurface),
     );
   }
 }
@@ -137,4 +132,3 @@ class _GoldPatternPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
-

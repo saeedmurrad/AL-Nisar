@@ -56,7 +56,11 @@ class _FacebookCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(color: c.borderDefault, width: 0.5),
                 ),
-                child: Icon(Icons.facebook_rounded, color: c.accentGold, size: 22),
+                child: Icon(
+                  Icons.facebook_rounded,
+                  color: c.accentGold,
+                  size: 22,
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -132,7 +136,11 @@ class _YouTubeCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(color: c.borderDefault, width: 0.5),
                 ),
-                child: Icon(Icons.play_circle_outline_rounded, color: c.accentGold, size: 24),
+                child: Icon(
+                  Icons.play_circle_outline_rounded,
+                  color: c.accentGold,
+                  size: 24,
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(

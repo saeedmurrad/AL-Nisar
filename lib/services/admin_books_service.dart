@@ -1,40 +1,45 @@
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
+import '../models/upload_file_data.dart';
 import '../models/book_model.dart';
+import '../utils/file_bytes_utils.dart';
 
 class AdminBooksService {
-  AdminBooksService({
-    FirebaseFirestore? firestore,
-    FirebaseStorage? storage,
-  })  : _firestore = firestore ?? FirebaseFirestore.instance,
-        _storage = storage ?? FirebaseStorage.instance;
+  AdminBooksService({FirebaseFirestore? firestore, FirebaseStorage? storage})
+    : _firestore = firestore ?? FirebaseFirestore.instance,
+      _storage = storage ?? FirebaseStorage.instance;
 
   final FirebaseFirestore _firestore;
   final FirebaseStorage _storage;
 
-  Reference bookPdfRef(String bookId) => _storage.ref().child('books/$bookId.pdf');
+  Reference bookPdfRef(String bookId) =>
+      _storage.ref().child('books/$bookId.pdf');
   Reference bookCoverRef(String bookId, {required String extension}) =>
       _storage.ref().child('book_covers/$bookId.$extension');
 
   UploadTask uploadBookPdfTask({
     required String bookId,
-    required String pdfPath,
+    required UploadFileData pdf,
   }) {
-    final file = File(pdfPath);
     final ref = bookPdfRef(bookId);
-    return ref.putFile(file, SettableMetadata(contentType: 'application/pdf'));
+    return ref.putData(
+      pdf.bytes,
+      SettableMetadata(
+        contentType: pdfMimeType,
+        customMetadata: {'originalName': pdf.name},
+      ),
+    );
   }
 
   Future<String> uploadBookPdf({
     required String bookId,
-    required String pdfPath,
+    required UploadFileData pdf,
   }) async {
     final ref = bookPdfRef(bookId);
-    await uploadBookPdfTask(bookId: bookId, pdfPath: pdfPath);
+    await uploadBookPdfTask(bookId: bookId, pdf: pdf);
     return ref.fullPath;
   }
 
@@ -48,23 +53,26 @@ class AdminBooksService {
 
   UploadTask uploadCoverImageTask({
     required String bookId,
-    required String imagePath,
+    required UploadFileData image,
   }) {
-    final file = File(imagePath);
-    final lower = imagePath.toLowerCase();
-    final ext = lower.endsWith('.png') ? 'png' : 'jpg';
+    final ext = imageExtensionFromName(image.name);
     final ref = bookCoverRef(bookId, extension: ext);
-    return ref.putFile(file);
+    return ref.putData(
+      image.bytes,
+      SettableMetadata(
+        contentType: imageMimeTypeFromName(image.name),
+        customMetadata: {'originalName': image.name},
+      ),
+    );
   }
 
   Future<String?> uploadCoverImage({
     required String bookId,
-    required String imagePath,
+    required UploadFileData image,
   }) async {
-    final lower = imagePath.toLowerCase();
-    final ext = lower.endsWith('.png') ? 'png' : 'jpg';
+    final ext = imageExtensionFromName(image.name);
     final ref = bookCoverRef(bookId, extension: ext);
-    await uploadCoverImageTask(bookId: bookId, imagePath: imagePath);
+    await uploadCoverImageTask(bookId: bookId, image: image);
     return ref.getDownloadURL();
   }
 
@@ -78,8 +86,9 @@ class AdminBooksService {
 
   Stream<List<BookModel>> streamAllBooks() {
     return _firestore.collection('books').snapshots().map((snapshot) {
-      final list =
-          snapshot.docs.map((d) => BookModel.fromFirestore(d)).toList();
+      final list = snapshot.docs
+          .map((d) => BookModel.fromFirestore(d))
+          .toList();
       list.sort((a, b) => b.uploadedAt.compareTo(a.uploadedAt));
       return list;
     });
@@ -126,4 +135,3 @@ class AdminBooksService {
     return (pdfOk: pdfOk, coverOk: coverOk);
   }
 }
-

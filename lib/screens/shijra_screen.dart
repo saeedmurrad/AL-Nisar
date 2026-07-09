@@ -99,7 +99,10 @@ class _ShijraScreenState extends State<ShijraScreen> {
       );
       return;
     }
-    context.push('/shajra/detail', extra: ShajraDetailRouteArgs(entry: entry, allEntries: all));
+    context.push(
+      '/shajra/detail',
+      extra: ShajraDetailRouteArgs(entry: entry, allEntries: all),
+    );
   }
 
   void _openUrduPdf(
@@ -112,7 +115,9 @@ class _ShijraScreenState extends State<ShijraScreen> {
         '/shajra/urdu-pdf',
         extra: ShajraUrduPdfArgs(
           number: detail.number,
-          titleUrdu: detail.titleUrdu.isNotEmpty ? detail.titleUrdu : entry.fullTitle,
+          titleUrdu: detail.titleUrdu.isNotEmpty
+              ? detail.titleUrdu
+              : entry.fullTitle,
           storagePath: detail.storagePath,
         ),
       );
@@ -284,10 +289,7 @@ class _LangPill extends StatelessWidget {
           decoration: BoxDecoration(
             color: selected ? c.accentGold : c.backgroundSurface,
             borderRadius: BorderRadius.circular(999),
-            border: Border.all(
-              color: c.accentGold,
-              width: selected ? 0 : 1,
-            ),
+            border: Border.all(color: c.accentGold, width: selected ? 0 : 1),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -339,9 +341,7 @@ class _IntroBanner extends StatelessWidget {
       decoration: BoxDecoration(
         color: c.backgroundSurface,
         borderRadius: BorderRadius.circular(12),
-        border: Border(
-          left: BorderSide(color: c.accentGold, width: 4),
-        ),
+        border: Border(left: BorderSide(color: c.accentGold, width: 4)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -431,7 +431,12 @@ class _UrduBody extends StatelessWidget {
   final List<ShajraEntryModel>? entries;
   final VoidCallback onRetry;
   final Stream<Map<int, ShajraUrduDetailModel>> detailsStream;
-  final void Function(ShajraEntryModel, ShajraUrduDetailModel?, List<ShajraEntryModel>) onOpen;
+  final void Function(
+    ShajraEntryModel,
+    ShajraUrduDetailModel?,
+    List<ShajraEntryModel>,
+  )
+  onOpen;
 
   @override
   Widget build(BuildContext context) {
@@ -476,7 +481,12 @@ class _UrduEntryList extends StatelessWidget {
   final Color cardBorder;
   final List<ShajraEntryModel> entries;
   final Map<int, ShajraUrduDetailModel> detailsByNumber;
-  final void Function(ShajraEntryModel, ShajraUrduDetailModel?, List<ShajraEntryModel>) onOpen;
+  final void Function(
+    ShajraEntryModel,
+    ShajraUrduDetailModel?,
+    List<ShajraEntryModel>,
+  )
+  onOpen;
 
   @override
   Widget build(BuildContext context) {
@@ -485,7 +495,9 @@ class _UrduEntryList extends StatelessWidget {
         final e = entries[i];
         final d = detailsByNumber[e.number];
         final pdfAvailable = d != null && d.storagePath.isNotEmpty;
-        final bioAvailable = ShajraBundledService.hasBundledUrduDetail(e.number);
+        final bioAvailable = ShajraBundledService.hasBundledUrduDetail(
+          e.number,
+        );
         final canOpen = pdfAvailable || bioAvailable;
         final isFirst = e.number == 1;
         final isLast = i == entries.length - 1;
@@ -545,9 +557,17 @@ class _UrduEntryList extends StatelessWidget {
                             ),
                             const SizedBox(width: 8),
                             if (pdfAvailable)
-                              Icon(Icons.picture_as_pdf_outlined, color: c.accentGold, size: 18)
+                              Icon(
+                                Icons.picture_as_pdf_outlined,
+                                color: c.accentGold,
+                                size: 18,
+                              )
                             else if (bioAvailable)
-                              Icon(Icons.menu_book_outlined, color: c.accentGold, size: 18)
+                              Icon(
+                                Icons.menu_book_outlined,
+                                color: c.accentGold,
+                                size: 18,
+                              )
                             else
                               Text(
                                 'Not added',
@@ -597,7 +617,9 @@ class _ShajraListShimmer extends StatelessWidget {
                 child: SizedBox(
                   width: 40,
                   height: 40,
-                  child: ShimmerPlaceholder(borderRadius: BorderRadius.circular(999)),
+                  child: ShimmerPlaceholder(
+                    borderRadius: BorderRadius.circular(999),
+                  ),
                 ),
               ),
               const SizedBox(width: 12),
@@ -677,8 +699,13 @@ class _ShajraErrorCard extends StatelessWidget {
               style: OutlinedButton.styleFrom(
                 foregroundColor: c.accentGold,
                 side: BorderSide(color: c.accentGold, width: 1.2),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 22,
+                  vertical: 12,
+                ),
               ),
               child: Text(
                 'Try Again',
@@ -760,7 +787,11 @@ class _ShajraEntryList extends StatelessWidget {
                             onTap: () => onOpenTap!(e, entries),
                             borderRadius: BorderRadius.circular(12),
                             child: Ink(
-                              decoration: _cardDecoration(c, cardBorder, isFirst),
+                              decoration: _cardDecoration(
+                                c,
+                                cardBorder,
+                                isFirst,
+                              ),
                               padding: const EdgeInsets.all(14),
                               child: _ShajraCardContent(
                                 c: c,
@@ -793,14 +824,15 @@ class _ShajraEntryList extends StatelessWidget {
   }
 }
 
-BoxDecoration _cardDecoration(AppThemeColors c, Color cardBorder, bool isFirst) {
+BoxDecoration _cardDecoration(
+  AppThemeColors c,
+  Color cardBorder,
+  bool isFirst,
+) {
   return BoxDecoration(
     color: isFirst ? c.accentGold.o(0.15) : c.backgroundSurface,
     borderRadius: BorderRadius.circular(12),
-    border: Border.all(
-      color: isFirst ? c.accentGold : cardBorder,
-      width: 1,
-    ),
+    border: Border.all(color: isFirst ? c.accentGold : cardBorder, width: 1),
   );
 }
 
@@ -825,8 +857,9 @@ class _ShajraCardContent extends StatelessWidget {
       children: [
         Expanded(
           child: Column(
-            crossAxisAlignment:
-                rtl ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+            crossAxisAlignment: rtl
+                ? CrossAxisAlignment.end
+                : CrossAxisAlignment.start,
             children: [
               Text(
                 e.listDisplayName,
@@ -834,27 +867,27 @@ class _ShajraCardContent extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 style: isFirst
                     ? (rtl
-                        ? AppTheme.amiriUrdu(
-                            fontSize: 16,
-                            height: 1.35,
-                            color: c.accentGold,
-                          )
-                        : AppTheme.cormorantGaramond(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: c.accentGold,
-                          ))
+                          ? AppTheme.amiriUrdu(
+                              fontSize: 16,
+                              height: 1.35,
+                              color: c.accentGold,
+                            )
+                          : AppTheme.cormorantGaramond(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: c.accentGold,
+                            ))
                     : rtl
-                        ? AppTheme.amiriUrdu(
-                            fontSize: 16,
-                            height: 1.35,
-                            color: c.textPrimary,
-                          )
-                        : AppTheme.cormorantGaramond(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: c.textPrimary,
-                          ),
+                    ? AppTheme.amiriUrdu(
+                        fontSize: 16,
+                        height: 1.35,
+                        color: c.textPrimary,
+                      )
+                    : AppTheme.cormorantGaramond(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: c.textPrimary,
+                      ),
               ),
             ],
           ),
@@ -863,10 +896,7 @@ class _ShajraCardContent extends StatelessWidget {
           const SizedBox(width: 6),
           CustomPaint(
             size: const Size(10, 16),
-            painter: _ChevronPainter(
-              c.accentGold,
-              pointRight: !rtl,
-            ),
+            painter: _ChevronPainter(c.accentGold, pointRight: !rtl),
           ),
         ],
       ],
@@ -995,9 +1025,27 @@ class _WifiOffPainter extends CustomPainter {
 
     final c = Offset(size.width / 2, size.height * 0.55);
     final w = size.width * 0.42;
-    canvas.drawArc(Rect.fromCenter(center: c, width: w, height: w * 0.55), 3.5, 2.2, false, p);
-    canvas.drawArc(Rect.fromCenter(center: c, width: w * 1.45, height: w * 0.9), 3.45, 2.3, false, p);
-    canvas.drawArc(Rect.fromCenter(center: c, width: w * 2.1, height: w * 1.25), 3.4, 2.35, false, p);
+    canvas.drawArc(
+      Rect.fromCenter(center: c, width: w, height: w * 0.55),
+      3.5,
+      2.2,
+      false,
+      p,
+    );
+    canvas.drawArc(
+      Rect.fromCenter(center: c, width: w * 1.45, height: w * 0.9),
+      3.45,
+      2.3,
+      false,
+      p,
+    );
+    canvas.drawArc(
+      Rect.fromCenter(center: c, width: w * 2.1, height: w * 1.25),
+      3.4,
+      2.35,
+      false,
+      p,
+    );
 
     canvas.drawLine(
       Offset(size.width * 0.2, size.height * 0.2),
@@ -1007,5 +1055,6 @@ class _WifiOffPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _WifiOffPainter oldDelegate) => oldDelegate.color != color;
+  bool shouldRepaint(covariant _WifiOffPainter oldDelegate) =>
+      oldDelegate.color != color;
 }

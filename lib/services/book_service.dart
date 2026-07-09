@@ -5,11 +5,9 @@ import 'package:firebase_storage/firebase_storage.dart';
 import '../models/book_model.dart';
 
 class BookService {
-  BookService({
-    FirebaseFirestore? firestore,
-    FirebaseStorage? storage,
-  })  : _firestore = firestore ?? FirebaseFirestore.instance,
-        _storage = storage ?? FirebaseStorage.instance;
+  BookService({FirebaseFirestore? firestore, FirebaseStorage? storage})
+    : _firestore = firestore ?? FirebaseFirestore.instance,
+      _storage = storage ?? FirebaseStorage.instance;
 
   final FirebaseFirestore _firestore;
   final FirebaseStorage _storage;
@@ -50,11 +48,11 @@ class BookService {
         .where('category', isEqualTo: category)
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs
-          .map((d) => BookModel.fromFirestore(d))
-          .where((b) => b.isActive)
-          .toList();
-    });
+          return snapshot.docs
+              .map((d) => BookModel.fromFirestore(d))
+              .where((b) => b.isActive)
+              .toList();
+        });
   }
 
   Future<List<BookModel>> searchBooks(String query) async {

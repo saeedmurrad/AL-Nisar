@@ -177,8 +177,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       Align(
                         alignment: Alignment.centerRight,
                         child: TextButton(
-                          onPressed:
-                              _busy ? null : () => context.go('/forgot-password'),
+                          onPressed: _busy
+                              ? null
+                              : () => context.go('/forgot-password'),
                           style: TextButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 4),
                             minimumSize: Size.zero,
@@ -264,8 +265,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                           TextButton(
-                            onPressed:
-                                _busy ? null : () => context.go('/signup'),
+                            onPressed: _busy
+                                ? null
+                                : () => context.go('/signup'),
                             style: TextButton.styleFrom(
                               padding: EdgeInsets.zero,
                               minimumSize: Size.zero,

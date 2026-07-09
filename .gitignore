@@ -54,3 +54,9 @@ app.*.map.json
 tool/node_modules/
 tool/_fb_export/
 assets/*.zip
+
+# Local Python venv for web setup tooling (never commit)
+.venv-websetup/
+
+# Claude Code local machine settings (keep launch.json shared)
+.claude/settings.local.json

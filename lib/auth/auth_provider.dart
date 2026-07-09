@@ -35,12 +35,11 @@ class AuthProvider extends ChangeNotifier {
     required String email,
     required String password,
     String? displayName,
-  }) =>
-      _service.signUpWithEmail(
-        email: email,
-        password: password,
-        displayName: displayName,
-      );
+  }) => _service.signUpWithEmail(
+    email: email,
+    password: password,
+    displayName: displayName,
+  );
   Future<void> sendPasswordResetEmail(String email) =>
       _service.sendPasswordResetEmail(email);
   Future<void> signOut() => _service.signOut();
@@ -69,4 +68,3 @@ class AuthProvider extends ChangeNotifier {
     super.dispose();
   }
 }
-

@@ -61,10 +61,10 @@ class _SignupScreenState extends State<SignupScreen> {
     setState(() => _loading = true);
     try {
       await context.read<AuthProvider>().signUpWithEmail(
-            email: email,
-            password: password,
-            displayName: name.isEmpty ? null : name,
-          );
+        email: email,
+        password: password,
+        displayName: name.isEmpty ? null : name,
+      );
     } catch (e) {
       if (!mounted) return;
       _showError(authErrorMessage(e));
@@ -197,8 +197,9 @@ class _SignupScreenState extends State<SignupScreen> {
                             ),
                           ),
                           TextButton(
-                            onPressed:
-                                _loading ? null : () => context.go('/login'),
+                            onPressed: _loading
+                                ? null
+                                : () => context.go('/login'),
                             style: TextButton.styleFrom(
                               padding: EdgeInsets.zero,
                               minimumSize: Size.zero,

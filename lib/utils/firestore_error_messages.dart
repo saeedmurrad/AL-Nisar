@@ -8,6 +8,8 @@ String sabaqAccessRequestErrorMessage(Object error) {
         return 'Please sign in to request access.';
       case 'request_already_active':
         return 'A request is already pending or approved for this Sabaq.';
+      case 'not_next_sabaq':
+        return 'You can only request the next Sabaq in sequence.';
     }
   }
   if (error is FirebaseException) {

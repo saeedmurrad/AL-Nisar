@@ -22,22 +22,17 @@ class GalleryImageModel {
   GalleryFolder get folderInfo => GalleryFolder.fromId(folder);
 
   bool get showInGallery =>
-      isActive &&
-      downloadUrl.isNotEmpty &&
-      folderInfo.showInGallery;
+      isActive && downloadUrl.isNotEmpty && folderInfo.showInGallery;
 
   Map<String, dynamic> toMap() => {
-        'storagePath': storagePath,
-        'downloadUrl': downloadUrl,
-        'uploadedAt': Timestamp.fromDate(uploadedAt),
-        'isActive': isActive,
-        'folder': GalleryFolder.normalizeId(folder),
-      };
+    'storagePath': storagePath,
+    'downloadUrl': downloadUrl,
+    'uploadedAt': Timestamp.fromDate(uploadedAt),
+    'isActive': isActive,
+    'folder': GalleryFolder.normalizeId(folder),
+  };
 
-  GalleryImageModel copyWith({
-    String? folder,
-    bool? isActive,
-  }) {
+  GalleryImageModel copyWith({String? folder, bool? isActive}) {
     return GalleryImageModel(
       id: id,
       storagePath: storagePath,

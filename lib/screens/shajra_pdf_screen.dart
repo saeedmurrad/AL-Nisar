@@ -33,16 +33,10 @@ class _ShajraPdfScreenState extends State<ShajraPdfScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            _TopBar(
-              title: title,
-              onBack: () => popOrGoHome(context),
-            ),
+            _TopBar(title: title, onBack: () => popOrGoHome(context)),
             Expanded(
               child: _missingAsset
-                  ? _MissingPdf(
-                      title: title,
-                      assetPath: widget.args.assetPath,
-                    )
+                  ? _MissingPdf(title: title, assetPath: widget.args.assetPath)
                   : SfPdfViewerTheme(
                       data: SfPdfViewerThemeData(
                         backgroundColor: c.backgroundPrimary,
@@ -83,7 +77,11 @@ class _TopBar extends StatelessWidget {
         children: [
           IconButton(
             onPressed: onBack,
-            icon: Icon(Icons.arrow_back_ios_new_rounded, color: c.accentGold, size: 20),
+            icon: Icon(
+              Icons.arrow_back_ios_new_rounded,
+              color: c.accentGold,
+              size: 20,
+            ),
           ),
           IconButton(
             onPressed: () => goAppHome(context),
@@ -149,4 +147,3 @@ class _MissingPdf extends StatelessWidget {
     );
   }
 }
-

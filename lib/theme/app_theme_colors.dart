@@ -61,10 +61,21 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
   AppThemeColors lerp(ThemeExtension<AppThemeColors>? other, double t) {
     if (other is! AppThemeColors) return this;
     return AppThemeColors(
-      backgroundPrimary: Color.lerp(backgroundPrimary, other.backgroundPrimary, t)!,
-      backgroundSurface: Color.lerp(backgroundSurface, other.backgroundSurface, t)!,
-      backgroundElevated:
-          Color.lerp(backgroundElevated, other.backgroundElevated, t)!,
+      backgroundPrimary: Color.lerp(
+        backgroundPrimary,
+        other.backgroundPrimary,
+        t,
+      )!,
+      backgroundSurface: Color.lerp(
+        backgroundSurface,
+        other.backgroundSurface,
+        t,
+      )!,
+      backgroundElevated: Color.lerp(
+        backgroundElevated,
+        other.backgroundElevated,
+        t,
+      )!,
       backgroundInput: Color.lerp(backgroundInput, other.backgroundInput, t)!,
       accentGold: Color.lerp(accentGold, other.accentGold, t)!,
       textPrimary: Color.lerp(textPrimary, other.textPrimary, t)!,
@@ -80,4 +91,3 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
 extension ThemeColorsX on BuildContext {
   AppThemeColors get c => Theme.of(this).extension<AppThemeColors>()!;
 }
-

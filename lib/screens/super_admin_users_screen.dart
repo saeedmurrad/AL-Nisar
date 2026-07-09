@@ -60,18 +60,44 @@ class SuperAdminUsersScreen extends StatelessWidget {
                             const SizedBox(height: 8),
                             Text(
                               'Firestore rules are not recognizing this account as Super Admin.',
-                              style: AppTheme.lato(fontSize: 12, color: c.textMuted, height: 1.35),
+                              style: AppTheme.lato(
+                                fontSize: 12,
+                                color: c.textMuted,
+                                height: 1.35,
+                              ),
                             ),
                             const SizedBox(height: 12),
-                            Text('uid: $uid', style: AppTheme.lato(fontSize: 12, color: c.textSecondary)),
+                            Text(
+                              'uid: $uid',
+                              style: AppTheme.lato(
+                                fontSize: 12,
+                                color: c.textSecondary,
+                              ),
+                            ),
                             const SizedBox(height: 4),
-                            Text('email: $email', style: AppTheme.lato(fontSize: 12, color: c.textSecondary)),
+                            Text(
+                              'email: $email',
+                              style: AppTheme.lato(
+                                fontSize: 12,
+                                color: c.textSecondary,
+                              ),
+                            ),
                             const SizedBox(height: 4),
-                            Text('role (app): $role', style: AppTheme.lato(fontSize: 12, color: c.textSecondary)),
+                            Text(
+                              'role (app): $role',
+                              style: AppTheme.lato(
+                                fontSize: 12,
+                                color: c.textSecondary,
+                              ),
+                            ),
                             const SizedBox(height: 12),
                             Text(
                               'Fix: In Firestore, open `users/$uid` and set `role` to `super_admin`.',
-                              style: AppTheme.lato(fontSize: 12, color: c.textMuted, height: 1.35),
+                              style: AppTheme.lato(
+                                fontSize: 12,
+                                color: c.textMuted,
+                                height: 1.35,
+                              ),
                             ),
                           ],
                         ),
@@ -82,13 +108,17 @@ class SuperAdminUsersScreen extends StatelessWidget {
                 final list = snap.data ?? const [];
                 if (list.isEmpty) {
                   return Center(
-                    child: Text('No users yet', style: AppTheme.lato(color: c.textMuted)),
+                    child: Text(
+                      'No users yet',
+                      style: AppTheme.lato(color: c.textMuted),
+                    ),
                   );
                 }
                 return ListView.separated(
                   padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
                   itemCount: list.length,
-                  separatorBuilder: (context, index) => const SizedBox(height: 10),
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 10),
                   itemBuilder: (context, i) {
                     final u = list[i];
                     final displayName = u.displayName.trim();
@@ -102,7 +132,9 @@ class SuperAdminUsersScreen extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  displayName.isNotEmpty ? displayName : '(no name)',
+                                  displayName.isNotEmpty
+                                      ? displayName
+                                      : '(no name)',
                                   style: AppTheme.lato(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w800,
@@ -111,7 +143,9 @@ class SuperAdminUsersScreen extends StatelessWidget {
                                 ),
                                 const SizedBox(height: 6),
                                 Text(
-                                  address.isNotEmpty ? address : 'Address not provided',
+                                  address.isNotEmpty
+                                      ? address
+                                      : 'Address not provided',
                                   style: AppTheme.lato(
                                     fontSize: 12,
                                     color: c.textMuted,
@@ -122,7 +156,10 @@ class SuperAdminUsersScreen extends StatelessWidget {
                                   const SizedBox(height: 6),
                                   Text(
                                     'Role: ${_roleLabel(u.role)}',
-                                    style: AppTheme.lato(fontSize: 12, color: c.textSecondary),
+                                    style: AppTheme.lato(
+                                      fontSize: 12,
+                                      color: c.textSecondary,
+                                    ),
                                   ),
                                 ],
                               ],
@@ -131,7 +168,9 @@ class SuperAdminUsersScreen extends StatelessWidget {
                           if (u.role != AppRole.superAdmin)
                             TextButton(
                               onPressed: () async {
-                                final next = u.role == AppRole.admin ? AppRole.user : AppRole.admin;
+                                final next = u.role == AppRole.admin
+                                    ? AppRole.user
+                                    : AppRole.admin;
                                 await service.setUserRole(u.uid, next);
                               },
                               child: Text(
@@ -167,4 +206,3 @@ class SuperAdminUsersScreen extends StatelessWidget {
     }
   }
 }
-

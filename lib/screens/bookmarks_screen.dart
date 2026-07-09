@@ -250,7 +250,9 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
                             border: i > 0
                                 ? Border(
                                     top: BorderSide(
-                                      color: c.accentGold.withValues(alpha: 0.35),
+                                      color: c.accentGold.withValues(
+                                        alpha: 0.35,
+                                      ),
                                       width: 0.8,
                                     ),
                                   )
@@ -294,7 +296,8 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
                                         style: AppTheme.lato(
                                           fontSize: 12,
                                           fontWeight: FontWeight.w800,
-                                          color: Theme.of(context).brightness ==
+                                          color:
+                                              Theme.of(context).brightness ==
                                                   Brightness.dark
                                               ? c.backgroundPrimary
                                               : c.textPrimary,
@@ -310,10 +313,13 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
                                           if (bm.note.isNotEmpty)
                                             Text(
                                               bm.note,
-                                              style: AppTheme.lato(
-                                                fontSize: 13,
-                                                color: c.textMuted,
-                                              ).copyWith(fontStyle: FontStyle.italic),
+                                              style:
+                                                  AppTheme.lato(
+                                                    fontSize: 13,
+                                                    color: c.textMuted,
+                                                  ).copyWith(
+                                                    fontStyle: FontStyle.italic,
+                                                  ),
                                             ),
                                           const SizedBox(height: 4),
                                           Text(

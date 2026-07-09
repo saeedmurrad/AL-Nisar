@@ -53,10 +53,7 @@ class AsbaqScreen extends StatelessWidget {
                 const SizedBox(height: 6),
                 Text(
                   'Select an Asbaq PDF to begin',
-                  style: TextStyle(
-                    color: c.textMuted,
-                    fontSize: 12,
-                  ),
+                  style: TextStyle(color: c.textMuted, fontSize: 12),
                 ),
               ],
             ),
@@ -108,7 +105,10 @@ class AsbaqScreen extends StatelessWidget {
                             if (b.storagePath.trim().isEmpty) return;
                             context.push(
                               '/books/reader',
-                              extra: BookReaderArgs(book: asBook, autoDownloadIfMissing: true),
+                              extra: BookReaderArgs(
+                                book: asBook,
+                                autoDownloadIfMissing: true,
+                              ),
                             );
                           },
                           child: _AsbaqPdfCard(
@@ -163,11 +163,16 @@ class _AsbaqPdfCard extends StatelessWidget {
                       placeholder: (context, url) => ShimmerPlaceholder(
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      errorWidget: (context, url, error) => const GoldPatternError(),
+                      errorWidget: (context, url, error) =>
+                          const GoldPatternError(),
                     )
                   : ColoredBox(
                       color: c.backgroundInput,
-                      child: Icon(Icons.picture_as_pdf_outlined, color: c.accentGold, size: 28),
+                      child: Icon(
+                        Icons.picture_as_pdf_outlined,
+                        color: c.accentGold,
+                        size: 28,
+                      ),
                     ),
             ),
           ),
@@ -206,13 +211,7 @@ class _AsbaqPdfCard extends StatelessWidget {
                     ),
                   ),
                 const SizedBox(height: 6),
-                Text(
-                  'PDF',
-                  style: TextStyle(
-                    color: c.textMuted,
-                    fontSize: 11,
-                  ),
-                ),
+                Text('PDF', style: TextStyle(color: c.textMuted, fontSize: 11)),
               ],
             ),
           ),
@@ -220,10 +219,7 @@ class _AsbaqPdfCard extends StatelessWidget {
             _chevronRightSvg,
             width: 18,
             height: 18,
-            colorFilter: ColorFilter.mode(
-              c.accentGold,
-              BlendMode.srcIn,
-            ),
+            colorFilter: ColorFilter.mode(c.accentGold, BlendMode.srcIn),
           ),
         ],
       ),

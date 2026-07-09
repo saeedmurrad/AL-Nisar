@@ -1,18 +1,18 @@
-import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../models/book_model.dart';
+import '../models/upload_file_data.dart';
 import '../providers/book_provider.dart';
 import '../services/admin_books_service.dart';
 import '../services/pdf_cover_extractor.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
 import '../theme/color_utils.dart';
+import '../utils/file_bytes_utils.dart';
+import '../utils/upload_picker.dart';
 import '../widgets/screen_navigation_header.dart';
 import '../widgets/shimmer_placeholder.dart';
 
@@ -31,8 +31,8 @@ class _AdminUploadBookScreenState extends State<AdminUploadBookScreen> {
   final _description = TextEditingController();
   final _totalPages = TextEditingController();
 
-  String? _pdfPath;
-  String? _coverPath;
+  UploadFileData? _pdfFile;
+  UploadFileData? _coverFile;
   bool _saving = false;
   double? _progress;
   String? _progressLabel;
@@ -52,39 +52,27 @@ class _AdminUploadBookScreenState extends State<AdminUploadBookScreen> {
   }
 
   Future<void> _pickPdf() async {
-    final res = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: const ['pdf'],
-      withData: false,
-    );
-    final path = res?.files.single.path;
-    if (path == null || path.trim().isEmpty) return;
-    setState(() => _pdfPath = path);
+    final file = await pickUploadFile(allowedExtensions: const ['pdf']);
+    if (file == null) return;
+    setState(() => _pdfFile = file);
   }
 
   Future<void> _pickCover() async {
-    final res = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
+    final file = await pickUploadFile(
       allowedExtensions: const ['jpg', 'jpeg', 'png'],
-      withData: false,
     );
-    final path = res?.files.single.path;
-    if (path == null || path.trim().isEmpty) return;
-    setState(() => _coverPath = path);
+    if (file == null) return;
+    setState(() => _coverFile = file);
   }
 
   Future<void> _save() async {
     final title = _title.text.trim();
-    final pdf = _pdfPath;
-    if (title.isEmpty || pdf == null || pdf.trim().isEmpty) {
+    final pdf = _pdfFile;
+    if (title.isEmpty || pdf == null) {
       _snack('Please add a title and select a PDF');
       return;
     }
-    if (!File(pdf).existsSync()) {
-      _snack('PDF file not found');
-      return;
-    }
-    final pdfBytes = File(pdf).lengthSync();
+    final pdfBytes = pdf.length;
     // Keep a sane limit for mobile uploads.
     if (pdfBytes > 50 * 1024 * 1024) {
       _snack('PDF is too large (max 50 MB)');
@@ -93,7 +81,7 @@ class _AdminUploadBookScreenState extends State<AdminUploadBookScreen> {
 
     setState(() => _saving = true);
     try {
-      final analyzed = await extractPdfPageCountAndCover(pdf);
+      final analyzed = await extractPdfPageCountAndCover(pdf.bytes);
       final extractedPages = analyzed.pageCount;
       final thumbPng = analyzed.coverPng;
       if (mounted && extractedPages > 0) {
@@ -105,7 +93,7 @@ class _AdminUploadBookScreenState extends State<AdminUploadBookScreen> {
         _progress = 0;
         _progressLabel = 'Uploading PDF...';
       });
-      final pdfTask = _service.uploadBookPdfTask(bookId: id, pdfPath: pdf);
+      final pdfTask = _service.uploadBookPdfTask(bookId: id, pdf: pdf);
       pdfTask.snapshotEvents.listen((snap) {
         final total = snap.totalBytes;
         final done = snap.bytesTransferred;
@@ -117,9 +105,9 @@ class _AdminUploadBookScreenState extends State<AdminUploadBookScreen> {
       final storagePath = _service.bookPdfRef(id).fullPath;
 
       String coverUrl = '';
-      final cover = _coverPath;
-      if (cover != null && cover.trim().isNotEmpty && File(cover).existsSync()) {
-        final coverBytes = File(cover).lengthSync();
+      final cover = _coverFile;
+      if (cover != null) {
+        final coverBytes = cover.length;
         if (coverBytes > 10 * 1024 * 1024) {
           _snack('Cover image is too large (max 10 MB)');
           return;
@@ -128,7 +116,10 @@ class _AdminUploadBookScreenState extends State<AdminUploadBookScreen> {
           _progress = 0;
           _progressLabel = 'Uploading cover...';
         });
-        final coverTask = _service.uploadCoverImageTask(bookId: id, imagePath: cover);
+        final coverTask = _service.uploadCoverImageTask(
+          bookId: id,
+          image: cover,
+        );
         coverTask.snapshotEvents.listen((snap) {
           final total = snap.totalBytes;
           final done = snap.bytesTransferred;
@@ -137,15 +128,19 @@ class _AdminUploadBookScreenState extends State<AdminUploadBookScreen> {
           }
         });
         await coverTask;
-        final lower = cover.toLowerCase();
-        final ext = lower.endsWith('.png') ? 'png' : 'jpg';
-        coverUrl = await _service.bookCoverRef(id, extension: ext).getDownloadURL();
+        final ext = imageExtensionFromName(cover.name);
+        coverUrl = await _service
+            .bookCoverRef(id, extension: ext)
+            .getDownloadURL();
       } else if (thumbPng != null && thumbPng.isNotEmpty) {
         setState(() {
           _progress = 0;
           _progressLabel = 'Uploading cover from PDF…';
         });
-        final coverTask = _service.uploadCoverPngDataTask(bookId: id, pngBytes: thumbPng);
+        final coverTask = _service.uploadCoverPngDataTask(
+          bookId: id,
+          pngBytes: thumbPng,
+        );
         coverTask.snapshotEvents.listen((snap) {
           final total = snap.totalBytes;
           final done = snap.bytesTransferred;
@@ -154,18 +149,21 @@ class _AdminUploadBookScreenState extends State<AdminUploadBookScreen> {
           }
         });
         await coverTask;
-        coverUrl = await _service.bookCoverRef(id, extension: 'png').getDownloadURL();
+        coverUrl = await _service
+            .bookCoverRef(id, extension: 'png')
+            .getDownloadURL();
       }
 
       final manualPages = int.tryParse(_totalPages.text.trim()) ?? 0;
-      final totalPages =
-          extractedPages > 0 ? extractedPages : manualPages;
+      final totalPages = extractedPages > 0 ? extractedPages : manualPages;
       final model = BookModel(
         id: id,
         title: title,
         titleUrdu: _titleUrdu.text.trim(),
         author: _author.text.trim(),
-        category: _category.text.trim().isEmpty ? 'Books' : _category.text.trim(),
+        category: _category.text.trim().isEmpty
+            ? 'Books'
+            : _category.text.trim(),
         description: _description.text.trim(),
         storagePath: storagePath,
         coverImageUrl: coverUrl,
@@ -252,12 +250,8 @@ class _AdminUploadBookScreenState extends State<AdminUploadBookScreen> {
   @override
   Widget build(BuildContext context) {
     final c = context.c;
-    final pdfName = _pdfPath == null
-        ? 'No PDF selected'
-        : _pdfPath!.split(Platform.pathSeparator).last;
-    final coverName = _coverPath == null
-        ? 'No cover selected (optional)'
-        : _coverPath!.split(Platform.pathSeparator).last;
+    final pdfName = _pdfFile?.name ?? 'No PDF selected';
+    final coverName = _coverFile?.name ?? 'No cover selected (optional)';
 
     return Scaffold(
       body: Column(
@@ -298,7 +292,10 @@ class _AdminUploadBookScreenState extends State<AdminUploadBookScreen> {
                         padding: const EdgeInsets.only(bottom: 8),
                         child: Text(
                           'No books in Firebase yet',
-                          style: AppTheme.lato(fontSize: 13, color: c.textMuted),
+                          style: AppTheme.lato(
+                            fontSize: 13,
+                            color: c.textMuted,
+                          ),
                         ),
                       );
                     }
@@ -316,7 +313,10 @@ class _AdminUploadBookScreenState extends State<AdminUploadBookScreen> {
                             decoration: BoxDecoration(
                               color: c.backgroundInput,
                               borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: c.borderDefault, width: 0.5),
+                              border: Border.all(
+                                color: c.borderDefault,
+                                width: 0.5,
+                              ),
                             ),
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
@@ -343,21 +343,22 @@ class _AdminUploadBookScreenState extends State<AdminUploadBookScreen> {
                                               const ShimmerPlaceholder(),
                                           errorWidget: (context, url, error) =>
                                               Container(
-                                            width: 40,
-                                            height: 56,
-                                            color: c.backgroundElevated,
-                                            child: Icon(
-                                              Icons.broken_image_outlined,
-                                              color: c.textMuted,
-                                              size: 20,
-                                            ),
-                                          ),
+                                                width: 40,
+                                                height: 56,
+                                                color: c.backgroundElevated,
+                                                child: Icon(
+                                                  Icons.broken_image_outlined,
+                                                  color: c.textMuted,
+                                                  size: 20,
+                                                ),
+                                              ),
                                         ),
                                 ),
                                 const SizedBox(width: 10),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         b.title.isEmpty ? b.id : b.title,
@@ -371,7 +372,9 @@ class _AdminUploadBookScreenState extends State<AdminUploadBookScreen> {
                                       ),
                                       if (!b.isActive)
                                         Padding(
-                                          padding: const EdgeInsets.only(top: 4),
+                                          padding: const EdgeInsets.only(
+                                            top: 4,
+                                          ),
                                           child: Text(
                                             'Hidden',
                                             style: AppTheme.lato(
@@ -437,7 +440,11 @@ class _AdminUploadBookScreenState extends State<AdminUploadBookScreen> {
                   ),
                   const SizedBox(height: 14),
                 ],
-                _Field(label: 'Title', controller: _title, hintText: 'Book title'),
+                _Field(
+                  label: 'Title',
+                  controller: _title,
+                  hintText: 'Book title',
+                ),
                 const SizedBox(height: 12),
                 _Field(
                   label: 'Title (Urdu/Arabic) (optional)',
@@ -512,8 +519,8 @@ class _AdminUploadBookScreenState extends State<AdminUploadBookScreen> {
                       backgroundColor: c.accentGold,
                       foregroundColor:
                           Theme.of(context).brightness == Brightness.dark
-                              ? c.backgroundPrimary
-                              : c.textPrimary,
+                          ? c.backgroundPrimary
+                          : c.textPrimary,
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -527,9 +534,10 @@ class _AdminUploadBookScreenState extends State<AdminUploadBookScreen> {
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
                               color:
-                                  Theme.of(context).brightness == Brightness.dark
-                                      ? c.backgroundPrimary
-                                      : c.textPrimary,
+                                  Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? c.backgroundPrimary
+                                  : c.textPrimary,
                             ),
                           )
                         : Text(
@@ -665,4 +673,3 @@ class _Field extends StatelessWidget {
     );
   }
 }
-

@@ -1,12 +1,11 @@
 import 'dart:async';
-import 'dart:io';
+import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'package:share_plus/share_plus.dart';
@@ -20,6 +19,7 @@ import '../services/reading_progress_service.dart';
 import '../services/share_page_image_helper.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
+import '../utils/file_bytes_utils.dart';
 
 class BookReaderScreen extends StatefulWidget {
   const BookReaderScreen({super.key, required this.args});
@@ -39,7 +39,7 @@ class _BookReaderScreenState extends State<BookReaderScreen> {
   final _viewerBoundaryKey = GlobalKey();
   final _books = BookService();
 
-  File? _file;
+  Uint8List? _pdfBytes;
   int _currentPage = 1;
   int _totalPages = 1;
   bool _loading = true;
@@ -63,23 +63,20 @@ class _BookReaderScreenState extends State<BookReaderScreen> {
 
   Future<void> _loadFile() async {
     final book = widget.args.book;
-    final f = await _cache.getCachedPdf(book.id);
+    final cachedBytes = await _cache.getCachedPdfBytes(book.id);
     if (!mounted) return;
-    if (f == null) {
-      if (widget.args.autoDownloadIfMissing && book.storagePath.trim().isNotEmpty) {
+    if (cachedBytes == null) {
+      if (widget.args.autoDownloadIfMissing &&
+          book.storagePath.trim().isNotEmpty) {
         try {
           setState(() => _downloadProgress = 0);
           final url = await _books.getBookDownloadUrl(book.storagePath);
-          final out = await _cache.downloadAndCachePdf(
-            book.id,
-            url,
-            (p) {
-              if (mounted) setState(() => _downloadProgress = p);
-            },
-          );
+          final out = await _cache.downloadAndCachePdf(book.id, url, (p) {
+            if (mounted) setState(() => _downloadProgress = p);
+          });
           if (!mounted) return;
           setState(() {
-            _file = out;
+            _pdfBytes = out;
             _loading = false;
             _loadFailed = false;
             _downloadProgress = null;
@@ -97,7 +94,7 @@ class _BookReaderScreenState extends State<BookReaderScreen> {
       return;
     }
     setState(() {
-      _file = f;
+      _pdfBytes = cachedBytes;
       _loading = false;
     });
   }
@@ -155,10 +152,7 @@ class _BookReaderScreenState extends State<BookReaderScreen> {
             ),
             TextButton(
               onPressed: () => Navigator.pop(ctx, _ResumeChoice.yes),
-              child: Text(
-                'Yes',
-                style: AppTheme.lato(color: c.accentGold),
-              ),
+              child: Text('Yes', style: AppTheme.lato(color: c.accentGold)),
             ),
           ],
         );
@@ -369,15 +363,14 @@ class _BookReaderScreenState extends State<BookReaderScreen> {
     await WidgetsBinding.instance.endOfFrame;
 
     try {
-      final file = await _captureViewerToFile(
-        baseName: 'al_nisar_${book.id}_p$_currentPage',
-      );
+      final bytes = await _captureViewerToBytes();
       if (!mounted) return;
-      if (file != null) {
-        await Share.shareXFiles(
-          [XFile(file.path)],
-          text: 'From "${book.title}" — Page $_currentPage\nAL Nisar App',
-        );
+      if (bytes != null) {
+        final filename =
+            'al_nisar_${book.id}_p${_currentPage}_${DateTime.now().millisecondsSinceEpoch}.png';
+        await Share.shareXFiles([
+          xFileFromBytes(bytes, name: filename, mimeType: 'image/png'),
+        ], text: 'From "${book.title}" — Page $_currentPage\nAL Nisar App');
         return;
       }
     } catch (_) {
@@ -396,7 +389,7 @@ class _BookReaderScreenState extends State<BookReaderScreen> {
     );
   }
 
-  Future<File?> _captureViewerToFile({required String baseName}) async {
+  Future<Uint8List?> _captureViewerToBytes() async {
     final ctx = _viewerBoundaryKey.currentContext;
     if (ctx == null) return null;
     final boundary = ctx.findRenderObject() as RenderRepaintBoundary?;
@@ -407,13 +400,7 @@ class _BookReaderScreenState extends State<BookReaderScreen> {
     final bd = await image.toByteData(format: ui.ImageByteFormat.png);
     if (bd == null) return null;
 
-    final bytes = bd.buffer.asUint8List();
-    final dir = await getTemporaryDirectory();
-    final out = File(
-      '${dir.path}/${baseName}_${DateTime.now().millisecondsSinceEpoch}.png',
-    );
-    await out.writeAsBytes(bytes, flush: true);
-    return out;
+    return bd.buffer.asUint8List();
   }
 
   Future<void> _showPageDialog() async {
@@ -522,10 +509,7 @@ class _BookReaderScreenState extends State<BookReaderScreen> {
                 padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
                 child: Text(
                   'Text size',
-                  style: AppTheme.lato(
-                    fontSize: 12,
-                    color: c.textMuted,
-                  ),
+                  style: AppTheme.lato(fontSize: 12, color: c.textMuted),
                 ),
               ),
               Row(
@@ -539,7 +523,10 @@ class _BookReaderScreenState extends State<BookReaderScreen> {
                       });
                       Navigator.pop(ctx);
                     },
-                    child: Text('Small', style: AppTheme.lato(color: c.textSecondary)),
+                    child: Text(
+                      'Small',
+                      style: AppTheme.lato(color: c.textSecondary),
+                    ),
                   ),
                   TextButton(
                     onPressed: () {
@@ -549,7 +536,10 @@ class _BookReaderScreenState extends State<BookReaderScreen> {
                       });
                       Navigator.pop(ctx);
                     },
-                    child: Text('Medium', style: AppTheme.lato(color: c.textSecondary)),
+                    child: Text(
+                      'Medium',
+                      style: AppTheme.lato(color: c.textSecondary),
+                    ),
                   ),
                   TextButton(
                     onPressed: () {
@@ -559,7 +549,10 @@ class _BookReaderScreenState extends State<BookReaderScreen> {
                       });
                       Navigator.pop(ctx);
                     },
-                    child: Text('Large', style: AppTheme.lato(color: c.textSecondary)),
+                    child: Text(
+                      'Large',
+                      style: AppTheme.lato(color: c.textSecondary),
+                    ),
                   ),
                 ],
               ),
@@ -636,7 +629,7 @@ class _BookReaderScreenState extends State<BookReaderScreen> {
       );
     }
 
-    if (_loadFailed || _file == null) {
+    if (_loadFailed || _pdfBytes == null) {
       return Scaffold(
         backgroundColor: c.backgroundPrimary,
         body: SafeArea(
@@ -698,8 +691,8 @@ class _BookReaderScreenState extends State<BookReaderScreen> {
                     backgroundColor: c.backgroundPrimary,
                     progressBarColor: c.accentGold,
                   ),
-                  child: SfPdfViewer.file(
-                    _file!,
+                  child: SfPdfViewer.memory(
+                    _pdfBytes!,
                     controller: _pdf,
                     scrollDirection: PdfScrollDirection.horizontal,
                     pageLayoutMode: PdfPageLayoutMode.single,
@@ -707,10 +700,12 @@ class _BookReaderScreenState extends State<BookReaderScreen> {
                     canShowScrollHead: true,
                     canShowScrollStatus: true,
                     initialZoomLevel: _zoomLevel,
-                    currentSearchTextHighlightColor:
-                        c.accentGold.withValues(alpha: 0.45),
-                    otherSearchTextHighlightColor:
-                        c.accentGold.withValues(alpha: 0.22),
+                    currentSearchTextHighlightColor: c.accentGold.withValues(
+                      alpha: 0.45,
+                    ),
+                    otherSearchTextHighlightColor: c.accentGold.withValues(
+                      alpha: 0.22,
+                    ),
                     onDocumentLoaded: _onDocumentLoaded,
                     onPageChanged: _onPageChanged,
                   ),
@@ -756,14 +751,17 @@ class _BookReaderScreenState extends State<BookReaderScreen> {
                                   style: AppTheme.lato(color: c.textPrimary),
                                   decoration: InputDecoration(
                                     hintText: 'Search in PDF…',
-                                    hintStyle:
-                                        AppTheme.lato(color: c.textFaint),
+                                    hintStyle: AppTheme.lato(
+                                      color: c.textFaint,
+                                    ),
                                     border: InputBorder.none,
                                   ),
                                   onSubmitted: _runSearch,
                                 ),
                               ),
-                              if (search != null && search.hasResult && searchDone)
+                              if (search != null &&
+                                  search.hasResult &&
+                                  searchDone)
                                 Text(
                                   '$searchIndex of $searchTotal',
                                   style: AppTheme.lato(
@@ -773,13 +771,17 @@ class _BookReaderScreenState extends State<BookReaderScreen> {
                                 ),
                               IconButton(
                                 onPressed: () => search?.previousInstance(),
-                                icon: Icon(Icons.navigate_before,
-                                    color: c.accentGold),
+                                icon: Icon(
+                                  Icons.navigate_before,
+                                  color: c.accentGold,
+                                ),
                               ),
                               IconButton(
                                 onPressed: () => search?.nextInstance(),
-                                icon: Icon(Icons.navigate_next,
-                                    color: c.accentGold),
+                                icon: Icon(
+                                  Icons.navigate_next,
+                                  color: c.accentGold,
+                                ),
                               ),
                             ],
                           )
@@ -787,11 +789,17 @@ class _BookReaderScreenState extends State<BookReaderScreen> {
                             children: [
                               IconButton(
                                 onPressed: () => popOrGoHome(context),
-                                icon: Icon(Icons.arrow_back, color: c.accentGold),
+                                icon: Icon(
+                                  Icons.arrow_back,
+                                  color: c.accentGold,
+                                ),
                               ),
                               IconButton(
                                 onPressed: () => goAppHome(context),
-                                icon: Icon(Icons.home_outlined, color: c.accentGold),
+                                icon: Icon(
+                                  Icons.home_outlined,
+                                  color: c.accentGold,
+                                ),
                               ),
                               Expanded(
                                 child: Text(
@@ -824,7 +832,10 @@ class _BookReaderScreenState extends State<BookReaderScreen> {
                               ),
                               IconButton(
                                 onPressed: _openMore,
-                                icon: Icon(Icons.more_horiz, color: c.accentGold),
+                                icon: Icon(
+                                  Icons.more_horiz,
+                                  color: c.accentGold,
+                                ),
                               ),
                             ],
                           ),
@@ -879,8 +890,11 @@ class _BookReaderScreenState extends State<BookReaderScreen> {
                             child: Slider(
                               min: 1,
                               max: _totalPages.toDouble(),
-                              divisions: _totalPages > 1 ? _totalPages - 1 : null,
-                              value: _currentPage.clamp(1, _totalPages)
+                              divisions: _totalPages > 1
+                                  ? _totalPages - 1
+                                  : null,
+                              value: _currentPage
+                                  .clamp(1, _totalPages)
                                   .toDouble(),
                               onChanged: (v) {
                                 _pdf.jumpToPage(v.round());

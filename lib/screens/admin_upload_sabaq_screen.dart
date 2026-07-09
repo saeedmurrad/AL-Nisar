@@ -1,15 +1,14 @@
-import 'dart:io';
-
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../models/sabaq_pdf_model.dart';
+import '../models/upload_file_data.dart';
 import '../services/admin_sabaq_service.dart';
 import '../utils/sabaq_order_utils.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
 import '../theme/color_utils.dart';
+import '../utils/upload_picker.dart';
 import '../widgets/screen_navigation_header.dart';
 
 class AdminUploadSabaqScreen extends StatefulWidget {
@@ -23,8 +22,8 @@ class _AdminUploadSabaqScreenState extends State<AdminUploadSabaqScreen> {
   final _titleEn = TextEditingController();
   final _titleUr = TextEditingController();
 
-  String? _pdfPath;
-  String? _coverPath;
+  UploadFileData? _pdfFile;
+  UploadFileData? _coverFile;
   bool _saving = false;
   double? _progress;
 
@@ -38,25 +37,17 @@ class _AdminUploadSabaqScreenState extends State<AdminUploadSabaqScreen> {
   }
 
   Future<void> _pickPdf() async {
-    final res = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: const ['pdf'],
-      withData: false,
-    );
-    final path = res?.files.single.path;
-    if (path == null || path.trim().isEmpty) return;
-    setState(() => _pdfPath = path);
+    final file = await pickUploadFile(allowedExtensions: const ['pdf']);
+    if (file == null) return;
+    setState(() => _pdfFile = file);
   }
 
   Future<void> _pickCover() async {
-    final res = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
+    final file = await pickUploadFile(
       allowedExtensions: const ['jpg', 'jpeg', 'png'],
-      withData: false,
     );
-    final path = res?.files.single.path;
-    if (path == null || path.trim().isEmpty) return;
-    setState(() => _coverPath = path);
+    if (file == null) return;
+    setState(() => _coverFile = file);
   }
 
   void _snack(String msg) {
@@ -71,16 +62,12 @@ class _AdminUploadSabaqScreenState extends State<AdminUploadSabaqScreen> {
   Future<void> _upload() async {
     final en = _titleEn.text.trim();
     final ur = _titleUr.text.trim();
-    final pdf = _pdfPath;
-    if (en.isEmpty || ur.isEmpty || pdf == null || pdf.trim().isEmpty) {
+    final pdf = _pdfFile;
+    if (en.isEmpty || ur.isEmpty || pdf == null) {
       _snack('Please add English title, Urdu title, and select a PDF');
       return;
     }
-    if (!File(pdf).existsSync()) {
-      _snack('PDF file not found');
-      return;
-    }
-    final bytes = File(pdf).lengthSync();
+    final bytes = pdf.length;
     if (bytes > 50 * 1024 * 1024) {
       _snack('PDF is too large (max 50 MB)');
       return;
@@ -92,7 +79,7 @@ class _AdminUploadSabaqScreenState extends State<AdminUploadSabaqScreen> {
     });
     try {
       final id = _service.newId();
-      final task = _service.uploadPdfTask(id: id, pdfPath: pdf);
+      final task = _service.uploadPdfTask(id: id, pdf: pdf);
       task.snapshotEvents.listen((snap) {
         final total = snap.totalBytes;
         final done = snap.bytesTransferred;
@@ -104,14 +91,14 @@ class _AdminUploadSabaqScreenState extends State<AdminUploadSabaqScreen> {
       final storagePath = _service.pdfRef(id).fullPath;
 
       String thumbUrl = '';
-      final cover = _coverPath;
-      if (cover != null && cover.trim().isNotEmpty && File(cover).existsSync()) {
-        final coverBytes = File(cover).lengthSync();
+      final cover = _coverFile;
+      if (cover != null) {
+        final coverBytes = cover.length;
         if (coverBytes > 10 * 1024 * 1024) {
           _snack('Thumbnail image is too large (max 10 MB)');
           return;
         }
-        final coverTask = _service.uploadThumbTask(id: id, imagePath: cover);
+        final coverTask = _service.uploadThumbTask(id: id, image: cover);
         coverTask.snapshotEvents.listen((snap) {
           final total = snap.totalBytes;
           final done = snap.bytesTransferred;
@@ -120,7 +107,7 @@ class _AdminUploadSabaqScreenState extends State<AdminUploadSabaqScreen> {
           }
         });
         await coverTask;
-        thumbUrl = await _service.getThumbUrl(id: id, imagePath: cover);
+        thumbUrl = await _service.getThumbUrl(id: id, imageName: cover.name);
       }
 
       final model = SabaqPdfModel(
@@ -156,12 +143,8 @@ class _AdminUploadSabaqScreenState extends State<AdminUploadSabaqScreen> {
   @override
   Widget build(BuildContext context) {
     final c = context.c;
-    final pdfName = _pdfPath == null
-        ? 'No PDF selected'
-        : _pdfPath!.split(Platform.pathSeparator).last;
-    final coverName = _coverPath == null
-        ? 'No thumbnail selected (optional)'
-        : _coverPath!.split(Platform.pathSeparator).last;
+    final pdfName = _pdfFile?.name ?? 'No PDF selected';
+    final coverName = _coverFile?.name ?? 'No thumbnail selected (optional)';
 
     return Scaffold(
       body: Column(
@@ -243,7 +226,8 @@ class _AdminUploadSabaqScreenState extends State<AdminUploadSabaqScreen> {
                     onPressed: _saving ? null : _upload,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: c.accentGold,
-                      foregroundColor: Theme.of(context).brightness == Brightness.dark
+                      foregroundColor:
+                          Theme.of(context).brightness == Brightness.dark
                           ? c.backgroundPrimary
                           : c.textPrimary,
                       padding: const EdgeInsets.symmetric(vertical: 14),
@@ -258,7 +242,9 @@ class _AdminUploadSabaqScreenState extends State<AdminUploadSabaqScreen> {
                             width: 18,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              color: Theme.of(context).brightness == Brightness.dark
+                              color:
+                                  Theme.of(context).brightness ==
+                                      Brightness.dark
                                   ? c.backgroundPrimary
                                   : c.textPrimary,
                             ),

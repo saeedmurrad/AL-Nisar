@@ -188,15 +188,19 @@ class _UrduIrshadPhotoCard extends StatelessWidget {
                           fit: BoxFit.cover,
                           width: double.infinity,
                           filterQuality: FilterQuality.high,
-                          placeholder: (context, url) => const ShimmerPlaceholder(),
-                          errorWidget: (context, url, error) => CachedNetworkImage(
-                            imageUrl: DummyData.calligraphyClose,
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                            filterQuality: FilterQuality.high,
-                            placeholder: (context, url) => const ShimmerPlaceholder(),
-                            errorWidget: (context, url, error) => const GoldPatternError(),
-                          ),
+                          placeholder: (context, url) =>
+                              const ShimmerPlaceholder(),
+                          errorWidget: (context, url, error) =>
+                              CachedNetworkImage(
+                                imageUrl: DummyData.calligraphyClose,
+                                fit: BoxFit.cover,
+                                width: double.infinity,
+                                filterQuality: FilterQuality.high,
+                                placeholder: (context, url) =>
+                                    const ShimmerPlaceholder(),
+                                errorWidget: (context, url, error) =>
+                                    const GoldPatternError(),
+                              ),
                         ),
                       if (!loading)
                         Positioned(
@@ -207,7 +211,10 @@ class _UrduIrshadPhotoCard extends StatelessWidget {
                             decoration: BoxDecoration(
                               color: c.backgroundPrimary.o(0.6),
                               borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: c.borderDefault, width: 0.5),
+                              border: Border.all(
+                                color: c.borderDefault,
+                                width: 0.5,
+                              ),
                             ),
                             child: Icon(
                               Icons.fullscreen_rounded,

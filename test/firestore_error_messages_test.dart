@@ -14,6 +14,10 @@ void main() {
         sabaqAccessRequestErrorMessage(StateError('request_already_active')),
         'A request is already pending or approved for this Sabaq.',
       );
+      expect(
+        sabaqAccessRequestErrorMessage(StateError('not_next_sabaq')),
+        'You can only request the next Sabaq in sequence.',
+      );
     });
 
     test('maps FirebaseException codes', () {

@@ -5,7 +5,7 @@ import '../models/asbaq_pdf_model.dart';
 
 class AsbaqService {
   AsbaqService({FirebaseFirestore? firestore})
-      : _firestore = firestore ?? FirebaseFirestore.instance;
+    : _firestore = firestore ?? FirebaseFirestore.instance;
 
   final FirebaseFirestore _firestore;
 
@@ -23,4 +23,3 @@ class AsbaqService {
     });
   }
 }
-

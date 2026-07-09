@@ -4,11 +4,7 @@ import '../theme/color_utils.dart';
 import '../theme/app_theme_colors.dart';
 
 class OrnamentDivider extends StatelessWidget {
-  const OrnamentDivider({
-    super.key,
-    this.color,
-    this.mutedColor,
-  });
+  const OrnamentDivider({super.key, this.color, this.mutedColor});
 
   final Color? color;
   final Color? mutedColor;
@@ -26,11 +22,7 @@ class OrnamentDivider extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Text(
             '✦',
-            style: TextStyle(
-              color: col.o(0.9),
-              fontSize: 14,
-              height: 1,
-            ),
+            style: TextStyle(color: col.o(0.9), fontSize: 14, height: 1),
           ),
         ),
         _line(muted),
@@ -44,14 +36,9 @@ class OrnamentDivider extends StatelessWidget {
       height: 1,
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            mutedColor.o(0.0),
-            mutedColor.o(0.9),
-            mutedColor.o(0.0),
-          ],
+          colors: [mutedColor.o(0.0), mutedColor.o(0.9), mutedColor.o(0.0)],
         ),
       ),
     );
   }
 }
-

@@ -14,11 +14,9 @@ class AppLayout {
   static const double radiusLg = 14;
   static const double radiusPill = 999;
 
-  static const EdgeInsets shellPadding =
-      EdgeInsets.fromLTRB(4, 18, 16, 12);
+  static const EdgeInsets shellPadding = EdgeInsets.fromLTRB(4, 18, 16, 12);
 
-  static const EdgeInsets screenPadding =
-      EdgeInsets.fromLTRB(16, 14, 16, 16);
+  static const EdgeInsets screenPadding = EdgeInsets.fromLTRB(16, 14, 16, 16);
 
   static BorderRadius get cardRadius => BorderRadius.circular(radiusLg);
 }

@@ -4,9 +4,8 @@ import 'shajra_scrape_client.dart';
 
 /// Shajra Pak data for the app — reads bundled assets only (no runtime scraping).
 class ShajraService {
-  ShajraService({
-    ShajraBundledService? bundled,
-  }) : _bundled = bundled ?? ShajraBundledService();
+  ShajraService({ShajraBundledService? bundled})
+    : _bundled = bundled ?? ShajraBundledService();
 
   final ShajraBundledService _bundled;
 

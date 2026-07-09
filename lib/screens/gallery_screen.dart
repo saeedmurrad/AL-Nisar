@@ -1,11 +1,11 @@
+import 'dart:typed_data';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:path_provider/path_provider.dart';
-import 'dart:io';
 
 import '../data/dummy_data.dart';
 import '../models/gallery_folder.dart';
@@ -14,6 +14,8 @@ import '../services/gallery_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/color_utils.dart';
 import '../theme/app_theme_colors.dart';
+import '../utils/file_bytes_utils.dart';
+import '../utils/responsive_layout.dart';
 import '../widgets/gold_card.dart';
 import '../widgets/shimmer_placeholder.dart';
 import '../widgets/standard_shell_header.dart';
@@ -49,8 +51,11 @@ class _GalleryScreenState extends State<GalleryScreen> {
               builder: (context, snap) {
                 final list = snap.data ?? const <GalleryImageModel>[];
 
-                if (snap.connectionState == ConnectionState.waiting && list.isEmpty) {
-                  return Center(child: CircularProgressIndicator(color: c.accentGold));
+                if (snap.connectionState == ConnectionState.waiting &&
+                    list.isEmpty) {
+                  return Center(
+                    child: CircularProgressIndicator(color: c.accentGold),
+                  );
                 }
 
                 if (list.isEmpty) {
@@ -69,7 +74,10 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 }
 
                 if (_openFolder != null) {
-                  final images = GalleryService.imagesInFolder(list, _openFolder!);
+                  final images = GalleryService.imagesInFolder(
+                    list,
+                    _openFolder!,
+                  );
                   if (images.isEmpty) {
                     return Center(
                       child: Text(
@@ -116,7 +124,11 @@ class _GalleryScreenState extends State<GalleryScreen> {
     return {GalleryFolder.general: general};
   }
 
-  void _openViewer(BuildContext context, List<GalleryImageModel> images, int index) {
+  void _openViewer(
+    BuildContext context,
+    List<GalleryImageModel> images,
+    int index,
+  ) {
     final urls = images.map((e) => e.downloadUrl).toList();
     Navigator.of(context).push(
       PageRouteBuilder(
@@ -208,22 +220,32 @@ class _FolderCard extends StatelessWidget {
         child: Row(
           children: [
             ClipRRect(
-              borderRadius: const BorderRadius.horizontal(left: Radius.circular(14)),
+              borderRadius: const BorderRadius.horizontal(
+                left: Radius.circular(14),
+              ),
               child: SizedBox(
                 width: 88,
                 height: 88,
                 child: coverUrl.isEmpty
                     ? ColoredBox(
                         color: c.backgroundElevated,
-                        child: Icon(Icons.folder_outlined, color: c.accentGold, size: 32),
+                        child: Icon(
+                          Icons.folder_outlined,
+                          color: c.accentGold,
+                          size: 32,
+                        ),
                       )
                     : CachedNetworkImage(
                         imageUrl: coverUrl,
                         fit: BoxFit.cover,
-                        placeholder: (context, url) => const ShimmerPlaceholder(),
+                        placeholder: (context, url) =>
+                            const ShimmerPlaceholder(),
                         errorWidget: (context, url, error) => ColoredBox(
                           color: c.backgroundElevated,
-                          child: Icon(Icons.folder_outlined, color: c.accentGold),
+                          child: Icon(
+                            Icons.folder_outlined,
+                            color: c.accentGold,
+                          ),
                         ),
                       ),
               ),
@@ -272,8 +294,8 @@ class _ImageGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     return GridView.builder(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: ResponsiveLayout.gridColumns(context),
         crossAxisSpacing: 12,
         mainAxisSpacing: 12,
         childAspectRatio: 3 / 4,
@@ -288,9 +310,8 @@ class _ImageGrid extends StatelessWidget {
             child: CachedNetworkImage(
               imageUrl: url,
               fit: BoxFit.cover,
-              placeholder: (context, url) => ShimmerPlaceholder(
-                borderRadius: BorderRadius.circular(12),
-              ),
+              placeholder: (context, url) =>
+                  ShimmerPlaceholder(borderRadius: BorderRadius.circular(12)),
               errorWidget: (context, url, error) => const GoldPatternError(),
             ),
           ),
@@ -347,9 +368,8 @@ class _GalleryViewerState extends State<_GalleryViewer> {
               );
             },
             backgroundDecoration: BoxDecoration(color: c.backgroundPrimary),
-            loadingBuilder: (context, event) => const Center(
-              child: ShimmerPlaceholder(),
-            ),
+            loadingBuilder: (context, event) =>
+                const Center(child: ShimmerPlaceholder()),
           ),
           SafeArea(
             child: Padding(
@@ -369,14 +389,21 @@ class _GalleryViewerState extends State<_GalleryViewer> {
                         _closeSvg,
                         width: 18,
                         height: 18,
-                        colorFilter: ColorFilter.mode(c.accentGold, BlendMode.srcIn),
+                        colorFilter: ColorFilter.mode(
+                          c.accentGold,
+                          BlendMode.srcIn,
+                        ),
                       ),
                     ),
                   ),
                   const Spacer(),
                   Text(
                     '${_i + 1}/${widget.images.length}',
-                    style: TextStyle(color: c.textMuted, fontSize: 12, letterSpacing: 1.1),
+                    style: TextStyle(
+                      color: c.textMuted,
+                      fontSize: 12,
+                      letterSpacing: 1.1,
+                    ),
                   ),
                   const SizedBox(width: 10),
                   InkWell(
@@ -413,9 +440,17 @@ class _GalleryViewerState extends State<_GalleryViewer> {
     setState(() => _sharing = true);
     try {
       final url = widget.images[_i];
-      final file = await _downloadImageToTemp(url);
+      final bytes = await _downloadImageToTemp(url);
       if (!mounted) return;
-      await Share.shareXFiles([XFile(file.path)]);
+      if (bytes == null) return;
+      await Share.shareXFiles([
+        xFileFromBytes(
+          bytes,
+          name:
+              'gallery_${DateTime.now().millisecondsSinceEpoch}.${_guessImageExt(url)}',
+          mimeType: imageMimeTypeFromName(url),
+        ),
+      ]);
     } catch (_) {
       // Ignore; user can retry.
     } finally {
@@ -423,21 +458,15 @@ class _GalleryViewerState extends State<_GalleryViewer> {
     }
   }
 
-  Future<File> _downloadImageToTemp(String url) async {
-    final uri = Uri.parse(url);
-    final client = HttpClient();
-    final req = await client.getUrl(uri);
-    final res = await req.close();
-    if (res.statusCode < 200 || res.statusCode >= 300) {
-      client.close(force: true);
-      throw HttpException('download_failed', uri: uri);
-    }
-    final bytes = await res.fold<List<int>>(<int>[], (p, e) => p..addAll(e));
-    client.close(force: true);
-    final dir = await getTemporaryDirectory();
-    final out = File('${dir.path}/gallery_${DateTime.now().millisecondsSinceEpoch}.jpg');
-    await out.writeAsBytes(bytes, flush: true);
-    return out;
+  Future<Uint8List?> _downloadImageToTemp(String url) async {
+    return downloadUrlBytes(url);
+  }
+
+  String _guessImageExt(String url) {
+    final lower = url.toLowerCase();
+    if (lower.contains('.png')) return 'png';
+    if (lower.contains('.webp')) return 'webp';
+    return 'jpg';
   }
 }
 

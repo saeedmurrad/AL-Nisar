@@ -17,6 +17,7 @@ class UserProfileModel {
   final String uid;
   final String email;
   final String displayName;
+
   /// Member mailing or location line from Firestore (`address`); optional.
   final String address;
   final String photoUrl;
@@ -45,4 +46,3 @@ class UserProfileModel {
     );
   }
 }
-

@@ -86,13 +86,12 @@ class _IrshadatScreenState extends State<IrshadatScreen> {
   }
 
   String _resolveImageUrl(IrshadFirestoreModel ir) {
-    return ir.imageUrl.trim().isNotEmpty ? ir.imageUrl.trim() : DummyData.rosePetals;
+    return ir.imageUrl.trim().isNotEmpty
+        ? ir.imageUrl.trim()
+        : DummyData.rosePetals;
   }
 
-  void _openImageFullscreen(
-    List<IrshadFirestoreModel> items,
-    int index,
-  ) {
+  void _openImageFullscreen(List<IrshadFirestoreModel> items, int index) {
     final urls = items.map(_resolveImageUrl).toList();
     FullScreenImageViewer.open(
       context,
@@ -125,8 +124,10 @@ class _IrshadatScreenState extends State<IrshadatScreen> {
                 const SizedBox(height: 12),
                 _LanguageToggle(
                   urduSelected: _language == IrshadatLanguage.urdu,
-                  onSelectUrdu: () => setState(() => _language = IrshadatLanguage.urdu),
-                  onSelectEnglish: () => setState(() => _language = IrshadatLanguage.english),
+                  onSelectUrdu: () =>
+                      setState(() => _language = IrshadatLanguage.urdu),
+                  onSelectEnglish: () =>
+                      setState(() => _language = IrshadatLanguage.english),
                 ),
               ],
             ),
@@ -136,9 +137,7 @@ class _IrshadatScreenState extends State<IrshadatScreen> {
               stream: _service.streamIrshadat(_language),
               builder: (context, snap) {
                 final list = snap.data;
-                final items = (list == null || list.isEmpty)
-                    ? null
-                    : list;
+                final items = (list == null || list.isEmpty) ? null : list;
 
                 // Fallback to dummy content when Firebase is empty/unavailable.
                 final fallback = DummyData.irshadList
@@ -146,7 +145,9 @@ class _IrshadatScreenState extends State<IrshadatScreen> {
                       (d) => IrshadFirestoreModel(
                         id: d.dateLabel,
                         dateLabel: d.dateLabel,
-                        text: _language == IrshadatLanguage.urdu ? d.urdu : d.english,
+                        text: _language == IrshadatLanguage.urdu
+                            ? d.urdu
+                            : d.english,
                         imageUrl: '',
                         createdAt: DateTime.now(),
                         isActive: true,
@@ -169,7 +170,9 @@ class _IrshadatScreenState extends State<IrshadatScreen> {
                     child: Padding(
                       padding: const EdgeInsets.all(24),
                       child: Text(
-                        q.isEmpty ? 'No Irshadat yet' : 'No matches for your search',
+                        q.isEmpty
+                            ? 'No Irshadat yet'
+                            : 'No matches for your search',
                         style: AppTheme.lato(color: c.textMuted, fontSize: 14),
                         textAlign: TextAlign.center,
                       ),
@@ -180,10 +183,13 @@ class _IrshadatScreenState extends State<IrshadatScreen> {
                 return ListView.separated(
                   padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
                   itemCount: filtered.length,
-                  separatorBuilder: (context, index) => const SizedBox(height: 12),
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 12),
                   itemBuilder: (context, i) {
                     final ir = filtered[i];
-                    final bookmarked = _bookmarkedKeys.contains(_bookmarkKey(ir));
+                    final bookmarked = _bookmarkedKeys.contains(
+                      _bookmarkKey(ir),
+                    );
                     final hasText = ir.text.trim().isNotEmpty;
                     return GoldCard(
                       backgroundColor: c.backgroundInput,
@@ -200,7 +206,8 @@ class _IrshadatScreenState extends State<IrshadatScreen> {
                                 child: Material(
                                   color: Colors.transparent,
                                   child: InkWell(
-                                    onTap: () => _openImageFullscreen(filtered, i),
+                                    onTap: () =>
+                                        _openImageFullscreen(filtered, i),
                                     borderRadius: BorderRadius.circular(12),
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(12),
@@ -213,8 +220,9 @@ class _IrshadatScreenState extends State<IrshadatScreen> {
                                             filterQuality: FilterQuality.high,
                                             placeholder: (context, url) =>
                                                 const ShimmerPlaceholder(),
-                                            errorWidget: (context, url, error) =>
-                                                const GoldPatternError(),
+                                            errorWidget:
+                                                (context, url, error) =>
+                                                    const GoldPatternError(),
                                           ),
                                           Positioned(
                                             right: 8,
@@ -222,7 +230,9 @@ class _IrshadatScreenState extends State<IrshadatScreen> {
                                             child: Container(
                                               padding: const EdgeInsets.all(6),
                                               decoration: BoxDecoration(
-                                                color: c.backgroundPrimary.o(0.55),
+                                                color: c.backgroundPrimary.o(
+                                                  0.55,
+                                                ),
                                                 borderRadius:
                                                     BorderRadius.circular(8),
                                               ),
@@ -283,8 +293,9 @@ class _IrshadatScreenState extends State<IrshadatScreen> {
                                   Expanded(
                                     child: _ActionPill(
                                       label: bookmarked ? 'Saved' : 'Bookmark',
-                                      iconSvg:
-                                          bookmarked ? _bookmarkFilledSvg : _bookmarkSvg,
+                                      iconSvg: bookmarked
+                                          ? _bookmarkFilledSvg
+                                          : _bookmarkSvg,
                                       active: bookmarked,
                                       onTap: () => _toggleBookmark(ir),
                                     ),
@@ -316,10 +327,7 @@ class _IrshadatScreenState extends State<IrshadatScreen> {
 }
 
 class _SearchBar extends StatelessWidget {
-  const _SearchBar({
-    required this.controller,
-    required this.onChanged,
-  });
+  const _SearchBar({required this.controller, required this.onChanged});
 
   final TextEditingController controller;
   final ValueChanged<String> onChanged;
@@ -340,10 +348,7 @@ class _SearchBar extends StatelessWidget {
             _searchSvg,
             width: 18,
             height: 18,
-            colorFilter: ColorFilter.mode(
-              c.accentGold,
-              BlendMode.srcIn,
-            ),
+            colorFilter: ColorFilter.mode(c.accentGold, BlendMode.srcIn),
           ),
           const SizedBox(width: 10),
           Expanded(
@@ -506,4 +511,3 @@ const _bookmarkFilledSvg =
     '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7 4h10v17l-5-3-5 3V4z" fill="currentColor" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>';
 const _shareSvg =
     '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M16 7l-8 4 8 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 9.2a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4zM6 13.2a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4zM18 19.2a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>';
-

@@ -28,8 +28,9 @@ class AdminLessonsScreen extends StatelessWidget {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         backgroundColor: c.accentGold,
-        foregroundColor:
-            Theme.of(context).brightness == Brightness.dark ? c.backgroundPrimary : c.textPrimary,
+        foregroundColor: Theme.of(context).brightness == Brightness.dark
+            ? c.backgroundPrimary
+            : c.textPrimary,
         onPressed: () async {
           final created = await showModalBottomSheet<LessonModel?>(
             context: context,
@@ -70,13 +71,17 @@ class AdminLessonsScreen extends StatelessWidget {
                 final list = snap.data ?? const [];
                 if (list.isEmpty) {
                   return Center(
-                    child: Text(emptyLabel, style: AppTheme.lato(color: c.textMuted)),
+                    child: Text(
+                      emptyLabel,
+                      style: AppTheme.lato(color: c.textMuted),
+                    ),
                   );
                 }
                 return ListView.separated(
                   padding: const EdgeInsets.fromLTRB(16, 14, 16, 90),
                   itemCount: list.length,
-                  separatorBuilder: (context, index) => const SizedBox(height: 10),
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 10),
                   itemBuilder: (context, i) {
                     final l = list[i];
                     return GoldCard(
@@ -109,32 +114,51 @@ class AdminLessonsScreen extends StatelessWidget {
                               l.subtitle,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
-                              style: AppTheme.lato(fontSize: 12, color: c.textMuted),
+                              style: AppTheme.lato(
+                                fontSize: 12,
+                                color: c.textMuted,
+                              ),
                             ),
                           ],
                           const SizedBox(height: 8),
                           Row(
                             children: [
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 6,
+                                ),
                                 decoration: BoxDecoration(
                                   color: c.backgroundElevated,
                                   borderRadius: BorderRadius.circular(999),
-                                  border: Border.all(color: c.borderDefault, width: 0.5),
+                                  border: Border.all(
+                                    color: c.borderDefault,
+                                    width: 0.5,
+                                  ),
                                 ),
                                 child: Text(
                                   '${l.pages.length} pages',
-                                  style: AppTheme.lato(fontSize: 11, color: c.textSecondary),
+                                  style: AppTheme.lato(
+                                    fontSize: 11,
+                                    color: c.textSecondary,
+                                  ),
                                 ),
                               ),
                               const SizedBox(width: 10),
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 6,
+                                ),
                                 decoration: BoxDecoration(
-                                  color: l.isLocked ? Colors.red.withValues(alpha: 0.12) : c.accentGold.o(0.12),
+                                  color: l.isLocked
+                                      ? Colors.red.withValues(alpha: 0.12)
+                                      : c.accentGold.o(0.12),
                                   borderRadius: BorderRadius.circular(999),
                                   border: Border.all(
-                                    color: l.isLocked ? Colors.red.withValues(alpha: 0.5) : c.accentGold.o(0.35),
+                                    color: l.isLocked
+                                        ? Colors.red.withValues(alpha: 0.5)
+                                        : c.accentGold.o(0.35),
                                     width: 0.8,
                                   ),
                                 ),
@@ -143,7 +167,9 @@ class AdminLessonsScreen extends StatelessWidget {
                                   style: AppTheme.lato(
                                     fontSize: 11,
                                     fontWeight: FontWeight.w700,
-                                    color: l.isLocked ? Colors.red.shade300 : c.accentGold,
+                                    color: l.isLocked
+                                        ? Colors.red.shade300
+                                        : c.accentGold,
                                   ),
                                 ),
                               ),
@@ -163,15 +189,19 @@ class AdminLessonsScreen extends StatelessWidget {
                               ),
                               TextButton(
                                 onPressed: () async {
-                                  final updated = await showModalBottomSheet<LessonModel?>(
-                                    context: context,
-                                    isScrollControlled: true,
-                                    backgroundColor: c.backgroundSurface,
-                                    shape: const RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-                                    ),
-                                    builder: (ctx) => _LessonEditor(initial: l),
-                                  );
+                                  final updated =
+                                      await showModalBottomSheet<LessonModel?>(
+                                        context: context,
+                                        isScrollControlled: true,
+                                        backgroundColor: c.backgroundSurface,
+                                        shape: const RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.vertical(
+                                            top: Radius.circular(16),
+                                          ),
+                                        ),
+                                        builder: (ctx) =>
+                                            _LessonEditor(initial: l),
+                                      );
                                   if (updated == null) return;
                                   await service.upsert(updated);
                                 },
@@ -213,7 +243,9 @@ class _LessonEditorState extends State<_LessonEditor> {
   late final _title = TextEditingController(text: widget.initial.title);
   late final _subtitle = TextEditingController(text: widget.initial.subtitle);
   late final _cover = TextEditingController(text: widget.initial.coverImageUrl);
-  late final _urduTitle = TextEditingController(text: widget.initial.urduTitle ?? '');
+  late final _urduTitle = TextEditingController(
+    text: widget.initial.urduTitle ?? '',
+  );
   late final _lessonNumber = TextEditingController(
     text: widget.initial.lessonNumber?.toString() ?? '',
   );
@@ -270,7 +302,11 @@ class _LessonEditorState extends State<_LessonEditor> {
           const SizedBox(height: 12),
           _Field(label: 'Title', controller: _title, hintText: 'Title'),
           const SizedBox(height: 10),
-          _Field(label: 'Subtitle', controller: _subtitle, hintText: 'Subtitle'),
+          _Field(
+            label: 'Subtitle',
+            controller: _subtitle,
+            hintText: 'Subtitle',
+          ),
           const SizedBox(height: 10),
           _Field(
             label: 'Urdu title (optional)',
@@ -341,7 +377,9 @@ class _LessonEditorState extends State<_LessonEditor> {
                         children: [
                           Expanded(
                             child: Text(
-                              p.chapterTitle.isEmpty ? 'Page ${i + 1}' : p.chapterTitle,
+                              p.chapterTitle.isEmpty
+                                  ? 'Page ${i + 1}'
+                                  : p.chapterTitle,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: AppTheme.lato(
@@ -353,7 +391,10 @@ class _LessonEditorState extends State<_LessonEditor> {
                           ),
                           IconButton(
                             onPressed: () => setState(() => _pages.removeAt(i)),
-                            icon: Icon(Icons.delete_outline, color: c.textMuted),
+                            icon: Icon(
+                              Icons.delete_outline,
+                              color: c.textMuted,
+                            ),
                           ),
                         ],
                       ),
@@ -377,7 +418,9 @@ class _LessonEditorState extends State<_LessonEditor> {
                   isLocked: widget.initial.isLocked,
                   pages: _pages,
                   createdAt: widget.initial.createdAt,
-                  urduTitle: _urduTitle.text.trim().isEmpty ? null : _urduTitle.text.trim(),
+                  urduTitle: _urduTitle.text.trim().isEmpty
+                      ? null
+                      : _urduTitle.text.trim(),
                   lessonNumber: ln,
                   isActive: widget.initial.isActive,
                 ),
@@ -385,15 +428,19 @@ class _LessonEditorState extends State<_LessonEditor> {
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: c.accentGold,
-              foregroundColor:
-                  Theme.of(context).brightness == Brightness.dark ? c.backgroundPrimary : c.textPrimary,
+              foregroundColor: Theme.of(context).brightness == Brightness.dark
+                  ? c.backgroundPrimary
+                  : c.textPrimary,
               padding: const EdgeInsets.symmetric(vertical: 14),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
               elevation: 0,
             ),
-            child: Text('Save', style: AppTheme.lato(fontWeight: FontWeight.w700)),
+            child: Text(
+              'Save',
+              style: AppTheme.lato(fontWeight: FontWeight.w700),
+            ),
           ),
           const SizedBox(height: 8),
         ],
@@ -412,9 +459,13 @@ class _PageEditor extends StatefulWidget {
 }
 
 class _PageEditorState extends State<_PageEditor> {
-  late final _chapter = TextEditingController(text: widget.initial?.chapterTitle ?? '');
+  late final _chapter = TextEditingController(
+    text: widget.initial?.chapterTitle ?? '',
+  );
   late final _urdu = TextEditingController(text: widget.initial?.urdu ?? '');
-  late final _english = TextEditingController(text: widget.initial?.english ?? '');
+  late final _english = TextEditingController(
+    text: widget.initial?.english ?? '',
+  );
 
   @override
   void dispose() {
@@ -442,7 +493,11 @@ class _PageEditorState extends State<_PageEditor> {
             ),
           ),
           const SizedBox(height: 12),
-          _Field(label: 'Chapter title', controller: _chapter, hintText: 'Chapter'),
+          _Field(
+            label: 'Chapter title',
+            controller: _chapter,
+            hintText: 'Chapter',
+          ),
           const SizedBox(height: 10),
           _Field(
             label: 'Urdu',
@@ -472,15 +527,19 @@ class _PageEditorState extends State<_PageEditor> {
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: c.accentGold,
-              foregroundColor:
-                  Theme.of(context).brightness == Brightness.dark ? c.backgroundPrimary : c.textPrimary,
+              foregroundColor: Theme.of(context).brightness == Brightness.dark
+                  ? c.backgroundPrimary
+                  : c.textPrimary,
               padding: const EdgeInsets.symmetric(vertical: 14),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
               elevation: 0,
             ),
-            child: Text('Save page', style: AppTheme.lato(fontWeight: FontWeight.w700)),
+            child: Text(
+              'Save page',
+              style: AppTheme.lato(fontWeight: FontWeight.w700),
+            ),
           ),
           const SizedBox(height: 8),
         ],
@@ -551,4 +610,3 @@ class _Field extends StatelessWidget {
     );
   }
 }
-

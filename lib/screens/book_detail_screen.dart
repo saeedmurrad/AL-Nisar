@@ -21,11 +21,7 @@ import '../widgets/ornament_divider.dart';
 import '../widgets/shimmer_placeholder.dart';
 
 class BookDetailScreen extends StatefulWidget {
-  const BookDetailScreen({
-    super.key,
-    this.initialBook,
-    this.bookId,
-  });
+  const BookDetailScreen({super.key, this.initialBook, this.bookId});
 
   final BookModel? initialBook;
   final String? bookId;
@@ -129,14 +125,9 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
     });
     try {
       final url = await _bookService.getBookDownloadUrl(b.storagePath);
-      await _cache.downloadAndCachePdf(
-        b.id,
-        url,
-        (p) {
-          if (mounted) setState(() => _progress = p);
-        },
-        shouldContinue: () => !_cancelDownload,
-      );
+      await _cache.downloadAndCachePdf(b.id, url, (p) {
+        if (mounted) setState(() => _progress = p);
+      }, shouldContinue: () => !_cancelDownload);
       if (_cancelDownload) return;
       if (mounted) {
         setState(() {
@@ -191,9 +182,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
 
     if (_loadingBook) {
       return Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(color: c.accentGold),
-        ),
+        body: Center(child: CircularProgressIndicator(color: c.accentGold)),
       );
     }
 
@@ -365,7 +354,11 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                               width: 0.5,
                             ),
                           ),
-                          child: Icon(Icons.home_outlined, size: 20, color: c.accentGold),
+                          child: Icon(
+                            Icons.home_outlined,
+                            size: 20,
+                            color: c.accentGold,
+                          ),
                         ),
                       ),
                     ],
@@ -537,10 +530,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                       },
                       child: Text(
                         'Cancel',
-                        style: AppTheme.lato(
-                          fontSize: 13,
-                          color: c.textMuted,
-                        ),
+                        style: AppTheme.lato(fontSize: 13, color: c.textMuted),
                       ),
                     ),
                   ),
@@ -598,10 +588,7 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                       onPressed: _removeCache,
                       child: Text(
                         'Remove from device',
-                        style: AppTheme.lato(
-                          fontSize: 12,
-                          color: c.textMuted,
-                        ),
+                        style: AppTheme.lato(fontSize: 12, color: c.textMuted),
                       ),
                     ),
                   ),

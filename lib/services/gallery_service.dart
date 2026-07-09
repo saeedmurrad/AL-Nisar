@@ -6,7 +6,7 @@ import '../models/gallery_image_model.dart';
 
 class GalleryService {
   GalleryService({FirebaseFirestore? firestore})
-      : _firestore = firestore ?? FirebaseFirestore.instance;
+    : _firestore = firestore ?? FirebaseFirestore.instance;
 
   final FirebaseFirestore _firestore;
   bool get _firebaseReady => Firebase.apps.isNotEmpty;
@@ -47,9 +47,7 @@ class GalleryService {
     List<GalleryImageModel> images,
     GalleryFolder folder,
   ) {
-    return images
-        .where((e) => e.folderInfo.id == folder.id)
-        .toList()
+    return images.where((e) => e.folderInfo.id == folder.id).toList()
       ..sort((a, b) => b.uploadedAt.compareTo(a.uploadedAt));
   }
 }

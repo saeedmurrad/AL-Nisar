@@ -9,4 +9,3 @@ class IrshadModel {
   final String urdu;
   final String english;
 }
-

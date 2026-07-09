@@ -27,7 +27,9 @@ class LessonModel {
   final int? lessonNumber;
   final bool isActive;
 
-  factory LessonModel.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
+  factory LessonModel.fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> doc,
+  ) {
     final data = doc.data() ?? {};
     final ts = data['createdAt'];
     DateTime createdAt = DateTime.now();
@@ -94,11 +96,6 @@ class LessonPage {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'chapterTitle': chapterTitle,
-      'urdu': urdu,
-      'english': english,
-    };
+    return {'chapterTitle': chapterTitle, 'urdu': urdu, 'english': english};
   }
 }
-

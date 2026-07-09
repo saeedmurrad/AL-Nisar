@@ -8,8 +8,8 @@ import '../models/bookmark_model.dart';
 
 class BookmarkService {
   BookmarkService({FirebaseAuth? auth, FirebaseFirestore? firestore})
-      : _auth = auth ?? FirebaseAuth.instance,
-        _firestore = firestore ?? FirebaseFirestore.instance;
+    : _auth = auth ?? FirebaseAuth.instance,
+      _firestore = firestore ?? FirebaseFirestore.instance;
 
   final FirebaseAuth _auth;
   final FirebaseFirestore _firestore;
@@ -32,7 +32,9 @@ class BookmarkService {
     try {
       final list = jsonDecode(raw) as List<dynamic>;
       return list
-          .map((e) => BookmarkModel.fromJson(Map<String, dynamic>.from(e as Map)))
+          .map(
+            (e) => BookmarkModel.fromJson(Map<String, dynamic>.from(e as Map)),
+          )
           .toList();
     } catch (_) {
       return [];
@@ -71,9 +73,7 @@ class BookmarkService {
     }
 
     final all = await _loadAll();
-    all.removeWhere(
-      (b) => b.bookId == bookId && b.pageNumber == pageNumber,
-    );
+    all.removeWhere((b) => b.bookId == bookId && b.pageNumber == pageNumber);
     all.add(
       BookmarkModel(
         bookId: bookId,
@@ -88,10 +88,7 @@ class BookmarkService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(
       _storageKey(bookId, pageNumber),
-      jsonEncode({
-        'note': note,
-        'savedAt': DateTime.now().toIso8601String(),
-      }),
+      jsonEncode({'note': note, 'savedAt': DateTime.now().toIso8601String()}),
     );
   }
 
@@ -126,9 +123,7 @@ class BookmarkService {
       return;
     }
     final all = await _loadAll();
-    all.removeWhere(
-      (b) => b.bookId == bookId && b.pageNumber == pageNumber,
-    );
+    all.removeWhere((b) => b.bookId == bookId && b.pageNumber == pageNumber);
     await _saveAll(all);
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_storageKey(bookId, pageNumber));
@@ -141,9 +136,7 @@ class BookmarkService {
       return doc.exists;
     }
     final all = await _loadAll();
-    return all.any(
-      (b) => b.bookId == bookId && b.pageNumber == pageNumber,
-    );
+    return all.any((b) => b.bookId == bookId && b.pageNumber == pageNumber);
   }
 
   Future<BookmarkModel?> getBookmark(String bookId, int pageNumber) async {

@@ -30,20 +30,17 @@ class NotificationsScreen extends StatelessWidget {
             child: auth.isSuperAdmin
                 ? _AdminNotificationsList(colors: c)
                 : auth.isAuthenticated
-                    ? _MemberNotificationsList(
-                        colors: c,
-                        userId: auth.user!.uid,
-                      )
-                    : Center(
-                        child: Padding(
-                          padding: const EdgeInsets.all(24),
-                          child: Text(
-                            'Sign in to view notifications.',
-                            textAlign: TextAlign.center,
-                            style: AppTheme.lato(color: c.textMuted, fontSize: 14),
-                          ),
-                        ),
+                ? _MemberNotificationsList(colors: c, userId: auth.user!.uid)
+                : Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Text(
+                        'Sign in to view notifications.',
+                        textAlign: TextAlign.center,
+                        style: AppTheme.lato(color: c.textMuted, fontSize: 14),
                       ),
+                    ),
+                  ),
           ),
         ],
       ),
@@ -57,7 +54,8 @@ class _AdminNotificationsList extends StatefulWidget {
   final AppThemeColors colors;
 
   @override
-  State<_AdminNotificationsList> createState() => _AdminNotificationsListState();
+  State<_AdminNotificationsList> createState() =>
+      _AdminNotificationsListState();
 }
 
 class _AdminNotificationsListState extends State<_AdminNotificationsList> {
@@ -188,16 +186,14 @@ class _AdminNotificationsListState extends State<_AdminNotificationsList> {
 }
 
 class _MemberNotificationsList extends StatefulWidget {
-  const _MemberNotificationsList({
-    required this.colors,
-    required this.userId,
-  });
+  const _MemberNotificationsList({required this.colors, required this.userId});
 
   final AppThemeColors colors;
   final String userId;
 
   @override
-  State<_MemberNotificationsList> createState() => _MemberNotificationsListState();
+  State<_MemberNotificationsList> createState() =>
+      _MemberNotificationsListState();
 }
 
 class _MemberNotificationsListState extends State<_MemberNotificationsList> {
@@ -237,7 +233,8 @@ class _MemberNotificationsListState extends State<_MemberNotificationsList> {
                 n.type == 'news_published' && (n.newsId?.isNotEmpty ?? false);
             final showEventLink =
                 n.type == 'event_published' && (n.eventId?.isNotEmpty ?? false);
-            final showContentLink = showSabaqLink || showNewsLink || showEventLink;
+            final showContentLink =
+                showSabaqLink || showNewsLink || showEventLink;
             final marking = _markingIds.contains(n.id);
             final isUnread = !n.read;
             return GoldCard(

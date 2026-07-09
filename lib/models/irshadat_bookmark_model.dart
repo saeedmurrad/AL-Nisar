@@ -22,26 +22,27 @@ class IrshadatBookmarkModel {
   String get id => '${language.name}_$irshadId';
 
   Map<String, dynamic> toJson() => {
-        'language': language.name,
-        'irshadId': irshadId,
-        'dateLabel': dateLabel,
-        'text': text,
-        'imageUrl': imageUrl,
-        'savedAt': savedAt.toIso8601String(),
-      };
+    'language': language.name,
+    'irshadId': irshadId,
+    'dateLabel': dateLabel,
+    'text': text,
+    'imageUrl': imageUrl,
+    'savedAt': savedAt.toIso8601String(),
+  };
 
   factory IrshadatBookmarkModel.fromJson(Map<String, dynamic> json) {
     final langRaw = (json['language'] as String? ?? 'urdu').toLowerCase();
-    final language =
-        langRaw == 'english' ? IrshadatLanguage.english : IrshadatLanguage.urdu;
+    final language = langRaw == 'english'
+        ? IrshadatLanguage.english
+        : IrshadatLanguage.urdu;
     return IrshadatBookmarkModel(
       language: language,
       irshadId: json['irshadId'] as String? ?? '',
       dateLabel: json['dateLabel'] as String? ?? '',
       text: json['text'] as String? ?? '',
       imageUrl: json['imageUrl'] as String? ?? '',
-      savedAt: DateTime.tryParse(json['savedAt'] as String? ?? '') ??
-          DateTime.now(),
+      savedAt:
+          DateTime.tryParse(json['savedAt'] as String? ?? '') ?? DateTime.now(),
     );
   }
 
@@ -50,8 +51,9 @@ class IrshadatBookmarkModel {
     Map<String, dynamic> data,
   ) {
     final langRaw = (data['language'] as String? ?? 'urdu').toLowerCase();
-    final language =
-        langRaw == 'english' ? IrshadatLanguage.english : IrshadatLanguage.urdu;
+    final language = langRaw == 'english'
+        ? IrshadatLanguage.english
+        : IrshadatLanguage.urdu;
     DateTime savedAt = DateTime.now();
     final v = data['savedAt'];
     if (v is Timestamp) savedAt = v.toDate();
@@ -65,4 +67,3 @@ class IrshadatBookmarkModel {
     );
   }
 }
-

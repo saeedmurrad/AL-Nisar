@@ -38,17 +38,11 @@ class AuthPrimaryButton extends StatelessWidget {
             ? SizedBox(
                 height: 18,
                 width: 18,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: fg,
-                ),
+                child: CircularProgressIndicator(strokeWidth: 2, color: fg),
               )
             : Text(
                 label,
-                style: AppTheme.lato(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
-                ),
+                style: AppTheme.lato(fontSize: 15, fontWeight: FontWeight.w700),
               ),
       ),
     );

@@ -7,7 +7,7 @@ import '../services/book_service.dart';
 
 class BookProvider extends ChangeNotifier {
   BookProvider({BookService? bookService})
-      : _service = bookService ?? BookService() {
+    : _service = bookService ?? BookService() {
     loadBooks();
   }
 

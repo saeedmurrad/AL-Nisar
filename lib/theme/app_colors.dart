@@ -33,4 +33,3 @@ class AppColorsLight {
   static const borderDefault = Color(0xFFC4A070);
   static const borderFaint = Color(0xFFD4B888);
 }
-

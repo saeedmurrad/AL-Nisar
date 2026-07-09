@@ -21,9 +21,10 @@ class SocialLinksConfig {
   factory SocialLinksConfig.fromMap(Map<String, dynamic>? data) {
     if (data == null || data.isEmpty) return defaults;
     return SocialLinksConfig(
-      facebookPageUrl: _str(data['facebookPageUrl']) ??
-          SocialLinksDefaults.facebookPageUrl,
-      youtubeChannelUrl: _str(data['youtubeChannelUrl']) ??
+      facebookPageUrl:
+          _str(data['facebookPageUrl']) ?? SocialLinksDefaults.facebookPageUrl,
+      youtubeChannelUrl:
+          _str(data['youtubeChannelUrl']) ??
           SocialLinksDefaults.youtubeChannelUrl,
       facebookLiveUrl: _str(data['facebookLiveUrl']) ?? '',
       isFacebookLive: data['isFacebookLive'] as bool? ?? false,

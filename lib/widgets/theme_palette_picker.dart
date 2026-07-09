@@ -27,7 +27,8 @@ class ThemePalettePicker extends StatelessWidget {
               selected: tp.colorPalette == palette,
               isDark: tp.isDark,
               size: 28,
-              onTap: () => context.read<ThemeProvider>().setColorPalette(palette),
+              onTap: () =>
+                  context.read<ThemeProvider>().setColorPalette(palette),
             ),
         ],
       );
@@ -37,7 +38,8 @@ class ThemePalettePicker extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         for (final palette in AppColorPalette.values) ...[
-          if (palette != AppColorPalette.values.first) const SizedBox(height: 8),
+          if (palette != AppColorPalette.values.first)
+            const SizedBox(height: 8),
           _PaletteRow(
             palette: palette,
             selected: tp.colorPalette == palette,
@@ -127,7 +129,9 @@ class _PaletteSwatch extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.c;
-    final accent = palette.colorsFor(isDark ? Brightness.dark : Brightness.light).accentGold;
+    final accent = palette
+        .colorsFor(isDark ? Brightness.dark : Brightness.light)
+        .accentGold;
 
     return InkWell(
       onTap: onTap,

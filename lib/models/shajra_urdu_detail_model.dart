@@ -20,12 +20,12 @@ class ShajraUrduDetailModel {
   String get id => number.toString();
 
   Map<String, dynamic> toMap() => {
-        'number': number,
-        'titleUrdu': titleUrdu,
-        'storagePath': storagePath,
-        'updatedAt': Timestamp.fromDate(updatedAt),
-        'isActive': isActive,
-      };
+    'number': number,
+    'titleUrdu': titleUrdu,
+    'storagePath': storagePath,
+    'updatedAt': Timestamp.fromDate(updatedAt),
+    'isActive': isActive,
+  };
 
   factory ShajraUrduDetailModel.fromFirestore(
     DocumentSnapshot<Map<String, dynamic>> doc,
@@ -41,4 +41,3 @@ class ShajraUrduDetailModel {
     );
   }
 }
-

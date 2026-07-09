@@ -27,9 +27,8 @@ class NewsCoverImage extends StatelessWidget {
         : CachedNetworkImage(
             imageUrl: url,
             fit: fit,
-            placeholder: (context, url) => ShimmerPlaceholder(
-              borderRadius: borderRadius,
-            ),
+            placeholder: (context, url) =>
+                ShimmerPlaceholder(borderRadius: borderRadius),
             errorWidget: (context, url, error) => const GoldPatternError(),
           );
 

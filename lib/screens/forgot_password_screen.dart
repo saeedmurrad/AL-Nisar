@@ -60,10 +60,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     final c = context.c;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(
-          message,
-          style: AppTheme.lato(color: c.textPrimary),
-        ),
+        content: Text(message, style: AppTheme.lato(color: c.textPrimary)),
         backgroundColor: c.backgroundElevated,
       ),
     );
@@ -168,12 +165,19 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           decoration: BoxDecoration(
                             color: c.backgroundInput,
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: c.borderDefault, width: 0.5),
+                            border: Border.all(
+                              color: c.borderDefault,
+                              width: 0.5,
+                            ),
                           ),
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Icon(Icons.info_outline, size: 18, color: c.accentGold),
+                              Icon(
+                                Icons.info_outline,
+                                size: 18,
+                                color: c.accentGold,
+                              ),
                               const SizedBox(width: 10),
                               Expanded(
                                 child: Text(

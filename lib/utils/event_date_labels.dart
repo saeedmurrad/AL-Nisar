@@ -66,7 +66,8 @@ class EventDateLabels {
     for (var i = 0; i < _shortMonths.length; i++) {
       if (_shortMonths[i].toUpperCase() == abbr && day > 0) {
         final yearMatch = RegExp(r'(20\d{2})').firstMatch(fullDateLine);
-        final year = int.tryParse(yearMatch?.group(1) ?? '') ?? DateTime.now().year;
+        final year =
+            int.tryParse(yearMatch?.group(1) ?? '') ?? DateTime.now().year;
         return DateTime(year, i + 1, day);
       }
     }

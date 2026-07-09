@@ -6,7 +6,7 @@ import 'shajra_bundled_service.dart';
 
 class ShajraUrduDetailsService {
   ShajraUrduDetailsService({FirebaseFirestore? firestore})
-      : _firestore = firestore ?? FirebaseFirestore.instance;
+    : _firestore = firestore ?? FirebaseFirestore.instance;
 
   final FirebaseFirestore _firestore;
 
@@ -20,7 +20,13 @@ class ShajraUrduDetailsService {
     return _col.snapshots().map((snap) {
       final list = snap.docs
           .map((d) => ShajraUrduDetailModel.fromFirestore(d))
-          .where((e) => e.isActive && e.number > 0 && e.number <= ShajraBundledService.maxEntryNumber && e.storagePath.isNotEmpty)
+          .where(
+            (e) =>
+                e.isActive &&
+                e.number > 0 &&
+                e.number <= ShajraBundledService.maxEntryNumber &&
+                e.storagePath.isNotEmpty,
+          )
           .toList();
       list.sort((a, b) => a.number.compareTo(b.number));
       return list;
@@ -33,4 +39,3 @@ class ShajraUrduDetailsService {
     });
   }
 }
-

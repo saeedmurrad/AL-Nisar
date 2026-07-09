@@ -16,13 +16,13 @@ class BookmarkModel {
   final DateTime savedAt;
 
   Map<String, dynamic> toJson() => {
-        'bookId': bookId,
-        'bookTitle': bookTitle,
-        'bookStoragePath': bookStoragePath,
-        'pageNumber': pageNumber,
-        'note': note,
-        'savedAt': savedAt.toIso8601String(),
-      };
+    'bookId': bookId,
+    'bookTitle': bookTitle,
+    'bookStoragePath': bookStoragePath,
+    'pageNumber': pageNumber,
+    'note': note,
+    'savedAt': savedAt.toIso8601String(),
+  };
 
   factory BookmarkModel.fromJson(Map<String, dynamic> json) {
     return BookmarkModel(
@@ -31,8 +31,8 @@ class BookmarkModel {
       bookStoragePath: json['bookStoragePath'] as String?,
       pageNumber: (json['pageNumber'] as num?)?.toInt() ?? 0,
       note: json['note'] as String? ?? '',
-      savedAt: DateTime.tryParse(json['savedAt'] as String? ?? '') ??
-          DateTime.now(),
+      savedAt:
+          DateTime.tryParse(json['savedAt'] as String? ?? '') ?? DateTime.now(),
     );
   }
 }

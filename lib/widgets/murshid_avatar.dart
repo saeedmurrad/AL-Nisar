@@ -29,20 +29,13 @@ class MurshidAvatar extends StatelessWidget {
 
     if (applyGoldenOverlay) {
       image = ColorFiltered(
-        colorFilter: ColorFilter.mode(
-          Colors.amber.o(0.08),
-          BlendMode.srcATop,
-        ),
+        colorFilter: ColorFilter.mode(Colors.amber.o(0.08), BlendMode.srcATop),
         child: image,
       );
     }
 
     image = ClipOval(
-      child: SizedBox(
-        width: diameter,
-        height: diameter,
-        child: image,
-      ),
+      child: SizedBox(width: diameter, height: diameter, child: image),
     );
 
     return Container(
@@ -55,10 +48,7 @@ class MurshidAvatar extends StatelessWidget {
       ),
       child: Container(
         padding: EdgeInsets.all(goldRingWidth),
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: c.accentGold,
-        ),
+        decoration: BoxDecoration(shape: BoxShape.circle, color: c.accentGold),
         child: Container(
           decoration: BoxDecoration(
             shape: BoxShape.circle,
@@ -70,4 +60,3 @@ class MurshidAvatar extends StatelessWidget {
     );
   }
 }
-

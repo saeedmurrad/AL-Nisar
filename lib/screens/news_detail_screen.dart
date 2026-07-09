@@ -11,11 +11,7 @@ import '../navigation/go_router_helpers.dart';
 import '../widgets/news_cover_image.dart';
 
 class NewsDetailScreen extends StatelessWidget {
-  const NewsDetailScreen({
-    super.key,
-    required this.newsId,
-    this.initial,
-  });
+  const NewsDetailScreen({super.key, required this.newsId, this.initial});
 
   final String newsId;
   final NewsFirestoreModel? initial;
@@ -29,7 +25,8 @@ class NewsDetailScreen extends StatelessWidget {
       future: NewsEventsService().getNewsById(newsId),
       initialData: seed,
       builder: (context, snap) {
-        if (snap.connectionState == ConnectionState.waiting && snap.data == null) {
+        if (snap.connectionState == ConnectionState.waiting &&
+            snap.data == null) {
           return Scaffold(
             body: Center(child: CircularProgressIndicator(color: c.accentGold)),
           );
@@ -221,19 +218,13 @@ class _BackButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: colors.backgroundElevated.o(0.82),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: colors.borderDefault,
-            width: 0.5,
-          ),
+          border: Border.all(color: colors.borderDefault, width: 0.5),
         ),
         child: SvgPicture.string(
           _backSvg,
           width: 18,
           height: 18,
-          colorFilter: ColorFilter.mode(
-            colors.accentGold,
-            BlendMode.srcIn,
-          ),
+          colorFilter: ColorFilter.mode(colors.accentGold, BlendMode.srcIn),
         ),
       ),
     );

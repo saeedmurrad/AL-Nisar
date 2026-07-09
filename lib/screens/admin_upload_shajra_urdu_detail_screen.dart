@@ -1,15 +1,14 @@
-import 'dart:io';
-
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../models/shajra_entry_model.dart';
 import '../models/shajra_urdu_detail_model.dart';
+import '../models/upload_file_data.dart';
 import '../services/admin_shajra_urdu_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
 import '../theme/color_utils.dart';
+import '../utils/upload_picker.dart';
 import '../widgets/screen_navigation_header.dart';
 
 class AdminUploadShajraUrduDetailScreen extends StatefulWidget {
@@ -25,21 +24,16 @@ class AdminUploadShajraUrduDetailScreen extends StatefulWidget {
 class _AdminUploadShajraUrduDetailScreenState
     extends State<AdminUploadShajraUrduDetailScreen> {
   final _service = AdminShajraUrduService();
-  String? _pdfPath;
+  UploadFileData? _pdfFile;
   bool _saving = false;
   double? _progress;
 
   ShajraEntryModel get _entry => widget.args.entry;
 
   Future<void> _pickPdf() async {
-    final res = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: const ['pdf'],
-      withData: false,
-    );
-    final path = res?.files.single.path;
-    if (path == null || path.trim().isEmpty) return;
-    setState(() => _pdfPath = path);
+    final file = await pickUploadFile(allowedExtensions: const ['pdf']);
+    if (file == null) return;
+    setState(() => _pdfFile = file);
   }
 
   void _snack(String msg) {
@@ -52,16 +46,12 @@ class _AdminUploadShajraUrduDetailScreenState
   }
 
   Future<void> _upload() async {
-    final pdf = _pdfPath;
-    if (pdf == null || pdf.trim().isEmpty) {
+    final pdf = _pdfFile;
+    if (pdf == null) {
       _snack('Please select a PDF');
       return;
     }
-    if (!File(pdf).existsSync()) {
-      _snack('PDF file not found');
-      return;
-    }
-    final bytes = File(pdf).lengthSync();
+    final bytes = pdf.length;
     if (bytes > 50 * 1024 * 1024) {
       _snack('PDF is too large (max 50 MB)');
       return;
@@ -74,7 +64,7 @@ class _AdminUploadShajraUrduDetailScreenState
 
     try {
       final number = _entry.number;
-      final task = _service.uploadPdfTask(number: number, pdfPath: pdf);
+      final task = _service.uploadPdfTask(number: number, pdf: pdf);
       task.snapshotEvents.listen((snap) {
         final total = snap.totalBytes;
         final done = snap.bytesTransferred;
@@ -113,9 +103,7 @@ class _AdminUploadShajraUrduDetailScreenState
   @override
   Widget build(BuildContext context) {
     final c = context.c;
-    final pdfName = _pdfPath == null
-        ? 'No PDF selected'
-        : _pdfPath!.split(Platform.pathSeparator).last;
+    final pdfName = _pdfFile?.name ?? 'No PDF selected';
 
     return Scaffold(
       backgroundColor: c.backgroundPrimary,
@@ -204,7 +192,8 @@ class _AdminUploadShajraUrduDetailScreenState
                       onPressed: _saving ? null : _upload,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: c.accentGold,
-                        foregroundColor: Theme.of(context).brightness == Brightness.dark
+                        foregroundColor:
+                            Theme.of(context).brightness == Brightness.dark
                             ? c.backgroundPrimary
                             : c.textPrimary,
                         padding: const EdgeInsets.symmetric(vertical: 14),
@@ -219,7 +208,9 @@ class _AdminUploadShajraUrduDetailScreenState
                               width: 18,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                color: Theme.of(context).brightness == Brightness.dark
+                                color:
+                                    Theme.of(context).brightness ==
+                                        Brightness.dark
                                     ? c.backgroundPrimary
                                     : c.textPrimary,
                               ),
@@ -295,4 +286,3 @@ class _PickerRow extends StatelessWidget {
     );
   }
 }
-

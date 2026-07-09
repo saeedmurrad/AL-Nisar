@@ -39,10 +39,7 @@ class LockedSabaqCard extends StatelessWidget {
                   _lockSvg,
                   width: 22,
                   height: 22,
-                  colorFilter: ColorFilter.mode(
-                    c.accentGold,
-                    BlendMode.srcIn,
-                  ),
+                  colorFilter: ColorFilter.mode(c.accentGold, BlendMode.srcIn),
                 ),
               ),
             ),
@@ -71,10 +68,7 @@ class LockedSabaqCard extends StatelessWidget {
                   const SizedBox(height: 10),
                   Text(
                     '$pageCount pages • Locked',
-                    style: TextStyle(
-                      color: c.textFaint,
-                      fontSize: 11,
-                    ),
+                    style: TextStyle(color: c.textFaint, fontSize: 11),
                   ),
                 ],
               ),
@@ -88,4 +82,3 @@ class LockedSabaqCard extends StatelessWidget {
 
 const _lockSvg =
     '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7.5 11V8.7A4.5 4.5 0 0 1 12 4.2a4.5 4.5 0 0 1 4.5 4.5V11" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M7 11h10a1.5 1.5 0 0 1 1.5 1.5v6A1.5 1.5 0 0 1 17 20H7a1.5 1.5 0 0 1-1.5-1.5v-6A1.5 1.5 0 0 1 7 11z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>';
-

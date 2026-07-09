@@ -24,7 +24,9 @@ class SabaqPdfModel {
   final bool isActive;
   final int? orderNumber;
 
-  factory SabaqPdfModel.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
+  factory SabaqPdfModel.fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> doc,
+  ) {
     final data = doc.data() ?? {};
     DateTime uploadedAt = DateTime.now();
     final ts = data['uploadedAt'];
@@ -42,12 +44,12 @@ class SabaqPdfModel {
   }
 
   Map<String, dynamic> toMap() => {
-        'titleEn': titleEn,
-        'titleUr': titleUr,
-        'storagePath': storagePath,
-        'thumbnailUrl': thumbnailUrl,
-        'uploadedAt': Timestamp.fromDate(uploadedAt),
-        'isActive': isActive,
-        if (orderNumber != null) 'orderNumber': orderNumber,
-      };
+    'titleEn': titleEn,
+    'titleUr': titleUr,
+    'storagePath': storagePath,
+    'thumbnailUrl': thumbnailUrl,
+    'uploadedAt': Timestamp.fromDate(uploadedAt),
+    'isActive': isActive,
+    if (orderNumber != null) 'orderNumber': orderNumber,
+  };
 }

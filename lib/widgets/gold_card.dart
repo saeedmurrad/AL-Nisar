@@ -28,10 +28,7 @@ class GoldCard extends StatelessWidget {
     final c = context.c;
     final surface = backgroundColor ?? c.backgroundSurface;
 
-    Widget content = Padding(
-      padding: padding,
-      child: child,
-    );
+    Widget content = Padding(padding: padding, child: child);
 
     if (showWatermark) {
       content = Stack(
@@ -60,10 +57,7 @@ class GoldCard extends StatelessWidget {
       clipBehavior: clipChild ? Clip.antiAlias : Clip.none,
       decoration: BoxDecoration(
         borderRadius: AppLayout.cardRadius,
-        border: Border.all(
-          color: c.accentGold.o(0.22),
-          width: 0.6,
-        ),
+        border: Border.all(color: c.accentGold.o(0.22), width: 0.6),
         gradient: showHighlight
             ? LinearGradient(
                 begin: Alignment.topCenter,

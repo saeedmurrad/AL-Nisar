@@ -119,7 +119,8 @@ class DummyData {
     IrshadModel(
       dateLabel: '13 Apr 2026',
       urdu: 'جو اپنے رب کو یاد رکھتا ہے، وہ خود کو کھو کر پا لیتا ہے۔',
-      english: 'Who remembers their Lord finds themselves by being lost in Him.',
+      english:
+          'Who remembers their Lord finds themselves by being lost in Him.',
     ),
     IrshadModel(
       dateLabel: '12 Apr 2026',
@@ -131,8 +132,14 @@ class DummyData {
   static const shijraLine = <MurshadModel>[
     MurshadModel(name: 'Hazrat Abdul Qadir Jilani (RA)', dates: '470–561 AH'),
     MurshadModel(name: 'Hazrat Sultan Bahoo (RA)', dates: '1039–1102 AH'),
-    MurshadModel(name: 'Hazrat Khawaja Ghulam Farid (RA)', dates: '1261–1319 AH'),
-    MurshadModel(name: 'Hazrat Khawaja Saeen Sufi Nisar Ahmad Khaliquei', dates: 'Contemporary'),
+    MurshadModel(
+      name: 'Hazrat Khawaja Ghulam Farid (RA)',
+      dates: '1261–1319 AH',
+    ),
+    MurshadModel(
+      name: 'Hazrat Khawaja Saeen Sufi Nisar Ahmad Khaliquei',
+      dates: 'Contemporary',
+    ),
   ];
 
   static const memberName = 'Umair';
@@ -230,4 +237,3 @@ class DummyData {
     ),
   ];
 }
-

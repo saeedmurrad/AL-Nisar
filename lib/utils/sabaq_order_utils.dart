@@ -43,7 +43,9 @@ int? parseSabaqOrderNumber(String titleEn, {String? titleUr}) {
 }
 
 int sabaqOrderFor(SabaqPdfModel model) =>
-    model.orderNumber ?? parseSabaqOrderNumber(model.titleEn, titleUr: model.titleUr) ?? 1 << 30;
+    model.orderNumber ??
+    parseSabaqOrderNumber(model.titleEn, titleUr: model.titleUr) ??
+    1 << 30;
 
 /// Keeps the newest upload when the same lesson number (or title) appears twice.
 List<SabaqPdfModel> dedupeSabaqList(List<SabaqPdfModel> list) {
@@ -51,7 +53,9 @@ List<SabaqPdfModel> dedupeSabaqList(List<SabaqPdfModel> list) {
   final byTitle = <String, SabaqPdfModel>{};
 
   for (final item in list) {
-    final order = item.orderNumber ?? parseSabaqOrderNumber(item.titleEn, titleUr: item.titleUr);
+    final order =
+        item.orderNumber ??
+        parseSabaqOrderNumber(item.titleEn, titleUr: item.titleUr);
     if (order != null) {
       final existing = byOrder[order];
       if (existing == null || item.uploadedAt.isAfter(existing.uploadedAt)) {
@@ -78,4 +82,41 @@ List<SabaqPdfModel> dedupeSabaqList(List<SabaqPdfModel> list) {
     return a.id.compareTo(b.id);
   });
   return out;
+}
+
+/// Whether the member may open [sabaqId] without an access grant.
+///
+/// The first lesson in [ordered] is always free for signed-in members.
+bool isFreeSabaqId(List<SabaqPdfModel> ordered, String sabaqId) {
+  if (ordered.isEmpty) return false;
+  return ordered.first.id == sabaqId;
+}
+
+/// True when the member already has this lesson (free first, or granted).
+bool memberHasSabaqAccess({
+  required List<SabaqPdfModel> ordered,
+  required Set<String> grantedIds,
+  required String sabaqId,
+}) {
+  if (isFreeSabaqId(ordered, sabaqId)) return true;
+  return grantedIds.contains(sabaqId);
+}
+
+/// The only Sabaq a member may request next (sequential unlock).
+///
+/// Returns null when every lesson is already unlocked.
+String? nextRequestableSabaqId({
+  required List<SabaqPdfModel> ordered,
+  required Set<String> grantedIds,
+}) {
+  for (final s in ordered) {
+    if (!memberHasSabaqAccess(
+      ordered: ordered,
+      grantedIds: grantedIds,
+      sabaqId: s.id,
+    )) {
+      return s.id;
+    }
+  }
+  return null;
 }

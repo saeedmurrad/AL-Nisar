@@ -9,11 +9,7 @@ import '../navigation/go_router_helpers.dart';
 import '../theme/app_theme_colors.dart';
 
 class EventDetailScreen extends StatelessWidget {
-  const EventDetailScreen({
-    super.key,
-    required this.eventId,
-    this.initial,
-  });
+  const EventDetailScreen({super.key, required this.eventId, this.initial});
 
   final String eventId;
   final EventFirestoreModel? initial;
@@ -30,7 +26,8 @@ class EventDetailScreen extends StatelessWidget {
       future: NewsEventsService().getEventById(eventId),
       initialData: seed,
       builder: (context, snap) {
-        if (snap.connectionState == ConnectionState.waiting && snap.data == null) {
+        if (snap.connectionState == ConnectionState.waiting &&
+            snap.data == null) {
           return Scaffold(
             body: Center(child: CircularProgressIndicator(color: c.accentGold)),
           );
@@ -212,19 +209,13 @@ class _BackButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: colors.backgroundElevated,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: colors.borderDefault,
-            width: 0.5,
-          ),
+          border: Border.all(color: colors.borderDefault, width: 0.5),
         ),
         child: SvgPicture.string(
           _backSvg,
           width: 18,
           height: 18,
-          colorFilter: ColorFilter.mode(
-            colors.accentGold,
-            BlendMode.srcIn,
-          ),
+          colorFilter: ColorFilter.mode(colors.accentGold, BlendMode.srcIn),
         ),
       ),
     );
@@ -259,10 +250,7 @@ class _InfoRow extends StatelessWidget {
           Expanded(
             child: Text(
               value,
-              style: AppTheme.lato(
-                fontSize: 14,
-                color: c.textSecondary,
-              ),
+              style: AppTheme.lato(fontSize: 14, color: c.textSecondary),
             ),
           ),
         ],

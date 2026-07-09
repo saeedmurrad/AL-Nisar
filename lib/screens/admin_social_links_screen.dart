@@ -107,7 +107,11 @@ class _AdminSocialLinksScreenState extends State<AdminSocialLinksScreen> {
                     children: [
                       Text(
                         'Home screen buttons for Facebook and YouTube. Turn on Go Live when streaming on Facebook.',
-                        style: AppTheme.lato(fontSize: 13, color: c.textMuted, height: 1.5),
+                        style: AppTheme.lato(
+                          fontSize: 13,
+                          color: c.textMuted,
+                          height: 1.5,
+                        ),
                       ),
                       const SizedBox(height: 16),
                       GoldCard(
@@ -124,7 +128,8 @@ class _AdminSocialLinksScreenState extends State<AdminSocialLinksScreen> {
                             _Field(
                               label: 'YouTube Channel URL',
                               controller: _youtubeChannel,
-                              hint: 'https://www.youtube.com/@sufinisarahmad159',
+                              hint:
+                                  'https://www.youtube.com/@sufinisarahmad159',
                             ),
                             const SizedBox(height: 14),
                             _Field(
@@ -145,11 +150,15 @@ class _AdminSocialLinksScreenState extends State<AdminSocialLinksScreen> {
                               ),
                               subtitle: Text(
                                 'Shows “Watch Live on Facebook” on Home',
-                                style: AppTheme.lato(fontSize: 12, color: c.textMuted),
+                                style: AppTheme.lato(
+                                  fontSize: 12,
+                                  color: c.textMuted,
+                                ),
                               ),
                               value: _isFacebookLive,
                               activeThumbColor: c.accentGold,
-                              onChanged: (v) => setState(() => _isFacebookLive = v),
+                              onChanged: (v) =>
+                                  setState(() => _isFacebookLive = v),
                             ),
                           ],
                         ),
@@ -238,7 +247,10 @@ class _Field extends StatelessWidget {
               borderRadius: BorderRadius.circular(10),
               borderSide: BorderSide(color: c.accentGold.o(0.7), width: 1),
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 12,
+            ),
           ),
         ),
       ],

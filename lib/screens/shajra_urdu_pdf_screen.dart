@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import '../navigation/go_router_helpers.dart';
@@ -25,7 +25,7 @@ class _ShajraUrduPdfScreenState extends State<ShajraUrduPdfScreen> {
   final _cache = PdfCacheService();
   final _pdf = PdfViewerController();
 
-  File? _file;
+  Uint8List? _pdfBytes;
   bool _loading = true;
   bool _failed = false;
   double? _progress;
@@ -43,14 +43,14 @@ class _ShajraUrduPdfScreenState extends State<ShajraUrduPdfScreen> {
       _loading = true;
       _failed = false;
       _progress = null;
-      _file = null;
+      _pdfBytes = null;
     });
 
-    final cached = await _cache.getCachedPdf(_cacheId);
+    final cached = await _cache.getCachedPdfBytes(_cacheId);
     if (!mounted) return;
     if (cached != null) {
       setState(() {
-        _file = cached;
+        _pdfBytes = cached;
         _loading = false;
       });
       return;
@@ -59,16 +59,12 @@ class _ShajraUrduPdfScreenState extends State<ShajraUrduPdfScreen> {
     try {
       setState(() => _progress = 0);
       final url = await _books.getBookDownloadUrl(widget.args.storagePath);
-      final f = await _cache.downloadAndCachePdf(
-        _cacheId,
-        url,
-        (p) {
-          if (mounted) setState(() => _progress = p);
-        },
-      );
+      final f = await _cache.downloadAndCachePdf(_cacheId, url, (p) {
+        if (mounted) setState(() => _progress = p);
+      });
       if (!mounted) return;
       setState(() {
-        _file = f;
+        _pdfBytes = f;
         _loading = false;
         _failed = false;
         _progress = null;
@@ -95,17 +91,27 @@ class _ShajraUrduPdfScreenState extends State<ShajraUrduPdfScreen> {
               padding: const EdgeInsets.fromLTRB(8, 6, 12, 10),
               decoration: BoxDecoration(
                 color: c.backgroundSurface,
-                border: Border(bottom: BorderSide(color: c.borderDefault.o(0.55))),
+                border: Border(
+                  bottom: BorderSide(color: c.borderDefault.o(0.55)),
+                ),
               ),
               child: Row(
                 children: [
                   IconButton(
                     onPressed: () => popOrGoHome(context),
-                    icon: Icon(Icons.arrow_back_ios_new_rounded, color: c.accentGold, size: 20),
+                    icon: Icon(
+                      Icons.arrow_back_ios_new_rounded,
+                      color: c.accentGold,
+                      size: 20,
+                    ),
                   ),
                   IconButton(
                     onPressed: () => goAppHome(context),
-                    icon: Icon(Icons.home_outlined, color: c.accentGold, size: 22),
+                    icon: Icon(
+                      Icons.home_outlined,
+                      color: c.accentGold,
+                      size: 22,
+                    ),
                   ),
                   Expanded(
                     child: Directionality(
@@ -131,7 +137,9 @@ class _ShajraUrduPdfScreenState extends State<ShajraUrduPdfScreen> {
                       child: _progress == null
                           ? CircularProgressIndicator(color: c.accentGold)
                           : Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 28),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 28,
+                              ),
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
@@ -153,48 +161,48 @@ class _ShajraUrduPdfScreenState extends State<ShajraUrduPdfScreen> {
                               ),
                             ),
                     )
-                  : _failed || _file == null
-                      ? Center(
-                          child: Padding(
-                            padding: const EdgeInsets.all(24),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  'Could not load PDF',
-                                  style: AppTheme.cormorantGaramond(
-                                    fontSize: 18,
-                                    color: c.textPrimary,
-                                  ),
-                                ),
-                                const SizedBox(height: 10),
-                                OutlinedButton(
-                                  onPressed: _load,
-                                  style: OutlinedButton.styleFrom(
-                                    foregroundColor: c.accentGold,
-                                    side: BorderSide(color: c.accentGold),
-                                  ),
-                                  child: Text('Try Again', style: AppTheme.lato()),
-                                ),
-                              ],
+                  : _failed || _pdfBytes == null
+                  ? Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'Could not load PDF',
+                              style: AppTheme.cormorantGaramond(
+                                fontSize: 18,
+                                color: c.textPrimary,
+                              ),
                             ),
-                          ),
-                        )
-                      : SfPdfViewerTheme(
-                          data: SfPdfViewerThemeData(
-                            backgroundColor: c.backgroundPrimary,
-                            progressBarColor: c.accentGold,
-                          ),
-                          child: SfPdfViewer.file(
-                            _file!,
-                            controller: _pdf,
-                            scrollDirection: PdfScrollDirection.horizontal,
-                            pageLayoutMode: PdfPageLayoutMode.single,
-                            enableTextSelection: true,
-                            canShowScrollHead: true,
-                            canShowScrollStatus: true,
-                          ),
+                            const SizedBox(height: 10),
+                            OutlinedButton(
+                              onPressed: _load,
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: c.accentGold,
+                                side: BorderSide(color: c.accentGold),
+                              ),
+                              child: Text('Try Again', style: AppTheme.lato()),
+                            ),
+                          ],
                         ),
+                      ),
+                    )
+                  : SfPdfViewerTheme(
+                      data: SfPdfViewerThemeData(
+                        backgroundColor: c.backgroundPrimary,
+                        progressBarColor: c.accentGold,
+                      ),
+                      child: SfPdfViewer.memory(
+                        _pdfBytes!,
+                        controller: _pdf,
+                        scrollDirection: PdfScrollDirection.horizontal,
+                        pageLayoutMode: PdfPageLayoutMode.single,
+                        enableTextSelection: true,
+                        canShowScrollHead: true,
+                        canShowScrollStatus: true,
+                      ),
+                    ),
             ),
           ],
         ),
@@ -202,4 +210,3 @@ class _ShajraUrduPdfScreenState extends State<ShajraUrduPdfScreen> {
     );
   }
 }
-

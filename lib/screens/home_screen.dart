@@ -26,7 +26,7 @@ class HomeScreen extends StatelessWidget {
         ? auth.profile!.displayName
         : (auth.user?.displayName ?? 'Member');
     return Scaffold(
-      drawer: const AppDrawer(),
+      drawer: ResponsiveLayout.isExpanded(context) ? null : const AppDrawer(),
       body: Column(
         children: [
           _Header(
@@ -63,10 +63,7 @@ class HomeScreen extends StatelessWidget {
 }
 
 class _Header extends StatelessWidget {
-  const _Header({
-    required this.memberName,
-    required this.onBellTap,
-  });
+  const _Header({required this.memberName, required this.onBellTap});
 
   final String memberName;
   final VoidCallback onBellTap;
@@ -78,12 +75,11 @@ class _Header extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 18, 16, 14),
       child: Row(
         children: [
-          const DrawerMenuButton(),
-          const SizedBox(width: 10),
-          const MurshidAvatar(
-            diameter: 40,
-            goldRingWidth: 1.5,
-          ),
+          if (!ResponsiveLayout.isExpanded(context)) ...const [
+            DrawerMenuButton(),
+            SizedBox(width: 10),
+          ],
+          const MurshidAvatar(diameter: 40, goldRingWidth: 1.5),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -110,9 +106,7 @@ class _Header extends StatelessWidget {
               ],
             ),
           ),
-          NotificationBellButton(
-            onTap: onBellTap,
-          ),
+          NotificationBellButton(onTap: onBellTap),
         ],
       ),
     );
@@ -148,7 +142,7 @@ class _HomeGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.c;
     return GridView.count(
-      crossAxisCount: 2,
+      crossAxisCount: ResponsiveLayout.gridColumns(context),
       shrinkWrap: true,
       mainAxisSpacing: 12,
       crossAxisSpacing: 12,
@@ -262,10 +256,7 @@ class _HomeGridCard extends StatelessWidget {
               sublabel,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: AppTheme.lato(
-                color: c.textMuted,
-                fontSize: 11,
-              ),
+              style: AppTheme.lato(color: c.textMuted, fontSize: 11),
             ),
           ],
         ),
@@ -273,4 +264,3 @@ class _HomeGridCard extends StatelessWidget {
     );
   }
 }
-

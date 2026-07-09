@@ -5,12 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 
 /// Result of the app-wide Android / system back policy.
-enum SystemBackResult {
-  didPop,
-  navigatedHome,
-  exitedApp,
-  needsHomeDoubleBack,
-}
+enum SystemBackResult { didPop, navigatedHome, exitedApp, needsHomeDoubleBack }
 
 /// Matches [popOrGoHome] but is async and tries [GoRouterDelegate.popRoute] first
 /// so nested navigators behave like the visible Back button.

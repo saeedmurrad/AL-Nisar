@@ -20,4 +20,3 @@ class ShajraPdfRegistry {
     return 'assets/pdfs/shajra/urdu/$n.pdf';
   }
 }
-

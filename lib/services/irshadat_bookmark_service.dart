@@ -9,8 +9,8 @@ import '../models/irshad_firestore_model.dart';
 
 class IrshadatBookmarkService {
   IrshadatBookmarkService({FirebaseAuth? auth, FirebaseFirestore? firestore})
-      : _auth = auth ?? FirebaseAuth.instance,
-        _firestore = firestore ?? FirebaseFirestore.instance;
+    : _auth = auth ?? FirebaseAuth.instance,
+      _firestore = firestore ?? FirebaseFirestore.instance;
 
   final FirebaseAuth _auth;
   final FirebaseFirestore _firestore;
@@ -23,7 +23,10 @@ class IrshadatBookmarkService {
   CollectionReference<Map<String, dynamic>>? get _userRef {
     final uid = _auth.currentUser?.uid;
     if (uid == null || uid.isEmpty) return null;
-    return _firestore.collection('users').doc(uid).collection('irshadat_bookmarks');
+    return _firestore
+        .collection('users')
+        .doc(uid)
+        .collection('irshadat_bookmarks');
   }
 
   String _idKey(IrshadatLanguage language, String irshadId) =>
@@ -123,8 +126,9 @@ class IrshadatBookmarkService {
   Future<({int total, int urdu, int english})> getStats() async {
     final all = await getAllBookmarks();
     final urdu = all.where((e) => e.language == IrshadatLanguage.urdu).length;
-    final english = all.where((e) => e.language == IrshadatLanguage.english).length;
+    final english = all
+        .where((e) => e.language == IrshadatLanguage.english)
+        .length;
     return (total: all.length, urdu: urdu, english: english);
   }
 }
-

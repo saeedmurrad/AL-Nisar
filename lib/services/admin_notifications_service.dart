@@ -4,7 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 /// In-app notifications for Super Admin (e.g. new Sabaq access requests).
 class AdminNotificationsService {
   AdminNotificationsService({FirebaseFirestore? firestore})
-      : _firestore = firestore ?? FirebaseFirestore.instance;
+    : _firestore = firestore ?? FirebaseFirestore.instance;
 
   final FirebaseFirestore _firestore;
 
@@ -55,15 +55,13 @@ class AdminNotificationsService {
   Stream<List<AdminNotificationDoc>> streamRecent({int limit = 40}) {
     if (!_ready) return Stream.value(const []);
     // Equality filter only — no composite index required; sort client-side.
-    return _col
-        .where('read', isEqualTo: false)
-        .limit(limit)
-        .snapshots()
-        .map((snap) {
-          final list = snap.docs.map(AdminNotificationDoc.fromFirestore).toList();
-          list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-          return list;
-        });
+    return _col.where('read', isEqualTo: false).limit(limit).snapshots().map((
+      snap,
+    ) {
+      final list = snap.docs.map(AdminNotificationDoc.fromFirestore).toList();
+      list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      return list;
+    });
   }
 
   /// Removes admin alerts for Sabaq requests that are no longer pending.
@@ -75,8 +73,8 @@ class AdminNotificationsService {
       if (data['type'] != 'sabaq_request') continue;
       final requestId =
           (data['requestId'] as String?)?.trim().isNotEmpty == true
-              ? data['requestId'] as String
-              : doc.id;
+          ? data['requestId'] as String
+          : doc.id;
       final req = await _firestore
           .collection('sabaq_access_requests')
           .doc(requestId)

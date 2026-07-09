@@ -41,6 +41,7 @@ import '../screens/super_admin_panel_screen.dart';
 import '../screens/super_admin_users_screen.dart';
 import '../screens/admin_social_links_screen.dart';
 import '../screens/admin_sabaq_requests_screen.dart';
+import '../widgets/responsive_shell.dart';
 
 GoRouter createAppRouter(AuthProvider auth) {
   return GoRouter(
@@ -83,14 +84,8 @@ GoRouter createAppRouter(AuthProvider auth) {
       return null;
     },
     routes: [
-      GoRoute(
-        path: '/',
-        builder: (context, state) => const SplashScreen(),
-      ),
-      GoRoute(
-        path: '/login',
-        builder: (context, state) => const LoginScreen(),
-      ),
+      GoRoute(path: '/', builder: (context, state) => const SplashScreen()),
+      GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
       GoRoute(
         path: '/signup',
         builder: (context, state) => const SignupScreen(),
@@ -99,194 +94,196 @@ GoRouter createAppRouter(AuthProvider auth) {
         path: '/forgot-password',
         builder: (context, state) => const ForgotPasswordScreen(),
       ),
-      GoRoute(
-        path: '/home',
-        builder: (context, state) => const HomeScreen(),
-      ),
-      GoRoute(
-        path: '/notifications',
-        builder: (context, state) => const NotificationsScreen(),
-      ),
-      GoRoute(
-        path: '/sabaq',
-        builder: (context, state) => const SabaqListScreen(),
-      ),
-      GoRoute(
-        path: '/irshadat',
-        builder: (context, state) => const IrshadatScreen(),
-      ),
-      GoRoute(
-        path: '/shijra',
-        builder: (context, state) => const ShijraScreen(),
-      ),
-      GoRoute(
-        path: '/shajra',
-        builder: (context, state) => const ShijraScreen(),
+      ShellRoute(
+        builder: (context, state, child) => ResponsiveShell(child: child),
         routes: [
           GoRoute(
-            path: 'detail',
-            builder: (context, state) {
-              final extra = state.extra;
-              if (extra is! ShajraDetailRouteArgs) {
-                return const _ShajraDetailMissing();
-              }
-              return ShajraDetailScreen(args: extra);
-            },
+            path: '/home',
+            builder: (context, state) => const HomeScreen(),
           ),
           GoRoute(
-            path: 'pdf',
-            builder: (context, state) {
-              final extra = state.extra;
-              if (extra is! ShajraPdfRouteArgs) {
-                return const _ShajraDetailMissing();
-              }
-              return ShajraPdfScreen(args: extra);
-            },
+            path: '/notifications',
+            builder: (context, state) => const NotificationsScreen(),
           ),
           GoRoute(
-            path: 'urdu-pdf',
-            builder: (context, state) {
-              final extra = state.extra;
-              if (extra is! ShajraUrduPdfArgs) {
-                return const _ShajraDetailMissing();
-              }
-              return ShajraUrduPdfScreen(args: extra);
-            },
-          ),
-        ],
-      ),
-      GoRoute(
-        path: '/gallery',
-        builder: (context, state) => const GalleryScreen(),
-      ),
-      GoRoute(
-        path: '/asbaq',
-        builder: (context, state) => const AsbaqScreen(),
-      ),
-      GoRoute(
-        path: '/books',
-        builder: (context, state) => const BooksScreen(),
-        routes: [
-          GoRoute(
-            path: 'detail',
-            builder: (context, state) {
-              final book = state.extra as BookModel?;
-              final id = state.uri.queryParameters['id'] ?? book?.id;
-              return BookDetailScreen(
-                initialBook: book,
-                bookId: id,
-              );
-            },
+            path: '/sabaq',
+            builder: (context, state) => const SabaqListScreen(),
           ),
           GoRoute(
-            path: 'reader',
-            builder: (context, state) {
-              final args = state.extra as BookReaderArgs?;
-              if (args == null) {
-                return const _MissingBookPlaceholder();
-              }
-              return BookReaderScreen(args: args);
-            },
-          ),
-        ],
-      ),
-      GoRoute(
-        path: '/bookmarks',
-        builder: (context, state) => const BookmarksScreen(),
-        routes: [
-          GoRoute(
-            path: 'irshadat',
-            builder: (context, state) => const IrshadatBookmarksScreen(),
-          ),
-        ],
-      ),
-      GoRoute(
-        path: '/news-events',
-        builder: (context, state) => const NewsEventsScreen(),
-        routes: [
-          GoRoute(
-            path: 'news-detail',
-            builder: (context, state) {
-              final extra = state.extra;
-              final id = extra is NewsFirestoreModel
-                  ? extra.id
-                  : (state.uri.queryParameters['id'] ?? 'n1');
-              return NewsDetailScreen(
-                newsId: id,
-                initial: extra is NewsFirestoreModel ? extra : null,
-              );
-            },
+            path: '/irshadat',
+            builder: (context, state) => const IrshadatScreen(),
           ),
           GoRoute(
-            path: 'event-detail',
-            builder: (context, state) {
-              final extra = state.extra;
-              final id = extra is EventFirestoreModel
-                  ? extra.id
-                  : (state.uri.queryParameters['id'] ?? 'e1');
-              return EventDetailScreen(
-                eventId: id,
-                initial: extra is EventFirestoreModel ? extra : null,
-              );
-            },
+            path: '/shijra',
+            builder: (context, state) => const ShijraScreen(),
           ),
-        ],
-      ),
-      GoRoute(
-        path: '/profile',
-        builder: (context, state) => const ProfileScreen(),
-      ),
-      GoRoute(
-        path: '/admin',
-        builder: (context, state) => const AdminPanelScreen(),
-      ),
-      GoRoute(
-        path: '/admin/books',
-        builder: (context, state) => const AdminUploadBookScreen(),
-      ),
-      GoRoute(
-        path: '/admin/gallery',
-        builder: (context, state) => const AdminUploadGalleryImagesScreen(),
-      ),
-      GoRoute(
-        path: '/admin/news-events',
-        builder: (context, state) => const AdminNewsEventsScreen(),
-      ),
-      GoRoute(
-        path: '/admin/shajra-urdu',
-        builder: (context, state) => const AdminShajraUrduDetailsScreen(),
-        routes: [
           GoRoute(
-            path: 'upload',
-            builder: (context, state) {
-              final extra = state.extra;
-              if (extra is! AdminShajraUrduUploadArgs) {
-                return const _ShajraDetailMissing();
-              }
-              return AdminUploadShajraUrduDetailScreen(args: extra);
-            },
+            path: '/shajra',
+            builder: (context, state) => const ShijraScreen(),
+            routes: [
+              GoRoute(
+                path: 'detail',
+                builder: (context, state) {
+                  final extra = state.extra;
+                  if (extra is! ShajraDetailRouteArgs) {
+                    return const _ShajraDetailMissing();
+                  }
+                  return ShajraDetailScreen(args: extra);
+                },
+              ),
+              GoRoute(
+                path: 'pdf',
+                builder: (context, state) {
+                  final extra = state.extra;
+                  if (extra is! ShajraPdfRouteArgs) {
+                    return const _ShajraDetailMissing();
+                  }
+                  return ShajraPdfScreen(args: extra);
+                },
+              ),
+              GoRoute(
+                path: 'urdu-pdf',
+                builder: (context, state) {
+                  final extra = state.extra;
+                  if (extra is! ShajraUrduPdfArgs) {
+                    return const _ShajraDetailMissing();
+                  }
+                  return ShajraUrduPdfScreen(args: extra);
+                },
+              ),
+            ],
           ),
-        ],
-      ),
-      GoRoute(
-        path: '/admin/irshadat',
-        builder: (context, state) => const AdminIrshadatScreen(),
-      ),
-      GoRoute(
-        path: '/admin/sabaq-requests',
-        builder: (context, state) => const AdminSabaqRequestsScreen(),
-      ),
-      GoRoute(
-        path: '/admin/social-links',
-        builder: (context, state) => const AdminSocialLinksScreen(),
-      ),
-      GoRoute(
-        path: '/super-admin',
-        builder: (context, state) => const SuperAdminPanelScreen(),
-        routes: [
           GoRoute(
-            path: 'users',
-            builder: (context, state) => const SuperAdminUsersScreen(),
+            path: '/gallery',
+            builder: (context, state) => const GalleryScreen(),
+          ),
+          GoRoute(
+            path: '/asbaq',
+            builder: (context, state) => const AsbaqScreen(),
+          ),
+          GoRoute(
+            path: '/books',
+            builder: (context, state) => const BooksScreen(),
+            routes: [
+              GoRoute(
+                path: 'detail',
+                builder: (context, state) {
+                  final book = state.extra as BookModel?;
+                  final id = state.uri.queryParameters['id'] ?? book?.id;
+                  return BookDetailScreen(initialBook: book, bookId: id);
+                },
+              ),
+              GoRoute(
+                path: 'reader',
+                builder: (context, state) {
+                  final args = state.extra as BookReaderArgs?;
+                  if (args == null) {
+                    return const _MissingBookPlaceholder();
+                  }
+                  return BookReaderScreen(args: args);
+                },
+              ),
+            ],
+          ),
+          GoRoute(
+            path: '/bookmarks',
+            builder: (context, state) => const BookmarksScreen(),
+            routes: [
+              GoRoute(
+                path: 'irshadat',
+                builder: (context, state) => const IrshadatBookmarksScreen(),
+              ),
+            ],
+          ),
+          GoRoute(
+            path: '/news-events',
+            builder: (context, state) => const NewsEventsScreen(),
+            routes: [
+              GoRoute(
+                path: 'news-detail',
+                builder: (context, state) {
+                  final extra = state.extra;
+                  final id = extra is NewsFirestoreModel
+                      ? extra.id
+                      : (state.uri.queryParameters['id'] ?? 'n1');
+                  return NewsDetailScreen(
+                    newsId: id,
+                    initial: extra is NewsFirestoreModel ? extra : null,
+                  );
+                },
+              ),
+              GoRoute(
+                path: 'event-detail',
+                builder: (context, state) {
+                  final extra = state.extra;
+                  final id = extra is EventFirestoreModel
+                      ? extra.id
+                      : (state.uri.queryParameters['id'] ?? 'e1');
+                  return EventDetailScreen(
+                    eventId: id,
+                    initial: extra is EventFirestoreModel ? extra : null,
+                  );
+                },
+              ),
+            ],
+          ),
+          GoRoute(
+            path: '/profile',
+            builder: (context, state) => const ProfileScreen(),
+          ),
+          GoRoute(
+            path: '/admin',
+            builder: (context, state) => const AdminPanelScreen(),
+          ),
+          GoRoute(
+            path: '/admin/books',
+            builder: (context, state) => const AdminUploadBookScreen(),
+          ),
+          GoRoute(
+            path: '/admin/gallery',
+            builder: (context, state) => const AdminUploadGalleryImagesScreen(),
+          ),
+          GoRoute(
+            path: '/admin/news-events',
+            builder: (context, state) => const AdminNewsEventsScreen(),
+          ),
+          GoRoute(
+            path: '/admin/shajra-urdu',
+            builder: (context, state) => const AdminShajraUrduDetailsScreen(),
+            routes: [
+              GoRoute(
+                path: 'upload',
+                builder: (context, state) {
+                  final extra = state.extra;
+                  if (extra is! AdminShajraUrduUploadArgs) {
+                    return const _ShajraDetailMissing();
+                  }
+                  return AdminUploadShajraUrduDetailScreen(args: extra);
+                },
+              ),
+            ],
+          ),
+          GoRoute(
+            path: '/admin/irshadat',
+            builder: (context, state) => const AdminIrshadatScreen(),
+          ),
+          GoRoute(
+            path: '/admin/sabaq-requests',
+            builder: (context, state) => const AdminSabaqRequestsScreen(),
+          ),
+          GoRoute(
+            path: '/admin/social-links',
+            builder: (context, state) => const AdminSocialLinksScreen(),
+          ),
+          GoRoute(
+            path: '/super-admin',
+            builder: (context, state) => const SuperAdminPanelScreen(),
+            routes: [
+              GoRoute(
+                path: 'users',
+                builder: (context, state) => const SuperAdminUsersScreen(),
+              ),
+            ],
           ),
         ],
       ),
@@ -344,4 +341,3 @@ class _MissingBookPlaceholder extends StatelessWidget {
     );
   }
 }
-

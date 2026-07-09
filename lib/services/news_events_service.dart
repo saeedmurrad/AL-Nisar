@@ -6,7 +6,7 @@ import '../models/news_firestore_model.dart';
 
 class NewsEventsService {
   NewsEventsService({FirebaseFirestore? firestore})
-      : _firestore = firestore ?? FirebaseFirestore.instance;
+    : _firestore = firestore ?? FirebaseFirestore.instance;
 
   final FirebaseFirestore _firestore;
 
@@ -14,26 +14,34 @@ class NewsEventsService {
 
   Stream<List<NewsFirestoreModel>> streamNews() {
     if (!isFirebaseReady) return Stream.value(const []);
-    return _firestore.collection('news').snapshots().map((snap) {
-      final list = snap.docs
-          .map((d) => NewsFirestoreModel.fromFirestore(d))
-          .where((d) => d.isActive)
-          .toList();
-      list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-      return list;
-    }).handleError((_) => <NewsFirestoreModel>[]);
+    return _firestore
+        .collection('news')
+        .snapshots()
+        .map((snap) {
+          final list = snap.docs
+              .map((d) => NewsFirestoreModel.fromFirestore(d))
+              .where((d) => d.isActive)
+              .toList();
+          list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+          return list;
+        })
+        .handleError((_) => <NewsFirestoreModel>[]);
   }
 
   Stream<List<EventFirestoreModel>> streamEvents() {
     if (!isFirebaseReady) return Stream.value(const []);
-    return _firestore.collection('events').snapshots().map((snap) {
-      final list = snap.docs
-          .map((d) => EventFirestoreModel.fromFirestore(d))
-          .where((d) => d.isActive)
-          .toList();
-      list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-      return list;
-    }).handleError((_) => <EventFirestoreModel>[]);
+    return _firestore
+        .collection('events')
+        .snapshots()
+        .map((snap) {
+          final list = snap.docs
+              .map((d) => EventFirestoreModel.fromFirestore(d))
+              .where((d) => d.isActive)
+              .toList();
+          list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+          return list;
+        })
+        .handleError((_) => <EventFirestoreModel>[]);
   }
 
   Future<NewsFirestoreModel?> getNewsById(String id) async {
@@ -50,4 +58,3 @@ class NewsEventsService {
     return EventFirestoreModel.fromFirestore(doc);
   }
 }
-

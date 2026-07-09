@@ -113,11 +113,7 @@ class _OpenBookPainter extends CustomPainter {
       ..close();
     canvas.drawPath(pathL, Paint()..color = fill);
     canvas.drawPath(pathL, p);
-    canvas.drawLine(
-      Offset(mid, h * 0.12),
-      Offset(mid, h * 0.78),
-      p,
-    );
+    canvas.drawLine(Offset(mid, h * 0.12), Offset(mid, h * 0.78), p);
   }
 
   @override
@@ -134,7 +130,10 @@ class BookmarkBookGoldIcon extends StatelessWidget {
     final c = context.c;
     return CustomPaint(
       size: Size(size, size),
-      painter: _BookmarkBookPainter(stroke: c.accentGold, fill: c.backgroundSurface),
+      painter: _BookmarkBookPainter(
+        stroke: c.accentGold,
+        fill: c.backgroundSurface,
+      ),
     );
   }
 }

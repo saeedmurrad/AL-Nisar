@@ -1,16 +1,16 @@
-import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../models/gallery_folder.dart';
 import '../models/gallery_image_model.dart';
+import '../models/upload_file_data.dart';
 import '../services/admin_gallery_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
 import '../theme/color_utils.dart';
+import '../utils/file_bytes_utils.dart';
+import '../utils/upload_picker.dart';
 import '../widgets/screen_navigation_header.dart';
 import '../widgets/shimmer_placeholder.dart';
 
@@ -30,20 +30,15 @@ class _AdminUploadGalleryImagesScreenState
   String? _label;
   String _uploadFolder = GalleryFolder.saeenG.id;
 
-  List<String> _paths = const [];
+  List<UploadFileData> _files = const [];
   final Set<String> _deletingIds = {};
 
   Future<void> _pickImages() async {
-    final res = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
+    final files = await pickMultipleUploadFiles(
       allowedExtensions: const ['jpg', 'jpeg', 'png', 'webp'],
-      allowMultiple: true,
-      withData: false,
     );
-    final files = res?.files ?? const [];
-    final paths = files.map((f) => f.path).whereType<String>().toList();
-    if (paths.isEmpty) return;
-    setState(() => _paths = paths);
+    if (files.isEmpty) return;
+    setState(() => _files = files);
   }
 
   void _snack(String msg) {
@@ -120,9 +115,12 @@ class _AdminUploadGalleryImagesScreenState
                   child: Text(
                     f.label,
                     style: AppTheme.lato(
-                      color: item.folder == f.id ? cc.accentGold : cc.textPrimary,
-                      fontWeight:
-                          item.folder == f.id ? FontWeight.w700 : FontWeight.w400,
+                      color: item.folder == f.id
+                          ? cc.accentGold
+                          : cc.textPrimary,
+                      fontWeight: item.folder == f.id
+                          ? FontWeight.w700
+                          : FontWeight.w400,
                     ),
                   ),
                 ),
@@ -140,28 +138,14 @@ class _AdminUploadGalleryImagesScreenState
     }
   }
 
-  String _extFromPath(String path) {
-    final p = path.toLowerCase();
-    if (p.endsWith('.jpeg')) return 'jpeg';
-    if (p.endsWith('.jpg')) return 'jpeg';
-    if (p.endsWith('.png')) return 'png';
-    if (p.endsWith('.webp')) return 'webp';
-    return 'jpeg';
-  }
-
   Future<void> _uploadAll() async {
-    if (_paths.isEmpty) {
+    if (_files.isEmpty) {
       _snack('Please choose one or more images');
       return;
     }
 
-    for (final p in _paths) {
-      final f = File(p);
-      if (!f.existsSync()) {
-        _snack('File not found: ${p.split(Platform.pathSeparator).last}');
-        return;
-      }
-      final bytes = f.lengthSync();
+    for (final file in _files) {
+      final bytes = file.length;
       if (bytes > 15 * 1024 * 1024) {
         _snack('One image is too large (max 15 MB)');
         return;
@@ -175,28 +159,24 @@ class _AdminUploadGalleryImagesScreenState
     });
 
     try {
-      for (var i = 0; i < _paths.length; i++) {
-        final path = _paths[i];
-        final filename = path.split(Platform.pathSeparator).last;
+      for (var i = 0; i < _files.length; i++) {
+        final file = _files[i];
+        final filename = file.name;
         setState(() {
-          _label = 'Uploading ${i + 1}/${_paths.length} — $filename';
-          _progress = i / _paths.length;
+          _label = 'Uploading ${i + 1}/${_files.length} — $filename';
+          _progress = i / _files.length;
         });
 
         final id = _service.newId();
-        final ext = _extFromPath(path);
+        final ext = imageExtensionFromName(file.name);
 
-        final task = _service.uploadImageTask(
-          id: id,
-          extension: ext,
-          imagePath: path,
-        );
+        final task = _service.uploadImageTask(id: id, image: file);
         task.snapshotEvents.listen((snap) {
           final total = snap.totalBytes;
           final done = snap.bytesTransferred;
           if (total > 0 && mounted) {
             final perFile = done / total;
-            final overall = (i + perFile) / _paths.length;
+            final overall = (i + perFile) / _files.length;
             setState(() => _progress = overall.clamp(0.0, 1.0));
           }
         });
@@ -279,12 +259,18 @@ class _AdminUploadGalleryImagesScreenState
                     value: _uploadFolder,
                     decoration: InputDecoration(
                       labelText: 'Folder',
-                      labelStyle: AppTheme.lato(fontSize: 12, color: c.textMuted),
+                      labelStyle: AppTheme.lato(
+                        fontSize: 12,
+                        color: c.textMuted,
+                      ),
                       filled: true,
                       fillColor: c.backgroundInput,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: c.borderDefault, width: 0.5),
+                        borderSide: BorderSide(
+                          color: c.borderDefault,
+                          width: 0.5,
+                        ),
                       ),
                     ),
                     dropdownColor: c.backgroundSurface,
@@ -313,7 +299,10 @@ class _AdminUploadGalleryImagesScreenState
                     onTap: _saving ? null : _pickImages,
                     borderRadius: BorderRadius.circular(14),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 14,
+                      ),
                       decoration: BoxDecoration(
                         color: c.backgroundInput,
                         borderRadius: BorderRadius.circular(14),
@@ -325,10 +314,13 @@ class _AdminUploadGalleryImagesScreenState
                           const SizedBox(width: 10),
                           Expanded(
                             child: Text(
-                              _paths.isEmpty
+                              _files.isEmpty
                                   ? 'Choose images (JPG/PNG/WEBP)'
-                                  : '${_paths.length} selected',
-                              style: AppTheme.lato(fontSize: 13, color: c.textPrimary),
+                                  : '${_files.length} selected',
+                              style: AppTheme.lato(
+                                fontSize: 13,
+                                color: c.textPrimary,
+                              ),
                             ),
                           ),
                           Text(
@@ -343,23 +335,26 @@ class _AdminUploadGalleryImagesScreenState
                       ),
                     ),
                   ),
-                  if (_paths.isNotEmpty) ...[
+                  if (_files.isNotEmpty) ...[
                     const SizedBox(height: 12),
-                    ..._paths.take(6).map((p) {
-                      final name = p.split(Platform.pathSeparator).last;
+                    ..._files.take(6).map((file) {
+                      final name = file.name;
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 6),
                         child: Text(
                           name,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: AppTheme.lato(fontSize: 12, color: c.textMuted),
+                          style: AppTheme.lato(
+                            fontSize: 12,
+                            color: c.textMuted,
+                          ),
                         ),
                       );
                     }),
-                    if (_paths.length > 6)
+                    if (_files.length > 6)
                       Text(
-                        '+${_paths.length - 6} more',
+                        '+${_files.length - 6} more',
                         style: AppTheme.lato(fontSize: 12, color: c.textMuted),
                       ),
                   ],
@@ -370,7 +365,8 @@ class _AdminUploadGalleryImagesScreenState
                       onPressed: _saving ? null : _uploadAll,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: c.accentGold,
-                        foregroundColor: Theme.of(context).brightness == Brightness.dark
+                        foregroundColor:
+                            Theme.of(context).brightness == Brightness.dark
                             ? c.backgroundPrimary
                             : c.textPrimary,
                         padding: const EdgeInsets.symmetric(vertical: 14),
@@ -385,7 +381,9 @@ class _AdminUploadGalleryImagesScreenState
                               width: 18,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                color: Theme.of(context).brightness == Brightness.dark
+                                color:
+                                    Theme.of(context).brightness ==
+                                        Brightness.dark
                                     ? c.backgroundPrimary
                                     : c.textPrimary,
                               ),
@@ -417,7 +415,9 @@ class _AdminUploadGalleryImagesScreenState
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 24),
                           child: Center(
-                            child: CircularProgressIndicator(color: c.accentGold),
+                            child: CircularProgressIndicator(
+                              color: c.accentGold,
+                            ),
                           ),
                         );
                       }
@@ -427,7 +427,10 @@ class _AdminUploadGalleryImagesScreenState
                           padding: const EdgeInsets.only(bottom: 8),
                           child: Text(
                             'No images in Firebase yet',
-                            style: AppTheme.lato(fontSize: 13, color: c.textMuted),
+                            style: AppTheme.lato(
+                              fontSize: 13,
+                              color: c.textMuted,
+                            ),
                           ),
                         );
                       }
@@ -449,7 +452,10 @@ class _AdminUploadGalleryImagesScreenState
                               decoration: BoxDecoration(
                                 color: c.backgroundInput,
                                 borderRadius: BorderRadius.circular(12),
-                                border: Border.all(color: c.borderDefault, width: 0.5),
+                                border: Border.all(
+                                  color: c.borderDefault,
+                                  width: 0.5,
+                                ),
                               ),
                               child: Row(
                                 children: [
@@ -461,7 +467,8 @@ class _AdminUploadGalleryImagesScreenState
                                             height: 48,
                                             color: c.backgroundElevated,
                                             child: Icon(
-                                              Icons.image_not_supported_outlined,
+                                              Icons
+                                                  .image_not_supported_outlined,
                                               color: c.textMuted,
                                               size: 22,
                                             ),
@@ -473,17 +480,21 @@ class _AdminUploadGalleryImagesScreenState
                                             fit: BoxFit.cover,
                                             placeholder: (context, url) =>
                                                 const ShimmerPlaceholder(),
-                                            errorWidget: (context, url, error) =>
-                                                Container(
-                                              width: 48,
-                                              height: 48,
-                                              color: c.backgroundElevated,
-                                              child: Icon(
-                                                Icons.broken_image_outlined,
-                                                color: c.textMuted,
-                                                size: 22,
-                                              ),
-                                            ),
+                                            errorWidget:
+                                                (
+                                                  context,
+                                                  url,
+                                                  error,
+                                                ) => Container(
+                                                  width: 48,
+                                                  height: 48,
+                                                  color: c.backgroundElevated,
+                                                  child: Icon(
+                                                    Icons.broken_image_outlined,
+                                                    color: c.textMuted,
+                                                    size: 22,
+                                                  ),
+                                                ),
                                           ),
                                   ),
                                   const SizedBox(width: 10),
@@ -524,7 +535,10 @@ class _AdminUploadGalleryImagesScreenState
                                         IconButton(
                                           onPressed: _saving
                                               ? null
-                                              : () => _confirmDeleteGalleryImage(img),
+                                              : () =>
+                                                    _confirmDeleteGalleryImage(
+                                                      img,
+                                                    ),
                                           icon: Icon(
                                             Icons.delete_outline,
                                             color: c.textMuted,

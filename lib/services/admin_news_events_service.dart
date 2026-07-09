@@ -1,18 +1,18 @@
-import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 import '../models/event_firestore_model.dart';
 import '../models/news_firestore_model.dart';
+import '../models/upload_file_data.dart';
+import '../utils/file_bytes_utils.dart';
 import 'user_notifications_service.dart';
 
 class AdminNewsEventsService {
   AdminNewsEventsService({
     FirebaseFirestore? firestore,
     FirebaseStorage? storage,
-  })  : _firestore = firestore ?? FirebaseFirestore.instance,
-        _storage = storage ?? FirebaseStorage.instance;
+  }) : _firestore = firestore ?? FirebaseFirestore.instance,
+       _storage = storage ?? FirebaseStorage.instance;
 
   final FirebaseFirestore _firestore;
   final FirebaseStorage _storage;
@@ -38,29 +38,33 @@ class AdminNewsEventsService {
 
   Future<String?> uploadNewsImage({
     required String newsId,
-    required String imagePath,
+    required UploadFileData image,
   }) async {
-    final file = File(imagePath);
-    final lower = imagePath.toLowerCase();
-    final ext = lower.endsWith('.png')
-        ? 'png'
-        : (lower.endsWith('.webp') ? 'webp' : 'jpg');
+    final ext = imageExtensionFromName(image.name);
     final ref = _storage.ref().child('news_images/$newsId.$ext');
-    await ref.putFile(file);
+    await ref.putData(
+      image.bytes,
+      SettableMetadata(
+        contentType: imageMimeTypeFromName(image.name),
+        customMetadata: {'originalName': image.name},
+      ),
+    );
     return ref.getDownloadURL();
   }
 
   Future<String?> uploadEventImage({
     required String eventId,
-    required String imagePath,
+    required UploadFileData image,
   }) async {
-    final file = File(imagePath);
-    final lower = imagePath.toLowerCase();
-    final ext = lower.endsWith('.png')
-        ? 'png'
-        : (lower.endsWith('.webp') ? 'webp' : 'jpg');
+    final ext = imageExtensionFromName(image.name);
     final ref = _storage.ref().child('event_images/$eventId.$ext');
-    await ref.putFile(file);
+    await ref.putData(
+      image.bytes,
+      SettableMetadata(
+        contentType: imageMimeTypeFromName(image.name),
+        customMetadata: {'originalName': image.name},
+      ),
+    );
     return ref.getDownloadURL();
   }
 
@@ -112,4 +116,3 @@ class AdminNewsEventsService {
     await _firestore.collection('events').doc(id).update({'isActive': active});
   }
 }
-

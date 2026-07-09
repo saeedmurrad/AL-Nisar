@@ -152,10 +152,7 @@ class _BooksScreenState extends State<BooksScreen> {
                       decoration: BoxDecoration(
                         color: c.backgroundInput,
                         borderRadius: BorderRadius.circular(14),
-                        border: Border.all(
-                          color: c.borderDefault,
-                          width: 0.5,
-                        ),
+                        border: Border.all(color: c.borderDefault, width: 0.5),
                       ),
                       padding: const EdgeInsets.symmetric(
                         horizontal: 12,
@@ -234,9 +231,9 @@ class _BooksScreenState extends State<BooksScreen> {
                               fontWeight: FontWeight.w600,
                               color: sel
                                   ? (Theme.of(context).brightness ==
-                                          Brightness.dark
-                                      ? c.backgroundPrimary
-                                      : c.textPrimary)
+                                            Brightness.dark
+                                        ? c.backgroundPrimary
+                                        : c.textPrimary)
                                   : c.textMuted,
                               letterSpacing: 0.4,
                             ),
@@ -297,7 +294,7 @@ class _BooksBody extends StatelessWidget {
     return GridView.builder(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
+        crossAxisCount: ResponsiveLayout.gridColumns(context),
         crossAxisSpacing: 12,
         mainAxisSpacing: 14,
         childAspectRatio: ResponsiveLayout.booksGridAspectRatio(context),
@@ -350,7 +347,8 @@ class _BooksBody extends StatelessWidget {
                             style: AppTheme.lato(
                               fontSize: 10,
                               fontWeight: FontWeight.w700,
-                              color: Theme.of(context).brightness ==
+                              color:
+                                  Theme.of(context).brightness ==
                                       Brightness.dark
                                   ? c.backgroundPrimary
                                   : c.textPrimary,
@@ -395,10 +393,7 @@ class _BooksBody extends StatelessWidget {
                         b.author,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: AppTheme.lato(
-                          fontSize: 11,
-                          color: c.textMuted,
-                        ),
+                        style: AppTheme.lato(fontSize: 11, color: c.textMuted),
                       ),
                     ],
                   ),
@@ -421,7 +416,7 @@ class _BooksShimmerGrid extends StatelessWidget {
     return GridView.builder(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
+        crossAxisCount: ResponsiveLayout.gridColumns(context),
         crossAxisSpacing: 12,
         mainAxisSpacing: 14,
         childAspectRatio: ResponsiveLayout.booksGridAspectRatio(context),
@@ -511,10 +506,7 @@ class _BooksErrorState extends StatelessWidget {
             Text(
               'Check your connection',
               textAlign: TextAlign.center,
-              style: AppTheme.lato(
-                fontSize: 14,
-                color: c.textMuted,
-              ),
+              style: AppTheme.lato(fontSize: 14, color: c.textMuted),
             ),
             const SizedBox(height: 24),
             OutlinedButton(
@@ -572,10 +564,7 @@ class _BooksEmptyState extends StatelessWidget {
             Text(
               'Check back soon',
               textAlign: TextAlign.center,
-              style: AppTheme.lato(
-                fontSize: 14,
-                color: c.textMuted,
-              ),
+              style: AppTheme.lato(fontSize: 14, color: c.textMuted),
             ),
           ],
         ),

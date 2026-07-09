@@ -22,7 +22,9 @@ class AsbaqPdfModel {
   final DateTime uploadedAt;
   final bool isActive;
 
-  factory AsbaqPdfModel.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
+  factory AsbaqPdfModel.fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> doc,
+  ) {
     final data = doc.data() ?? {};
     DateTime uploadedAt = DateTime.now();
     final ts = data['uploadedAt'];
@@ -39,12 +41,11 @@ class AsbaqPdfModel {
   }
 
   Map<String, dynamic> toMap() => {
-        'titleEn': titleEn,
-        'titleUr': titleUr,
-        'storagePath': storagePath,
-        'thumbnailUrl': thumbnailUrl,
-        'uploadedAt': Timestamp.fromDate(uploadedAt),
-        'isActive': isActive,
-      };
+    'titleEn': titleEn,
+    'titleUr': titleUr,
+    'storagePath': storagePath,
+    'thumbnailUrl': thumbnailUrl,
+    'uploadedAt': Timestamp.fromDate(uploadedAt),
+    'isActive': isActive,
+  };
 }
-

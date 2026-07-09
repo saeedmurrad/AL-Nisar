@@ -4,7 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 /// In-app notifications for members (e.g. Sabaq access approved/denied).
 class UserNotificationsService {
   UserNotificationsService({FirebaseFirestore? firestore})
-      : _firestore = firestore ?? FirebaseFirestore.instance;
+    : _firestore = firestore ?? FirebaseFirestore.instance;
 
   final FirebaseFirestore _firestore;
 
@@ -26,7 +26,8 @@ class UserNotificationsService {
       'requestId': requestId,
       'sabaqId': sabaqId,
       'title': 'Sabaq access approved',
-      'body': 'Your request to access "$title" has been approved. You can now read this Sabaq.',
+      'body':
+          'Your request to access "$title" has been approved. You can now read this Sabaq.',
       'createdAt': FieldValue.serverTimestamp(),
       'read': false,
     }, SetOptions(merge: true));
@@ -114,7 +115,9 @@ class UserNotificationsService {
     if (userIds.isEmpty) return;
     const chunkSize = 500;
     for (var i = 0; i < userIds.length; i += chunkSize) {
-      final end = (i + chunkSize < userIds.length) ? i + chunkSize : userIds.length;
+      final end = (i + chunkSize < userIds.length)
+          ? i + chunkSize
+          : userIds.length;
       final batch = _firestore.batch();
       for (final userId in userIds.sublist(i, end)) {
         batch.set(_col(userId).doc(docId), payload, SetOptions(merge: true));
@@ -125,18 +128,23 @@ class UserNotificationsService {
 
   Future<void> markAsRead(String userId, String notificationId) async {
     if (!_ready || userId.isEmpty || notificationId.trim().isEmpty) return;
-    await _col(userId)
-        .doc(notificationId)
-        .set({'read': true}, SetOptions(merge: true));
+    await _col(
+      userId,
+    ).doc(notificationId).set({'read': true}, SetOptions(merge: true));
   }
 
-  Stream<List<UserNotificationDoc>> streamForUser(String userId, {int limit = 40}) {
+  Stream<List<UserNotificationDoc>> streamForUser(
+    String userId, {
+    int limit = 40,
+  }) {
     if (!_ready || userId.isEmpty) return Stream.value(const []);
     return _col(userId)
         .orderBy('createdAt', descending: true)
         .limit(limit)
         .snapshots()
-        .map((snap) => snap.docs.map(UserNotificationDoc.fromFirestore).toList());
+        .map(
+          (snap) => snap.docs.map(UserNotificationDoc.fromFirestore).toList(),
+        );
   }
 
   Stream<int> streamUnreadCountForUser(String userId) {

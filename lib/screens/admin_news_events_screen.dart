@@ -1,17 +1,16 @@
-import 'dart:io';
-
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../auth/auth_provider.dart';
 import '../config/news_event_defaults.dart';
 import '../models/event_firestore_model.dart';
 import '../models/news_firestore_model.dart';
+import '../models/upload_file_data.dart';
 import '../services/admin_news_events_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
 import '../theme/color_utils.dart';
 import '../utils/event_date_labels.dart';
+import '../utils/upload_picker.dart';
 import '../widgets/gold_card.dart';
 import '../widgets/screen_navigation_header.dart';
 
@@ -159,13 +158,17 @@ class _AdminNewsEventsScreenState extends State<AdminNewsEventsScreen>
                     final list = snap.data ?? const [];
                     if (list.isEmpty) {
                       return Center(
-                        child: Text('No news yet', style: AppTheme.lato(color: c.textMuted)),
+                        child: Text(
+                          'No news yet',
+                          style: AppTheme.lato(color: c.textMuted),
+                        ),
                       );
                     }
                     return ListView.separated(
                       padding: const EdgeInsets.fromLTRB(16, 10, 16, 90),
                       itemCount: list.length,
-                      separatorBuilder: (context, index) => const SizedBox(height: 10),
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(height: 10),
                       itemBuilder: (context, i) {
                         final n = list[i];
                         return GoldCard(
@@ -190,14 +193,18 @@ class _AdminNewsEventsScreenState extends State<AdminNewsEventsScreen>
                                   Switch(
                                     value: n.isActive,
                                     activeThumbColor: c.accentGold,
-                                    onChanged: (v) => _service.setNewsActive(n.id, v),
+                                    onChanged: (v) =>
+                                        _service.setNewsActive(n.id, v),
                                   ),
                                 ],
                               ),
                               const SizedBox(height: 6),
                               Text(
                                 '${n.category} · ${n.dateLabel}',
-                                style: AppTheme.lato(fontSize: 12, color: c.textMuted),
+                                style: AppTheme.lato(
+                                  fontSize: 12,
+                                  color: c.textMuted,
+                                ),
                               ),
                               const SizedBox(height: 8),
                               Row(
@@ -206,15 +213,24 @@ class _AdminNewsEventsScreenState extends State<AdminNewsEventsScreen>
                                   TextButton(
                                     onPressed: () async {
                                       final updated =
-                                          await showModalBottomSheet<NewsFirestoreModel?>(
-                                        context: context,
-                                        isScrollControlled: true,
-                                        backgroundColor: c.backgroundSurface,
-                                        shape: const RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-                                        ),
-                                        builder: (ctx) => _NewsEditor(initial: n, service: _service),
-                                      );
+                                          await showModalBottomSheet<
+                                            NewsFirestoreModel?
+                                          >(
+                                            context: context,
+                                            isScrollControlled: true,
+                                            backgroundColor:
+                                                c.backgroundSurface,
+                                            shape: const RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.vertical(
+                                                    top: Radius.circular(16),
+                                                  ),
+                                            ),
+                                            builder: (ctx) => _NewsEditor(
+                                              initial: n,
+                                              service: _service,
+                                            ),
+                                          );
                                       if (updated == null) return;
                                       await _service.upsertNews(updated);
                                     },
@@ -242,13 +258,17 @@ class _AdminNewsEventsScreenState extends State<AdminNewsEventsScreen>
                     final list = snap.data ?? const [];
                     if (list.isEmpty) {
                       return Center(
-                        child: Text('No events yet', style: AppTheme.lato(color: c.textMuted)),
+                        child: Text(
+                          'No events yet',
+                          style: AppTheme.lato(color: c.textMuted),
+                        ),
                       );
                     }
                     return ListView.separated(
                       padding: const EdgeInsets.fromLTRB(16, 10, 16, 90),
                       itemCount: list.length,
-                      separatorBuilder: (context, index) => const SizedBox(height: 10),
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(height: 10),
                       itemBuilder: (context, i) {
                         final e = list[i];
                         return GoldCard(
@@ -273,7 +293,8 @@ class _AdminNewsEventsScreenState extends State<AdminNewsEventsScreen>
                                   Switch(
                                     value: e.isActive,
                                     activeThumbColor: c.accentGold,
-                                    onChanged: (v) => _service.setEventActive(e.id, v),
+                                    onChanged: (v) =>
+                                        _service.setEventActive(e.id, v),
                                   ),
                                 ],
                               ),
@@ -294,7 +315,10 @@ class _AdminNewsEventsScreenState extends State<AdminNewsEventsScreen>
                               const SizedBox(height: 6),
                               Text(
                                 '${e.fullDateLine} · ${e.timeLabel}',
-                                style: AppTheme.lato(fontSize: 12, color: c.textMuted),
+                                style: AppTheme.lato(
+                                  fontSize: 12,
+                                  color: c.textMuted,
+                                ),
                               ),
                               const SizedBox(height: 8),
                               Row(
@@ -303,15 +327,24 @@ class _AdminNewsEventsScreenState extends State<AdminNewsEventsScreen>
                                   TextButton(
                                     onPressed: () async {
                                       final updated =
-                                          await showModalBottomSheet<EventFirestoreModel?>(
-                                        context: context,
-                                        isScrollControlled: true,
-                                        backgroundColor: c.backgroundSurface,
-                                        shape: const RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-                                        ),
-                                        builder: (ctx) => _EventEditor(initial: e, service: _service),
-                                      );
+                                          await showModalBottomSheet<
+                                            EventFirestoreModel?
+                                          >(
+                                            context: context,
+                                            isScrollControlled: true,
+                                            backgroundColor:
+                                                c.backgroundSurface,
+                                            shape: const RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.vertical(
+                                                    top: Radius.circular(16),
+                                                  ),
+                                            ),
+                                            builder: (ctx) => _EventEditor(
+                                              initial: e,
+                                              service: _service,
+                                            ),
+                                          );
                                       if (updated == null) return;
                                       await _service.upsertEvent(updated);
                                     },
@@ -399,9 +432,11 @@ class _NewsEditorState extends State<_NewsEditor> {
       ? widget.initial.category.trim()
       : NewsEventDefaults.newsCategories.first;
   late DateTime _date = _parseNewsDate(widget.initial.dateLabel);
-  late final _body = TextEditingController(text: widget.initial.bodyParagraphs.join('\n\n'));
+  late final _body = TextEditingController(
+    text: widget.initial.bodyParagraphs.join('\n\n'),
+  );
 
-  String? _imagePath;
+  UploadFileData? _imageFile;
   bool _saving = false;
 
   static DateTime _parseNewsDate(String label) {
@@ -432,14 +467,11 @@ class _NewsEditorState extends State<_NewsEditor> {
   }
 
   Future<void> _pickImage() async {
-    final res = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
+    final file = await pickUploadFile(
       allowedExtensions: const ['jpg', 'jpeg', 'png', 'webp'],
-      withData: false,
     );
-    final path = res?.files.single.path;
-    if (path == null || path.trim().isEmpty) return;
-    setState(() => _imagePath = path);
+    if (file == null) return;
+    setState(() => _imageFile = file);
   }
 
   void _snack(String msg) {
@@ -469,14 +501,19 @@ class _NewsEditorState extends State<_NewsEditor> {
     setState(() => _saving = true);
     try {
       String imageUrl = widget.initial.imageUrl;
-      final img = _imagePath;
-      if (img != null && img.trim().isNotEmpty && File(img).existsSync()) {
-        final bytes = File(img).lengthSync();
+      final img = _imageFile;
+      if (img != null) {
+        final bytes = img.length;
         if (bytes > 10 * 1024 * 1024) {
           _snack('Image is too large (max 10 MB)');
           return;
         }
-        imageUrl = (await widget.service.uploadNewsImage(newsId: widget.initial.id, imagePath: img)) ?? imageUrl;
+        imageUrl =
+            (await widget.service.uploadNewsImage(
+              newsId: widget.initial.id,
+              image: img,
+            )) ??
+            imageUrl;
       }
 
       if (!mounted) return;
@@ -504,9 +541,7 @@ class _NewsEditorState extends State<_NewsEditor> {
   @override
   Widget build(BuildContext context) {
     final c = context.c;
-    final imgName = _imagePath == null
-        ? 'No image selected (optional)'
-        : _imagePath!.split(Platform.pathSeparator).last;
+    final imgName = _imageFile?.name ?? 'No image selected (optional)';
     final dateLabel = EventDateLabels.newsDateLabel(_date);
 
     final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
@@ -557,13 +592,16 @@ class _NewsEditorState extends State<_NewsEditor> {
                 items: [
                   for (final cat in {
                     ...NewsEventDefaults.newsCategories,
-                    if (!NewsEventDefaults.newsCategories.contains(_category)) _category,
+                    if (!NewsEventDefaults.newsCategories.contains(_category))
+                      _category,
                   })
                     DropdownMenuItem(value: cat, child: Text(cat)),
                 ],
-                onChanged: _saving ? null : (v) {
-                  if (v != null) setState(() => _category = v);
-                },
+                onChanged: _saving
+                    ? null
+                    : (v) {
+                        if (v != null) setState(() => _category = v);
+                      },
               ),
               const SizedBox(height: 10),
               Text(
@@ -580,7 +618,10 @@ class _NewsEditorState extends State<_NewsEditor> {
                 borderRadius: BorderRadius.circular(14),
                 child: Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 14,
+                  ),
                   decoration: BoxDecoration(
                     color: c.backgroundInput,
                     borderRadius: BorderRadius.circular(14),
@@ -588,9 +629,19 @@ class _NewsEditorState extends State<_NewsEditor> {
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.calendar_today_outlined, color: c.accentGold, size: 18),
+                      Icon(
+                        Icons.calendar_today_outlined,
+                        color: c.accentGold,
+                        size: 18,
+                      ),
                       const SizedBox(width: 10),
-                      Text(dateLabel, style: AppTheme.lato(fontSize: 13, color: c.textPrimary)),
+                      Text(
+                        dateLabel,
+                        style: AppTheme.lato(
+                          fontSize: 13,
+                          color: c.textPrimary,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -609,7 +660,10 @@ class _NewsEditorState extends State<_NewsEditor> {
                 onTap: _saving ? null : _pickImage,
                 borderRadius: BorderRadius.circular(14),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 14,
+                  ),
                   decoration: BoxDecoration(
                     color: c.backgroundInput,
                     borderRadius: BorderRadius.circular(14),
@@ -624,7 +678,10 @@ class _NewsEditorState extends State<_NewsEditor> {
                           imgName,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: AppTheme.lato(fontSize: 13, color: c.textPrimary),
+                          style: AppTheme.lato(
+                            fontSize: 13,
+                            color: c.textPrimary,
+                          ),
                         ),
                       ),
                       Text(
@@ -651,7 +708,8 @@ class _NewsEditorState extends State<_NewsEditor> {
                 onPressed: _saving ? null : _save,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: c.accentGold,
-                  foregroundColor: Theme.of(context).brightness == Brightness.dark
+                  foregroundColor:
+                      Theme.of(context).brightness == Brightness.dark
                       ? c.backgroundPrimary
                       : c.textPrimary,
                   padding: const EdgeInsets.symmetric(vertical: 14),
@@ -671,7 +729,10 @@ class _NewsEditorState extends State<_NewsEditor> {
                               : c.textPrimary,
                         ),
                       )
-                    : Text('Save', style: AppTheme.lato(fontWeight: FontWeight.w700)),
+                    : Text(
+                        'Save',
+                        style: AppTheme.lato(fontWeight: FontWeight.w700),
+                      ),
               ),
               const SizedBox(height: 8),
             ],
@@ -702,7 +763,9 @@ class _EventEditorState extends State<_EventEditor> {
   );
   late final _location = TextEditingController(text: widget.initial.location);
   late final _time = TextEditingController(text: widget.initial.timeLabel);
-  late final _desc = TextEditingController(text: widget.initial.descriptionLines.join('\n'));
+  late final _desc = TextEditingController(
+    text: widget.initial.descriptionLines.join('\n'),
+  );
 
   bool _saving = false;
 
@@ -746,7 +809,10 @@ class _EventEditorState extends State<_EventEditor> {
         .where((s) => s.isNotEmpty)
         .toList();
 
-    if (title.isEmpty || urduTitle.isEmpty || location.isEmpty || timeLabel.isEmpty) {
+    if (title.isEmpty ||
+        urduTitle.isEmpty ||
+        location.isEmpty ||
+        timeLabel.isEmpty) {
       _snack('Please fill title, Urdu title, location, and time');
       return;
     }
@@ -804,7 +870,11 @@ class _EventEditorState extends State<_EventEditor> {
                 ),
               ),
               const SizedBox(height: 12),
-              _Field(label: 'Title (English)', controller: _title, hintText: 'Event title'),
+              _Field(
+                label: 'Title (English)',
+                controller: _title,
+                hintText: 'Event title',
+              ),
               const SizedBox(height: 10),
               _Field(
                 label: 'Title (Urdu)',
@@ -827,7 +897,10 @@ class _EventEditorState extends State<_EventEditor> {
                 borderRadius: BorderRadius.circular(14),
                 child: Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 14,
+                  ),
                   decoration: BoxDecoration(
                     color: c.backgroundInput,
                     borderRadius: BorderRadius.circular(14),
@@ -835,12 +908,19 @@ class _EventEditorState extends State<_EventEditor> {
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.calendar_today_outlined, color: c.accentGold, size: 18),
+                      Icon(
+                        Icons.calendar_today_outlined,
+                        color: c.accentGold,
+                        size: 18,
+                      ),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
                           EventDateLabels.fullDateLine(_date),
-                          style: AppTheme.lato(fontSize: 13, color: c.textPrimary),
+                          style: AppTheme.lato(
+                            fontSize: 13,
+                            color: c.textPrimary,
+                          ),
                         ),
                       ),
                     ],
@@ -848,9 +928,17 @@ class _EventEditorState extends State<_EventEditor> {
                 ),
               ),
               const SizedBox(height: 10),
-              _Field(label: 'Location', controller: _location, hintText: 'Venue'),
+              _Field(
+                label: 'Location',
+                controller: _location,
+                hintText: 'Venue',
+              ),
               const SizedBox(height: 10),
-              _Field(label: 'Time', controller: _time, hintText: 'e.g., After Maghrib'),
+              _Field(
+                label: 'Time',
+                controller: _time,
+                hintText: 'e.g., After Maghrib',
+              ),
               const SizedBox(height: 10),
               _Field(
                 label: 'Description (optional)',
@@ -861,14 +949,19 @@ class _EventEditorState extends State<_EventEditor> {
               const SizedBox(height: 8),
               Text(
                 'Organizer: ${NewsEventDefaults.eventOrganizer}',
-                style: AppTheme.lato(fontSize: 11, color: c.textMuted, height: 1.35),
+                style: AppTheme.lato(
+                  fontSize: 11,
+                  color: c.textMuted,
+                  height: 1.35,
+                ),
               ),
               const SizedBox(height: 14),
               ElevatedButton(
                 onPressed: _saving ? null : _save,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: c.accentGold,
-                  foregroundColor: Theme.of(context).brightness == Brightness.dark
+                  foregroundColor:
+                      Theme.of(context).brightness == Brightness.dark
                       ? c.backgroundPrimary
                       : c.textPrimary,
                   padding: const EdgeInsets.symmetric(vertical: 14),
@@ -888,7 +981,10 @@ class _EventEditorState extends State<_EventEditor> {
                               : c.textPrimary,
                         ),
                       )
-                    : Text('Save', style: AppTheme.lato(fontWeight: FontWeight.w700)),
+                    : Text(
+                        'Save',
+                        style: AppTheme.lato(fontWeight: FontWeight.w700),
+                      ),
               ),
               const SizedBox(height: 8),
             ],
@@ -961,4 +1057,3 @@ class _Field extends StatelessWidget {
     );
   }
 }
-

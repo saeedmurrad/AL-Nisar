@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../data/dummy_data.dart';
 import '../theme/app_theme_colors.dart';
+import '../utils/responsive_layout.dart';
 import 'mandala_painter.dart';
 import 'shimmer_placeholder.dart';
 
@@ -55,7 +56,16 @@ class AuthScreenDecor extends StatelessWidget {
             ),
           ),
         ),
-        child,
+        // On wide (web/desktop) viewports the form column is centered and
+        // capped so fields don't stretch across the whole window.
+        Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: ResponsiveLayout.formMaxWidth,
+            ),
+            child: child,
+          ),
+        ),
       ],
     );
   }

@@ -7,8 +7,7 @@ import 'shajra_scrape_client.dart';
 
 /// Offline Shajra Pak data shipped in app assets (entries 1–40).
 class ShajraBundledService {
-  ShajraBundledService({AssetBundle? bundle})
-      : _bundle = bundle ?? rootBundle;
+  ShajraBundledService({AssetBundle? bundle}) : _bundle = bundle ?? rootBundle;
 
   final AssetBundle _bundle;
 
@@ -27,7 +26,8 @@ class ShajraBundledService {
   static String _urduDetailPath(int number) =>
       'assets/shajra/urdu/details/${number.toString().padLeft(2, '0')}.html';
 
-  Future<List<ShajraEntryModel>> loadEnglishList() => _loadList(_englishListPath);
+  Future<List<ShajraEntryModel>> loadEnglishList() =>
+      _loadList(_englishListPath);
 
   Future<List<ShajraEntryModel>> loadUrduList() => _loadList(_urduListPath);
 
@@ -35,13 +35,16 @@ class ShajraBundledService {
     try {
       final raw = await _bundle.loadString(assetPath);
       final arr = jsonDecode(raw) as List<dynamic>;
-      final list = arr
-          .map((e) => _withResolvedShortName(
-                ShajraEntryModel.fromJson(e as Map<String, dynamic>),
-              ))
-          .where((e) => e.number > 0 && e.number <= maxEntryNumber)
-          .toList()
-        ..sort((a, b) => a.number.compareTo(b.number));
+      final list =
+          arr
+              .map(
+                (e) => _withResolvedShortName(
+                  ShajraEntryModel.fromJson(e as Map<String, dynamic>),
+                ),
+              )
+              .where((e) => e.number > 0 && e.number <= maxEntryNumber)
+              .toList()
+            ..sort((a, b) => a.number.compareTo(b.number));
       if (list.isNotEmpty) return list;
     } catch (_) {
       // fall through

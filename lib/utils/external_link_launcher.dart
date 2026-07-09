@@ -1,21 +1,54 @@
-import 'dart:io';
-
+import 'package:flutter/foundation.dart'
+    show defaultTargetPlatform, kIsWeb, TargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
 
+/// Normalizes Facebook page URLs so deep links and browsers open the same page.
+String normalizeFacebookPageUrl(String url) {
+  final trimmed = url.trim();
+  if (trimmed.isEmpty) return trimmed;
+
+  final uri = Uri.tryParse(trimmed);
+  if (uri == null || !uri.hasScheme) return trimmed;
+
+  // Keep live / watch / groups / posts paths as-is.
+  final path = uri.path.toLowerCase();
+  if (path.contains('/live') ||
+      path.contains('/watch') ||
+      path.contains('/videos') ||
+      path.contains('/posts') ||
+      path.contains('/reel')) {
+    return trimmed;
+  }
+
+  // Prefer www host for page profile URLs (App Links / Universal Links).
+  if (uri.host.contains('facebook.com') || uri.host.contains('fb.com')) {
+    return Uri(
+      scheme: 'https',
+      host: 'www.facebook.com',
+      path: uri.path.isEmpty ? '/' : uri.path,
+      query: uri.hasQuery ? uri.query : null,
+    ).toString();
+  }
+  return trimmed;
+}
+
 /// Deep link that opens a Facebook HTTPS URL inside the Facebook app.
+///
+/// Prefer [launchFacebookUrl] which opens HTTPS first; this is a fallback only.
 Uri facebookAppUri(String httpsPageUrl) {
+  final normalized = normalizeFacebookPageUrl(httpsPageUrl);
   return Uri.parse(
-    'fb://facewebmodal/f?href=${Uri.encodeComponent(httpsPageUrl.trim())}',
+    'fb://facewebmodal/f?href=${Uri.encodeComponent(normalized)}',
   );
 }
 
 /// Android intent targeting the Facebook app (`com.facebook.katana`).
 Uri? androidFacebookIntentUri(Uri httpsUri) {
-  if (!Platform.isAndroid) return null;
+  if (kIsWeb || defaultTargetPlatform != TargetPlatform.android) return null;
   final path = '${httpsUri.host}${httpsUri.path}';
   final query = httpsUri.hasQuery ? '?${httpsUri.query}' : '';
   return Uri.parse(
@@ -33,12 +66,20 @@ Uri youtubeAppUri(String httpsUrl) {
 
 /// Android intent targeting the YouTube app (`com.google.android.youtube`).
 Uri? androidYouTubeIntentUri(Uri httpsUri) {
-  if (!Platform.isAndroid) return null;
+  if (kIsWeb || defaultTargetPlatform != TargetPlatform.android) return null;
   final path = '${httpsUri.host}${httpsUri.path}';
   final query = httpsUri.hasQuery ? '?${httpsUri.query}' : '';
   return Uri.parse(
     'intent://$path$query#Intent;package=com.google.android.youtube;scheme=https;end',
   );
+}
+
+Future<bool> _tryLaunch(Uri uri) async {
+  try {
+    return await launchUrl(uri, mode: LaunchMode.externalApplication);
+  } catch (_) {
+    return false;
+  }
 }
 
 Future<bool> _launchWithCandidates(
@@ -48,28 +89,15 @@ Future<bool> _launchWithCandidates(
   required String failureMessage,
 }) async {
   for (final uri in candidates) {
-    try {
-      final canOpen = await canLaunchUrl(uri);
-      if (!canOpen) continue;
-      final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
-      if (ok) return true;
-    } catch (_) {
-      continue;
-    }
+    final ok = await _tryLaunch(uri);
+    if (ok) return true;
   }
 
-  try {
-    final ok = await launchUrl(httpsUri, mode: LaunchMode.externalApplication);
-    if (!ok && context.mounted) {
-      _showFailure(context, failureMessage);
-    }
-    return ok;
-  } catch (_) {
-    if (context.mounted) {
-      _showFailure(context, failureMessage);
-    }
-    return false;
+  final ok = await _tryLaunch(httpsUri);
+  if (!ok && context.mounted) {
+    _showFailure(context, failureMessage);
   }
+  return ok;
 }
 
 Future<bool> launchFacebookUrl(
@@ -77,7 +105,7 @@ Future<bool> launchFacebookUrl(
   String url, {
   String? failureMessage,
 }) async {
-  final trimmed = url.trim();
+  final trimmed = normalizeFacebookPageUrl(url);
   if (trimmed.isEmpty) {
     _showFailure(context, failureMessage ?? 'Link is not available');
     return false;
@@ -89,10 +117,12 @@ Future<bool> launchFacebookUrl(
     return false;
   }
 
+  // Prefer HTTPS first so Android App Links / iOS Universal Links open the
+  // Facebook *page*. Older fb://facewebmodal often opens the app without the page.
   final candidates = <Uri>[
-    facebookAppUri(trimmed),
-    if (androidFacebookIntentUri(httpsUri) case final intent?) intent,
     httpsUri,
+    if (androidFacebookIntentUri(httpsUri) case final intent?) intent,
+    facebookAppUri(trimmed),
   ];
 
   return _launchWithCandidates(

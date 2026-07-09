@@ -45,14 +45,18 @@ class StandardShellHeader extends StatelessWidget {
                 IconButton(
                   tooltip: 'Back',
                   padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+                  constraints: const BoxConstraints(
+                    minWidth: 40,
+                    minHeight: 40,
+                  ),
                   onPressed: disableBack
                       ? null
                       : (onBack ?? () => popOrGoHome(context)),
                   icon: Icon(Icons.arrow_back, color: c.accentGold),
                 ),
               Expanded(
-                child: titleWidget ??
+                child:
+                    titleWidget ??
                     Text(
                       title,
                       style: AppTheme.displayTitle(color: c.textPrimary),

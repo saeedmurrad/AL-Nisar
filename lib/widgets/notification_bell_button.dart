@@ -9,10 +9,7 @@ import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
 
 class NotificationBellButton extends StatefulWidget {
-  const NotificationBellButton({
-    super.key,
-    required this.onTap,
-  });
+  const NotificationBellButton({super.key, required this.onTap});
 
   final VoidCallback onTap;
 
@@ -80,19 +77,13 @@ class _BellIcon extends StatelessWidget {
             decoration: BoxDecoration(
               color: colors.backgroundElevated,
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: colors.borderDefault,
-                width: 0.5,
-              ),
+              border: Border.all(color: colors.borderDefault, width: 0.5),
             ),
             child: SvgPicture.string(
               _bellSvg,
               width: 18,
               height: 18,
-              colorFilter: ColorFilter.mode(
-                colors.accentGold,
-                BlendMode.srcIn,
-              ),
+              colorFilter: ColorFilter.mode(colors.accentGold, BlendMode.srcIn),
             ),
           ),
           if (count > 0)
@@ -105,7 +96,10 @@ class _BellIcon extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: colors.accentGold,
                   borderRadius: BorderRadius.circular(999),
-                  border: Border.all(color: colors.backgroundSurface, width: 1.5),
+                  border: Border.all(
+                    color: colors.backgroundSurface,
+                    width: 1.5,
+                  ),
                 ),
                 alignment: Alignment.center,
                 child: Text(

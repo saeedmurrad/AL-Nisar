@@ -1,17 +1,15 @@
-import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 import '../models/gallery_folder.dart';
 import '../models/gallery_image_model.dart';
+import '../models/upload_file_data.dart';
+import '../utils/file_bytes_utils.dart';
 
 class AdminGalleryService {
-  AdminGalleryService({
-    FirebaseFirestore? firestore,
-    FirebaseStorage? storage,
-  })  : _firestore = firestore ?? FirebaseFirestore.instance,
-        _storage = storage ?? FirebaseStorage.instance;
+  AdminGalleryService({FirebaseFirestore? firestore, FirebaseStorage? storage})
+    : _firestore = firestore ?? FirebaseFirestore.instance,
+      _storage = storage ?? FirebaseStorage.instance;
 
   final FirebaseFirestore _firestore;
   final FirebaseStorage _storage;
@@ -26,12 +24,15 @@ class AdminGalleryService {
 
   UploadTask uploadImageTask({
     required String id,
-    required String extension,
-    required String imagePath,
+    required UploadFileData image,
   }) {
-    return imageRef(id, extension: extension).putFile(
-      File(imagePath),
-      SettableMetadata(contentType: 'image/$extension'),
+    final ext = imageExtensionFromName(image.name);
+    return imageRef(id, extension: ext).putData(
+      image.bytes,
+      SettableMetadata(
+        contentType: imageMimeTypeFromName(image.name),
+        customMetadata: {'originalName': image.name},
+      ),
     );
   }
 
@@ -40,10 +41,9 @@ class AdminGalleryService {
   }
 
   Future<void> updateFolder(String id, String folderId) async {
-    await _col.doc(id).set(
-      {'folder': GalleryFolder.normalizeId(folderId)},
-      SetOptions(merge: true),
-    );
+    await _col.doc(id).set({
+      'folder': GalleryFolder.normalizeId(folderId),
+    }, SetOptions(merge: true));
   }
 
   Future<void> upsert(GalleryImageModel model) async {
@@ -52,8 +52,9 @@ class AdminGalleryService {
 
   Stream<List<GalleryImageModel>> streamAll() {
     return _col.snapshots().map((snap) {
-      final list =
-          snap.docs.map((d) => GalleryImageModel.fromFirestore(d)).toList();
+      final list = snap.docs
+          .map((d) => GalleryImageModel.fromFirestore(d))
+          .toList();
       list.sort((a, b) => b.uploadedAt.compareTo(a.uploadedAt));
       return list;
     });
@@ -75,4 +76,3 @@ class AdminGalleryService {
     return storageOk;
   }
 }
-

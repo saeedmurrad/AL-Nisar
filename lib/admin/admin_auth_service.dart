@@ -3,7 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'admin_config.dart';
 
 class AdminAuthService {
-  AdminAuthService({FirebaseAuth? auth}) : _auth = auth ?? FirebaseAuth.instance;
+  AdminAuthService({FirebaseAuth? auth})
+    : _auth = auth ?? FirebaseAuth.instance;
 
   final FirebaseAuth _auth;
 
@@ -30,4 +31,3 @@ class AdminAuthService {
 
   Future<void> signOut() => _auth.signOut();
 }
-

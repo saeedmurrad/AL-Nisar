@@ -5,7 +5,7 @@ import '../models/social_links_config.dart';
 
 class SocialLinksService {
   SocialLinksService({FirebaseFirestore? firestore})
-      : _firestore = firestore ?? FirebaseFirestore.instance;
+    : _firestore = firestore ?? FirebaseFirestore.instance;
 
   final FirebaseFirestore _firestore;
 

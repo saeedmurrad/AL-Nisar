@@ -33,7 +33,10 @@ class _SabaqListScreenState extends State<SabaqListScreen> {
   final _sabaq = SabaqService();
   final _access = SabaqAccessService();
 
-  SabaqAccessRequestModel? _latestRequest(List<SabaqAccessRequestModel> all, String sabaqId) {
+  SabaqAccessRequestModel? _latestRequest(
+    List<SabaqAccessRequestModel> all,
+    String sabaqId,
+  ) {
     final m = all.where((r) => r.sabaqId == sabaqId).toList()
       ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
     return m.isEmpty ? null : m.first;
@@ -64,8 +67,10 @@ class _SabaqListScreenState extends State<SabaqListScreen> {
     required AuthProvider auth,
     required SabaqPdfModel s,
     required bool locked,
+    required bool isNextRequestable,
     required SabaqAccessRequestModel? latest,
-    required String? freeSabaqId,
+    required List<SabaqPdfModel> ordered,
+    required Set<String> grantedIds,
   }) {
     final c = context.c;
 
@@ -75,20 +80,26 @@ class _SabaqListScreenState extends State<SabaqListScreen> {
           context: context,
           auth: auth,
           s: s,
-          freeSabaqId: freeSabaqId,
+          ordered: ordered,
+          grantedIds: grantedIds,
         ),
         icon: Icon(Icons.open_in_new, color: c.accentGold),
         tooltip: 'Open',
       );
     }
 
-    final canRequest = s.storagePath.trim().isNotEmpty;
     final status = latest?.status.toLowerCase();
+
+    // Only the next sequential Sabaq may be requested.
+    if (!isNextRequestable) {
+      return _statusChip(c, 'Locked', color: c.textMuted);
+    }
 
     if (status == 'pending') {
       return _statusChip(c, 'Pending');
     }
 
+    // Denied → allow send again (same next Sabaq).
     if (status == 'denied') {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -96,14 +107,14 @@ class _SabaqListScreenState extends State<SabaqListScreen> {
           _statusChip(c, 'Denied', color: c.textMuted),
           const SizedBox(height: 6),
           TextButton(
-            onPressed: canRequest
-                ? () => _requestAccess(
-                      context: context,
-                      auth: auth,
-                      s: s,
-                      isResubmit: true,
-                    )
-                : null,
+            onPressed: () => _requestAccess(
+              context: context,
+              auth: auth,
+              s: s,
+              ordered: ordered,
+              grantedIds: grantedIds,
+              isResubmit: true,
+            ),
             child: Text(
               'Send Request Again',
               style: AppTheme.lato(
@@ -118,15 +129,20 @@ class _SabaqListScreenState extends State<SabaqListScreen> {
     }
 
     if (status == 'approved') {
+      // Grant stream may lag briefly after approval.
       return _statusChip(c, 'Approved');
     }
 
     return TextButton(
-      onPressed: canRequest
-          ? () => _requestAccess(context: context, auth: auth, s: s)
-          : null,
+      onPressed: () => _requestAccess(
+        context: context,
+        auth: auth,
+        s: s,
+        ordered: ordered,
+        grantedIds: grantedIds,
+      ),
       child: Text(
-        'Send Request',
+        'Send Access Request',
         style: AppTheme.lato(
           fontSize: 12,
           fontWeight: FontWeight.w800,
@@ -136,18 +152,19 @@ class _SabaqListScreenState extends State<SabaqListScreen> {
     );
   }
 
-  List<SabaqPdfModel> _ordered(List<SabaqPdfModel> list) => dedupeSabaqList(list);
+  List<SabaqPdfModel> _ordered(List<SabaqPdfModel> list) =>
+      dedupeSabaqList(list);
 
   Future<void> _openSabaq({
     required BuildContext context,
     required AuthProvider auth,
     required SabaqPdfModel s,
-    required String? freeSabaqId,
+    required List<SabaqPdfModel> ordered,
+    required Set<String> grantedIds,
   }) async {
     final c = context.c;
     if (s.storagePath.trim().isEmpty) return;
 
-    // Admins can open everything.
     if (auth.isAdminOrHigher) {
       final book = BookModel(
         id: s.id,
@@ -163,7 +180,10 @@ class _SabaqListScreenState extends State<SabaqListScreen> {
         isActive: true,
       );
       if (!context.mounted) return;
-      context.push('/books/reader', extra: BookReaderArgs(book: book, autoDownloadIfMissing: true));
+      context.push(
+        '/books/reader',
+        extra: BookReaderArgs(book: book, autoDownloadIfMissing: true),
+      );
       return;
     }
 
@@ -171,19 +191,23 @@ class _SabaqListScreenState extends State<SabaqListScreen> {
     if (uid == null || uid.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Please sign in to open Sabaq', style: AppTheme.lato(color: c.textPrimary)),
+          content: Text(
+            'Please sign in to open Sabaq',
+            style: AppTheme.lato(color: c.textPrimary),
+          ),
           backgroundColor: c.backgroundElevated,
         ),
       );
       return;
     }
 
-    final isFree = freeSabaqId != null && freeSabaqId == s.id;
+    final unlocked = memberHasSabaqAccess(
+      ordered: ordered,
+      grantedIds: grantedIds,
+      sabaqId: s.id,
+    );
 
-    final granted = await _access.hasAccess(uid, s.id);
-    if (!context.mounted) return;
-
-    if (isFree || granted) {
+    if (unlocked) {
       final book = BookModel(
         id: s.id,
         title: s.titleEn,
@@ -198,7 +222,10 @@ class _SabaqListScreenState extends State<SabaqListScreen> {
         isActive: true,
       );
       if (!context.mounted) return;
-      context.push('/books/reader', extra: BookReaderArgs(book: book, autoDownloadIfMissing: true));
+      context.push(
+        '/books/reader',
+        extra: BookReaderArgs(book: book, autoDownloadIfMissing: true),
+      );
       return;
     }
 
@@ -206,7 +233,7 @@ class _SabaqListScreenState extends State<SabaqListScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          'This Sabaq is locked. Request access from Admin.',
+          'This Sabaq is locked. Request access for the next available lesson.',
           style: AppTheme.lato(color: c.textPrimary),
         ),
         backgroundColor: c.backgroundElevated,
@@ -218,18 +245,41 @@ class _SabaqListScreenState extends State<SabaqListScreen> {
     required BuildContext context,
     required AuthProvider auth,
     required SabaqPdfModel s,
+    required List<SabaqPdfModel> ordered,
+    required Set<String> grantedIds,
     bool isResubmit = false,
   }) async {
     final c = context.c;
     if (!auth.isAuthenticated) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Please sign in to request access', style: AppTheme.lato(color: c.textPrimary)),
+          content: Text(
+            'Please sign in to request access',
+            style: AppTheme.lato(color: c.textPrimary),
+          ),
           backgroundColor: c.backgroundElevated,
         ),
       );
       return;
     }
+
+    final nextId = nextRequestableSabaqId(
+      ordered: ordered,
+      grantedIds: grantedIds,
+    );
+    if (nextId == null || nextId != s.id) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'You can only request the next Sabaq in sequence.',
+            style: AppTheme.lato(color: c.textPrimary),
+          ),
+          backgroundColor: c.backgroundElevated,
+        ),
+      );
+      return;
+    }
+
     final msgCtrl = TextEditingController();
     final send = await showDialog<bool>(
       context: context,
@@ -274,11 +324,16 @@ class _SabaqListScreenState extends State<SabaqListScreen> {
         s,
         message: msgCtrl.text,
         displayName: displayName,
+        orderedSabaqs: ordered,
+        grantedIds: grantedIds,
       );
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Access request sent', style: AppTheme.lato(color: c.textPrimary)),
+          content: Text(
+            'Access request sent',
+            style: AppTheme.lato(color: c.textPrimary),
+          ),
           backgroundColor: c.backgroundElevated,
         ),
       );
@@ -323,88 +378,130 @@ class _SabaqListScreenState extends State<SabaqListScreen> {
                 final list = snap.data;
                 final use = (list == null || list.isEmpty)
                     ? DummyData.sabaqList
-                        .map(
-                          (s) => SabaqPdfModel(
-                            id: s.id,
-                            titleEn: s.title,
-                            titleUr: s.urduTitle ?? '',
-                            storagePath: '',
-                            thumbnailUrl: s.coverImageUrl,
-                            uploadedAt: DateTime.now(),
-                            isActive: true,
-                            orderNumber: s.lessonNumber,
-                          ),
-                        )
-                        .toList()
+                          .map(
+                            (s) => SabaqPdfModel(
+                              id: s.id,
+                              titleEn: s.title,
+                              titleUr: s.urduTitle ?? '',
+                              storagePath: '',
+                              thumbnailUrl: s.coverImageUrl,
+                              uploadedAt: DateTime.now(),
+                              isActive: true,
+                              orderNumber: s.lessonNumber,
+                            ),
+                          )
+                          .toList()
                     : list;
 
                 final ordered = _ordered(use);
-                final firstId = ordered.isNotEmpty ? ordered.first.id : null;
                 final uid = auth.user?.uid ?? '';
 
-                return StreamBuilder<List<SabaqAccessRequestModel>>(
-                  stream: uid.isEmpty ? Stream.value(const []) : _access.streamRequestsForUser(uid),
-                  builder: (context, reqSnap) {
-                    final userRequests = reqSnap.data ?? [];
-                    return ListView.separated(
-                  padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
-                  itemCount: ordered.length,
-                  separatorBuilder: (context, index) => const SizedBox(height: 12),
-                  itemBuilder: (context, i) {
-                    final s = ordered[i];
-                    final isFree = !auth.isAdminOrHigher &&
-                        firstId != null &&
-                        firstId == s.id &&
-                        uid.isNotEmpty;
-
-                    if (auth.isAdminOrHigher || isFree) {
+                if (auth.isAdminOrHigher) {
+                  return ListView.separated(
+                    padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+                    itemCount: ordered.length,
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: 12),
+                    itemBuilder: (context, i) {
+                      final s = ordered[i];
                       return InkWell(
                         onTap: () => _openSabaq(
                           context: context,
                           auth: auth,
                           s: s,
-                          freeSabaqId: firstId,
+                          ordered: ordered,
+                          grantedIds: const {},
                         ),
                         child: _SabaqPdfTile(s: s, locked: false),
                       );
-                    }
+                    },
+                  );
+                }
 
-                    return StreamBuilder<bool>(
+                return StreamBuilder<Set<String>>(
+                  stream: uid.isEmpty
+                      ? Stream.value(const <String>{})
+                      : _access.streamGrantedSabaqIds(uid),
+                  builder: (context, grantSnap) {
+                    final grantedIds = grantSnap.data ?? const <String>{};
+                    final nextId = uid.isEmpty
+                        ? null
+                        : nextRequestableSabaqId(
+                            ordered: ordered,
+                            grantedIds: grantedIds,
+                          );
+
+                    return StreamBuilder<List<SabaqAccessRequestModel>>(
                       stream: uid.isEmpty
-                          ? Stream.value(false)
-                          : _access.streamHasAccess(uid, s.id),
-                      builder: (context, accSnap) {
-                        final granted = accSnap.data == true;
-                        final locked = !granted;
-                        final latest = _latestRequest(userRequests, s.id);
-                        return GoldCard(
-                          backgroundColor: c.backgroundSurface,
-                          padding: const EdgeInsets.all(12),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Expanded(
-                                child: Opacity(
-                                  opacity: locked ? 0.55 : 1,
-                                  child: _SabaqPdfTile(s: s, locked: locked, showChevron: false),
+                          ? Stream.value(const [])
+                          : _access.streamRequestsForUser(uid),
+                      builder: (context, reqSnap) {
+                        final userRequests = reqSnap.data ?? [];
+                        return ListView.separated(
+                          padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+                          itemCount: ordered.length,
+                          separatorBuilder: (context, index) =>
+                              const SizedBox(height: 12),
+                          itemBuilder: (context, i) {
+                            final s = ordered[i];
+                            final unlocked =
+                                uid.isNotEmpty &&
+                                memberHasSabaqAccess(
+                                  ordered: ordered,
+                                  grantedIds: grantedIds,
+                                  sabaqId: s.id,
+                                );
+                            final locked = !unlocked;
+                            final isNext = nextId != null && nextId == s.id;
+                            final latest = _latestRequest(userRequests, s.id);
+
+                            if (!locked) {
+                              return InkWell(
+                                onTap: () => _openSabaq(
+                                  context: context,
+                                  auth: auth,
+                                  s: s,
+                                  ordered: ordered,
+                                  grantedIds: grantedIds,
                                 ),
+                                child: _SabaqPdfTile(s: s, locked: false),
+                              );
+                            }
+
+                            return GoldCard(
+                              backgroundColor: c.backgroundSurface,
+                              padding: const EdgeInsets.all(12),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Expanded(
+                                    child: Opacity(
+                                      opacity: 0.55,
+                                      child: _SabaqPdfTile(
+                                        s: s,
+                                        locked: true,
+                                        showChevron: false,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  _buildAccessActions(
+                                    context: context,
+                                    auth: auth,
+                                    s: s,
+                                    locked: locked,
+                                    isNextRequestable: isNext,
+                                    latest: latest,
+                                    ordered: ordered,
+                                    grantedIds: grantedIds,
+                                  ),
+                                ],
                               ),
-                              const SizedBox(width: 10),
-                              _buildAccessActions(
-                                context: context,
-                                auth: auth,
-                                s: s,
-                                locked: locked,
-                                latest: latest,
-                                freeSabaqId: firstId,
-                              ),
-                            ],
-                          ),
+                            );
+                          },
                         );
                       },
                     );
-                  },
-                );
                   },
                 );
               },
@@ -443,11 +540,15 @@ class _SabaqPdfTile extends StatelessWidget {
                     imageUrl: s.thumbnailUrl,
                     fit: BoxFit.cover,
                     placeholder: (context, url) => const ShimmerPlaceholder(),
-                    errorWidget: (context, url, error) => const GoldPatternError(),
+                    errorWidget: (context, url, error) =>
+                        const GoldPatternError(),
                   )
                 : ColoredBox(
                     color: c.backgroundInput,
-                    child: Icon(Icons.picture_as_pdf_outlined, color: c.accentGold),
+                    child: Icon(
+                      Icons.picture_as_pdf_outlined,
+                      color: c.accentGold,
+                    ),
                   ),
           ),
         ),
@@ -494,10 +595,7 @@ class _SabaqPdfTile extends StatelessWidget {
             _chevronRightSvg,
             width: 18,
             height: 18,
-            colorFilter: ColorFilter.mode(
-              c.accentGold,
-              BlendMode.srcIn,
-            ),
+            colorFilter: ColorFilter.mode(c.accentGold, BlendMode.srcIn),
           ),
       ],
     );
@@ -506,4 +604,3 @@ class _SabaqPdfTile extends StatelessWidget {
 
 const _chevronRightSvg =
     '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 5.5L16 12l-6.5 6.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-

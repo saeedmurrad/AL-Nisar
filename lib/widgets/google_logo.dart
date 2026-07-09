@@ -8,11 +8,7 @@ class GoogleLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SvgPicture.string(
-      _googleSvg,
-      width: size,
-      height: size,
-    );
+    return SvgPicture.string(_googleSvg, width: size, height: size);
   }
 }
 

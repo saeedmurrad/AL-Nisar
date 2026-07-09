@@ -4,10 +4,8 @@ import 'package:firebase_core/firebase_core.dart';
 import '../models/lesson_model.dart';
 
 class LessonsService {
-  LessonsService({
-    FirebaseFirestore? firestore,
-    required this.collectionPath,
-  }) : _firestore = firestore ?? FirebaseFirestore.instance;
+  LessonsService({FirebaseFirestore? firestore, required this.collectionPath})
+    : _firestore = firestore ?? FirebaseFirestore.instance;
 
   final FirebaseFirestore _firestore;
   final String collectionPath;
@@ -31,4 +29,3 @@ class LessonsService {
     });
   }
 }
-

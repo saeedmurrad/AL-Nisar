@@ -48,4 +48,53 @@ void main() {
     expect(out.where((s) => s.titleEn.contains('05')).length, 1);
     expect(out.last.id, 'new');
   });
+
+  test('first Sabaq is free; next requestable is the second', () {
+    final ordered = dedupeSabaqList([
+      _model(id: '1', titleEn: 'Sabaq 01 — A', orderNumber: 1),
+      _model(id: '2', titleEn: 'Sabaq 02 — B', orderNumber: 2),
+      _model(id: '3', titleEn: 'Sabaq 03 — C', orderNumber: 3),
+    ]);
+    expect(isFreeSabaqId(ordered, '1'), isTrue);
+    expect(isFreeSabaqId(ordered, '2'), isFalse);
+    expect(
+      nextRequestableSabaqId(ordered: ordered, grantedIds: {}),
+      '2',
+    );
+  });
+
+  test('after grant, next requestable advances sequentially', () {
+    final ordered = dedupeSabaqList([
+      _model(id: '1', titleEn: 'Sabaq 01 — A', orderNumber: 1),
+      _model(id: '2', titleEn: 'Sabaq 02 — B', orderNumber: 2),
+      _model(id: '3', titleEn: 'Sabaq 03 — C', orderNumber: 3),
+    ]);
+    expect(
+      nextRequestableSabaqId(ordered: ordered, grantedIds: {'2'}),
+      '3',
+    );
+    expect(
+      nextRequestableSabaqId(ordered: ordered, grantedIds: {'2', '3'}),
+      isNull,
+    );
+  });
+
+  test('memberHasSabaqAccess treats free first and grants', () {
+    final ordered = dedupeSabaqList([
+      _model(id: '1', titleEn: 'Sabaq 01 — A', orderNumber: 1),
+      _model(id: '2', titleEn: 'Sabaq 02 — B', orderNumber: 2),
+    ]);
+    expect(
+      memberHasSabaqAccess(ordered: ordered, grantedIds: {}, sabaqId: '1'),
+      isTrue,
+    );
+    expect(
+      memberHasSabaqAccess(ordered: ordered, grantedIds: {}, sabaqId: '2'),
+      isFalse,
+    );
+    expect(
+      memberHasSabaqAccess(ordered: ordered, grantedIds: {'2'}, sabaqId: '2'),
+      isTrue,
+    );
+  });
 }

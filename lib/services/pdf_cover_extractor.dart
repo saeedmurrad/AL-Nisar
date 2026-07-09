@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -10,13 +9,14 @@ import 'package:syncfusion_flutter_pdf/pdf.dart' as sf;
 /// Uses [pdfx] on supported IO platforms (Android, iOS, macOS, Windows). On Web,
 /// Linux, or if rendering fails, page count falls back to Syncfusion (no thumbnail).
 Future<({int pageCount, Uint8List? coverPng})> extractPdfPageCountAndCover(
-  String pdfPath,
-) async {
-  if (!File(pdfPath).existsSync()) {
+  Uint8List pdfBytes, {
+  String? pdfPath,
+}) async {
+  if (pdfBytes.isEmpty) {
     return (pageCount: 0, coverPng: null);
   }
 
-  if (!kIsWeb && await hasPdfSupport()) {
+  if (!kIsWeb && pdfPath != null && await hasPdfSupport()) {
     PdfDocument? pdfxDoc;
     try {
       pdfxDoc = await PdfDocument.openFile(pdfPath);
@@ -42,7 +42,7 @@ Future<({int pageCount, Uint8List? coverPng})> extractPdfPageCountAndCover(
     }
   }
 
-  return _pageCountSyncfusionOnly(pdfPath);
+  return _pageCountSyncfusionOnly(pdfBytes);
 }
 
 Future<Uint8List?> _renderFirstPageCover(PdfPage page) async {
@@ -75,12 +75,11 @@ Future<Uint8List?> _renderFirstPageCover(PdfPage page) async {
 }
 
 Future<({int pageCount, Uint8List? coverPng})> _pageCountSyncfusionOnly(
-  String pdfPath,
+  Uint8List pdfBytes,
 ) async {
   sf.PdfDocument? doc;
   try {
-    final bytes = await File(pdfPath).readAsBytes();
-    doc = sf.PdfDocument(inputBytes: bytes);
+    doc = sf.PdfDocument(inputBytes: pdfBytes);
     final n = doc.pages.count;
     return (pageCount: n > 0 ? n : 0, coverPng: null);
   } catch (_) {

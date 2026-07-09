@@ -37,7 +37,8 @@ class AdminSabaqRequestsScreen extends StatelessWidget {
                 return ListView.separated(
                   padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
                   itemCount: list.length,
-                  separatorBuilder: (context, index) => const SizedBox(height: 10),
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 10),
                   itemBuilder: (context, i) {
                     final r = list[i];
                     return GoldCard(
@@ -70,13 +71,20 @@ class AdminSabaqRequestsScreen extends StatelessWidget {
                           const SizedBox(height: 8),
                           Text(
                             'Member: ${r.userName.isNotEmpty ? r.userName : '(name not provided)'}',
-                            style: AppTheme.lato(fontSize: 12, color: c.textMuted),
+                            style: AppTheme.lato(
+                              fontSize: 12,
+                              color: c.textMuted,
+                            ),
                           ),
                           if (r.message.trim().isNotEmpty) ...[
                             const SizedBox(height: 8),
                             Text(
                               'Message: ${r.message.trim()}',
-                              style: AppTheme.lato(fontSize: 12, color: c.textSecondary, height: 1.35),
+                              style: AppTheme.lato(
+                                fontSize: 12,
+                                color: c.textSecondary,
+                                height: 1.35,
+                              ),
                             ),
                           ],
                           const SizedBox(height: 10),
@@ -89,9 +97,16 @@ class AdminSabaqRequestsScreen extends StatelessWidget {
                                   },
                                   style: OutlinedButton.styleFrom(
                                     foregroundColor: Colors.red.shade300,
-                                    side: BorderSide(color: Colors.red.shade300),
+                                    side: BorderSide(
+                                      color: Colors.red.shade300,
+                                    ),
                                   ),
-                                  child: Text('Deny', style: AppTheme.lato(fontWeight: FontWeight.w700)),
+                                  child: Text(
+                                    'Deny',
+                                    style: AppTheme.lato(
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
                                 ),
                               ),
                               const SizedBox(width: 10),
@@ -106,12 +121,19 @@ class AdminSabaqRequestsScreen extends StatelessWidget {
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: c.accentGold,
-                                    foregroundColor: Theme.of(context).brightness == Brightness.dark
+                                    foregroundColor:
+                                        Theme.of(context).brightness ==
+                                            Brightness.dark
                                         ? c.backgroundPrimary
                                         : c.textPrimary,
                                     elevation: 0,
                                   ),
-                                  child: Text('Allow', style: AppTheme.lato(fontWeight: FontWeight.w700)),
+                                  child: Text(
+                                    'Allow',
+                                    style: AppTheme.lato(
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ],

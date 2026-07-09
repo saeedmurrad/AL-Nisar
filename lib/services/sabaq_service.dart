@@ -6,7 +6,7 @@ import '../utils/sabaq_order_utils.dart';
 
 class SabaqService {
   SabaqService({FirebaseFirestore? firestore})
-      : _firestore = firestore ?? FirebaseFirestore.instance;
+    : _firestore = firestore ?? FirebaseFirestore.instance;
 
   final FirebaseFirestore _firestore;
 

@@ -9,9 +9,7 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -33,6 +31,15 @@ class DefaultFirebaseOptions {
     appId: '1:4782847785:android:ac6ec21729169ce343a938',
     messagingSenderId: '4782847785',
     projectId: 'al-nisar-app',
+    storageBucket: 'al-nisar-app.firebasestorage.app',
+  );
+
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyA_aW0gKdgAwIlkLQoK-IbIxngdfAdGlSA',
+    appId: '1:4782847785:web:958bba864d4694ba43a938',
+    messagingSenderId: '4782847785',
+    projectId: 'al-nisar-app',
+    authDomain: 'al-nisar-app.firebaseapp.com',
     storageBucket: 'al-nisar-app.firebasestorage.app',
   );
 }

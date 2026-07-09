@@ -20,15 +20,10 @@ class AppShellChrome extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: c.backgroundSurface,
-        border: Border(
-          bottom: BorderSide(color: c.borderDefault, width: 0.5),
-        ),
+        border: Border(bottom: BorderSide(color: c.borderDefault, width: 0.5)),
       ),
       padding: padding,
-      child: SafeArea(
-        bottom: false,
-        child: child,
-      ),
+      child: SafeArea(bottom: false, child: child),
     );
   }
 }

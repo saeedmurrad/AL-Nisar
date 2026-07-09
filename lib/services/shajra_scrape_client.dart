@@ -130,7 +130,8 @@ class ShajraScrapeClient {
     for (final e in out) {
       deduped[e.number] = e;
     }
-    return deduped.values.toList()..sort((a, b) => a.number.compareTo(b.number));
+    return deduped.values.toList()
+      ..sort((a, b) => a.number.compareTo(b.number));
   }
 
   int? _plainIndexFromCellText(String raw) {
@@ -188,7 +189,10 @@ class ShajraScrapeClient {
 
     if (t.isNotEmpty) return t;
 
-    final parts = fullTitle.split(RegExp(r'\s+')).where((p) => p.isNotEmpty).toList();
+    final parts = fullTitle
+        .split(RegExp(r'\s+'))
+        .where((p) => p.isNotEmpty)
+        .toList();
     if (parts.length >= 3) {
       final start = parts.length - 4 >= 0 ? parts.length - 4 : 0;
       return parts.sublist(start).join(' ');

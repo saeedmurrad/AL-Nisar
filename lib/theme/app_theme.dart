@@ -8,20 +8,16 @@ class AppTheme {
   static ThemeData themeFor({
     required AppColorPalette palette,
     required Brightness brightness,
-  }) =>
-      _buildTheme(
-        brightness: brightness,
-        colors: palette.colorsFor(brightness),
-      );
+  }) => _buildTheme(
+    brightness: brightness,
+    colors: palette.colorsFor(brightness),
+  );
 
   static ThemeData _buildTheme({
     required Brightness brightness,
     required AppThemeColors colors,
   }) {
-    final base = ThemeData(
-      useMaterial3: true,
-      brightness: brightness,
-    );
+    final base = ThemeData(useMaterial3: true, brightness: brightness);
 
     final poppins = GoogleFonts.poppinsTextTheme();
 
@@ -108,37 +104,34 @@ class AppTheme {
     FontWeight fontWeight = FontWeight.w600,
     Color? color,
     double letterSpacing = 0.5,
-  }) =>
-      cormorantGaramond(
-        fontSize: fontSize,
-        fontWeight: fontWeight,
-        color: color,
-        letterSpacing: letterSpacing,
-      );
+  }) => cormorantGaramond(
+    fontSize: fontSize,
+    fontWeight: fontWeight,
+    color: color,
+    letterSpacing: letterSpacing,
+  );
 
   static TextStyle sectionCaption({
     Color? color,
     double fontSize = 11,
     double letterSpacing = 1.8,
-  }) =>
-      lato(
-        fontSize: fontSize,
-        fontWeight: FontWeight.w600,
-        color: color,
-        letterSpacing: letterSpacing,
-      );
+  }) => lato(
+    fontSize: fontSize,
+    fontWeight: FontWeight.w600,
+    color: color,
+    letterSpacing: letterSpacing,
+  );
 
   static TextStyle uiLabel({
     Color? color,
     double fontSize = 14,
     FontWeight fontWeight = FontWeight.w500,
-  }) =>
-      lato(
-        fontSize: fontSize,
-        fontWeight: fontWeight,
-        color: color,
-        letterSpacing: 0.4,
-      );
+  }) => lato(
+    fontSize: fontSize,
+    fontWeight: fontWeight,
+    color: color,
+    letterSpacing: 0.4,
+  );
 
   static TextStyle amiriUrdu({
     double fontSize = 18,
@@ -186,4 +179,3 @@ class AppTheme {
     );
   }
 }
-

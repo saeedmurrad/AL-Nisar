@@ -118,7 +118,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         height: 92,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          border: Border.all(color: c.accentGold.o(0.35), width: 3),
+                          border: Border.all(
+                            color: c.accentGold.o(0.35),
+                            width: 3,
+                          ),
                         ),
                         padding: const EdgeInsets.all(3),
                         child: Container(
@@ -128,31 +131,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             border: Border.all(color: c.accentGold, width: 1.5),
                           ),
                           child: photoUrl.trim().isNotEmpty
-                            ? ClipOval(
-                                child: Image.network(
-                                  photoUrl,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stack) =>
-                                      Center(
-                                        child: Text(
-                                          initials,
-                                          style: AppTheme.displayTitle(
-                                            fontSize: 34,
-                                            color: c.textPrimary,
+                              ? ClipOval(
+                                  child: Image.network(
+                                    photoUrl,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stack) =>
+                                        Center(
+                                          child: Text(
+                                            initials,
+                                            style: AppTheme.displayTitle(
+                                              fontSize: 34,
+                                              color: c.textPrimary,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                ),
-                              )
-                            : Center(
-                                child: Text(
-                                  initials,
-                                  style: AppTheme.displayTitle(
-                                    fontSize: 34,
-                                    color: c.textPrimary,
+                                  ),
+                                )
+                              : Center(
+                                  child: Text(
+                                    initials,
+                                    style: AppTheme.displayTitle(
+                                      fontSize: 34,
+                                      color: c.textPrimary,
+                                    ),
                                   ),
                                 ),
-                              ),
                         ),
                       ),
                       const SizedBox(height: 12),
@@ -235,7 +238,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 children: [
                                   Text(
                                     'My Bookmarks',
-                                    style: AppTheme.uiLabel(color: c.textPrimary),
+                                    style: AppTheme.uiLabel(
+                                      color: c.textPrimary,
+                                    ),
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
@@ -293,7 +298,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       if (_tab == 0)
                         Text(
                           'Coming soon.',
-                          style: AppTheme.lato(fontSize: 12, color: c.textMuted),
+                          style: AppTheme.lato(
+                            fontSize: 12,
+                            color: c.textMuted,
+                          ),
                         )
                       else
                         FutureBuilder<({int total, int urdu, int english})>(
@@ -351,23 +359,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(height: 18),
                 Row(
                   children: [
-                    Expanded(
-                      child: SectionLabel('Appearance'),
-                    ),
+                    Expanded(child: SectionLabel('Appearance')),
                     const ThemeToggleButton(),
                   ],
                 ),
                 const SizedBox(height: 10),
                 Text(
                   'Color theme',
-                  style: AppTheme.sectionCaption(color: c.textMuted, letterSpacing: 0.6),
+                  style: AppTheme.sectionCaption(
+                    color: c.textMuted,
+                    letterSpacing: 0.6,
+                  ),
                 ),
                 const SizedBox(height: 6),
                 const ThemePalettePicker(compact: false),
                 const SizedBox(height: 14),
                 Text(
                   'Text size',
-                  style: AppTheme.sectionCaption(color: c.textMuted, letterSpacing: 0.6),
+                  style: AppTheme.sectionCaption(
+                    color: c.textMuted,
+                    letterSpacing: 0.6,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 const FontScaleControl(),
@@ -391,7 +403,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 const SizedBox(height: 6),
                                 Text(
                                   'Upload and manage app content',
-                                  style: AppTheme.lato(fontSize: 12, color: c.textMuted),
+                                  style: AppTheme.lato(
+                                    fontSize: 12,
+                                    color: c.textMuted,
+                                  ),
                                 ),
                               ],
                             ),

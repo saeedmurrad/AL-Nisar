@@ -70,9 +70,7 @@ class _SunIcon extends StatelessWidget {
     return SizedBox(
       width: 22,
       height: 22,
-      child: CustomPaint(
-        painter: _SunPainter(color: color),
-      ),
+      child: CustomPaint(painter: _SunPainter(color: color)),
     );
   }
 }
@@ -87,9 +85,7 @@ class _MoonIcon extends StatelessWidget {
     return SizedBox(
       width: 22,
       height: 22,
-      child: CustomPaint(
-        painter: _MoonPainter(color: color),
-      ),
+      child: CustomPaint(painter: _MoonPainter(color: color)),
     );
   }
 }
@@ -153,4 +149,3 @@ class _SunPainter extends CustomPainter {
   bool shouldRepaint(covariant _SunPainter oldDelegate) =>
       oldDelegate.color != color;
 }
-

@@ -29,6 +29,7 @@ class ScreenNavigationHeader extends StatelessWidget {
   final VoidCallback? onHome;
   final bool backEnabled;
   final bool homeEnabled;
+
   /// When true, the back arrow is visible but not tappable (e.g. during save).
   final bool disableBack;
 
@@ -54,11 +55,9 @@ class ScreenNavigationHeader extends StatelessWidget {
               icon: Icon(Icons.home_outlined, color: c.accentGold),
             ),
           Expanded(
-            child: titleWidget ??
-                Text(
-                  title,
-                  style: AppTheme.displayTitle(color: c.textPrimary),
-                ),
+            child:
+                titleWidget ??
+                Text(title, style: AppTheme.displayTitle(color: c.textPrimary)),
           ),
           if (trailing case final t?) t,
         ],

@@ -43,10 +43,7 @@ class _SabaqReaderScreenState extends State<SabaqReaderScreen> {
     return Scaffold(
       body: Column(
         children: [
-          _TopBar(
-            title: 'Sabaq Reader',
-            onBack: () => popOrGoHome(context),
-          ),
+          _TopBar(title: 'Sabaq Reader', onBack: () => popOrGoHome(context)),
           Expanded(
             child: ListView(
               padding: EdgeInsets.zero,
@@ -87,11 +84,14 @@ class _SabaqReaderScreenState extends State<SabaqReaderScreen> {
                             ),
                             const SizedBox(height: 14),
                             SizedBox(
-                              height: ResponsiveLayout.lessonPageViewportHeight(context),
+                              height: ResponsiveLayout.lessonPageViewportHeight(
+                                context,
+                              ),
                               child: PageView.builder(
                                 controller: _pc,
                                 itemCount: pages.length,
-                                onPageChanged: (i) => setState(() => _index = i),
+                                onPageChanged: (i) =>
+                                    setState(() => _index = i),
                                 itemBuilder: (context, i) =>
                                     _PageContent(page: pages[i]),
                               ),
@@ -105,8 +105,9 @@ class _SabaqReaderScreenState extends State<SabaqReaderScreen> {
                                   onTap: () {
                                     if (_index == 0) return;
                                     _pc.previousPage(
-                                      duration:
-                                          const Duration(milliseconds: 240),
+                                      duration: const Duration(
+                                        milliseconds: 240,
+                                      ),
                                       curve: Curves.easeOut,
                                     );
                                   },
@@ -119,8 +120,7 @@ class _SabaqReaderScreenState extends State<SabaqReaderScreen> {
                                     dotHeight: 7,
                                     dotWidth: 7,
                                     spacing: 8,
-                                    dotColor:
-                                        c.borderDefault.o(0.9),
+                                    dotColor: c.borderDefault.o(0.9),
                                     activeDotColor: c.accentGold,
                                   ),
                                 ),
@@ -131,8 +131,9 @@ class _SabaqReaderScreenState extends State<SabaqReaderScreen> {
                                   onTap: () {
                                     if (_index >= pages.length - 1) return;
                                     _pc.nextPage(
-                                      duration:
-                                          const Duration(milliseconds: 240),
+                                      duration: const Duration(
+                                        milliseconds: 240,
+                                      ),
                                       curve: Curves.easeOut,
                                     );
                                   },
@@ -175,7 +176,9 @@ class _SabaqReaderScreenState extends State<SabaqReaderScreen> {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      ...locked.take(3).map(
+                      ...locked
+                          .take(3)
+                          .map(
                             (s) => Padding(
                               padding: const EdgeInsets.only(bottom: 12),
                               child: LockedSabaqCard(
@@ -226,10 +229,7 @@ class _TopBar extends StatelessWidget {
                   _backSvg,
                   width: 18,
                   height: 18,
-                  colorFilter: ColorFilter.mode(
-                    c.accentGold,
-                    BlendMode.srcIn,
-                  ),
+                  colorFilter: ColorFilter.mode(c.accentGold, BlendMode.srcIn),
                 ),
               ),
             ),
@@ -384,10 +384,7 @@ class _NavPill extends StatelessWidget {
         decoration: BoxDecoration(
           color: c.backgroundElevated,
           borderRadius: BorderRadius.circular(999),
-          border: Border.all(
-            color: c.borderDefault,
-            width: 0.5,
-          ),
+          border: Border.all(color: c.borderDefault, width: 0.5),
         ),
         child: Text(
           label,
@@ -432,10 +429,7 @@ class _ActionPill extends StatelessWidget {
               iconSvg,
               width: 16,
               height: 16,
-              colorFilter: ColorFilter.mode(
-                c.accentGold,
-                BlendMode.srcIn,
-              ),
+              colorFilter: ColorFilter.mode(c.accentGold, BlendMode.srcIn),
             ),
             const SizedBox(width: 8),
             Text(
@@ -459,4 +453,3 @@ const _bookmarkSvg =
     '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7 4h10v17l-5-3-5 3V4z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>';
 const _shareSvg =
     '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M16 7l-8 4 8 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 9.2a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4zM6 13.2a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4zM18 19.2a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>';
-

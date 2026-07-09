@@ -100,8 +100,8 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                       backgroundColor: c.accentGold,
                       foregroundColor:
                           Theme.of(context).brightness == Brightness.dark
-                              ? c.backgroundPrimary
-                              : c.textPrimary,
+                          ? c.backgroundPrimary
+                          : c.textPrimary,
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -115,9 +115,10 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
                               color:
-                                  Theme.of(context).brightness == Brightness.dark
-                                      ? c.backgroundPrimary
-                                      : c.textPrimary,
+                                  Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? c.backgroundPrimary
+                                  : c.textPrimary,
                             ),
                           )
                         : Text(
@@ -203,4 +204,3 @@ class _Field extends StatelessWidget {
     );
   }
 }
-

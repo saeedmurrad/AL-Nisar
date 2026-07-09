@@ -67,4 +67,3 @@ class MandalaPainter extends CustomPainter {
         oldDelegate.petals != petals;
   }
 }
-

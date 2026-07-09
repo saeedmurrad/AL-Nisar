@@ -141,8 +141,9 @@ class _NewsEventsScreenState extends State<NewsEventsScreen>
                     }
 
                     final featured = use.first;
-                    final rest =
-                        use.length <= 1 ? <NewsFirestoreModel>[] : use.sublist(1);
+                    final rest = use.length <= 1
+                        ? <NewsFirestoreModel>[]
+                        : use.sublist(1);
 
                     return _NewsTabFirestore(
                       featured: featured,
@@ -265,7 +266,8 @@ class _NewsTabFirestore extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
       children: [
         InkWell(
-          onTap: () => context.push('/news-events/news-detail', extra: featured),
+          onTap: () =>
+              context.push('/news-events/news-detail', extra: featured),
           borderRadius: BorderRadius.circular(14),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(14),
@@ -330,10 +332,7 @@ class _NewsTabFirestore extends StatelessWidget {
                   bottom: 12,
                   child: Text(
                     featured.dateLabel,
-                    style: AppTheme.lato(
-                      fontSize: 11,
-                      color: c.textMuted,
-                    ),
+                    style: AppTheme.lato(fontSize: 11, color: c.textMuted),
                   ),
                 ),
               ],
@@ -408,10 +407,7 @@ class _NewsTabFirestore extends StatelessWidget {
 }
 
 class _EventsTabFirestore extends StatelessWidget {
-  const _EventsTabFirestore({
-    required this.nextEvent,
-    required this.events,
-  });
+  const _EventsTabFirestore({required this.nextEvent, required this.events});
 
   final EventFirestoreModel nextEvent;
   final List<EventFirestoreModel> events;
@@ -433,7 +429,10 @@ class _EventsTabFirestore extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 5,
+                ),
                 decoration: BoxDecoration(
                   color: c.accentGold.o(0.12),
                   borderRadius: BorderRadius.circular(999),
@@ -462,7 +461,11 @@ class _EventsTabFirestore extends StatelessWidget {
               const SizedBox(height: 10),
               Row(
                 children: [
-                  Icon(Icons.calendar_today_outlined, size: 16, color: c.accentGold),
+                  Icon(
+                    Icons.calendar_today_outlined,
+                    size: 16,
+                    color: c.accentGold,
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -479,7 +482,11 @@ class _EventsTabFirestore extends StatelessWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.location_on_outlined, size: 16, color: c.accentGold),
+                  Icon(
+                    Icons.location_on_outlined,
+                    size: 16,
+                    color: c.accentGold,
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -539,7 +546,10 @@ class _EventsTabFirestore extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: c.accentGold.o(0.12),
                         borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: c.accentGold.o(0.30), width: 0.8),
+                        border: Border.all(
+                          color: c.accentGold.o(0.30),
+                          width: 0.8,
+                        ),
                       ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,

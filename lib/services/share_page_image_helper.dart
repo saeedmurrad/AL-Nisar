@@ -1,9 +1,9 @@
-import 'dart:io';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+
+import '../utils/file_bytes_utils.dart';
 
 /// Renders a simple branded card (title + page) as PNG and shares via [Share.shareXFiles].
 /// Syncfusion Flutter PDF does not expose page rasterization; this matches the share caption UX.
@@ -59,17 +59,11 @@ Future<void> sharePageImageCard({
     ),
     textDirection: TextDirection.ltr,
   )..layout();
-  pagePainter.paint(
-    canvas,
-    Offset(80, 120 + titlePainter.height),
-  );
+  pagePainter.paint(canvas, Offset(80, 120 + titlePainter.height));
   final sub = TextPainter(
     text: TextSpan(
       text: 'AL Nisar App',
-      style: TextStyle(
-        color: textColor.withValues(alpha: 0.75),
-        fontSize: 28,
-      ),
+      style: TextStyle(color: textColor.withValues(alpha: 0.75), fontSize: 28),
     ),
     textDirection: TextDirection.ltr,
   )..layout();
@@ -79,13 +73,12 @@ Future<void> sharePageImageCard({
   final bd = await image.toByteData(format: ui.ImageByteFormat.png);
   if (bd == null) return;
   final bytes = bd.buffer.asUint8List();
-  final dir = await getTemporaryDirectory();
-  final f = File(
-    '${dir.path}/al_nisar_page_${pageNumber}_${DateTime.now().millisecondsSinceEpoch}.png',
-  );
-  await f.writeAsBytes(bytes);
-  await Share.shareXFiles(
-    [XFile(f.path)],
-    text: 'From "$bookTitle" — Page $pageNumber\nAL Nisar App',
-  );
+  await Share.shareXFiles([
+    xFileFromBytes(
+      bytes,
+      name:
+          'al_nisar_page_${pageNumber}_${DateTime.now().millisecondsSinceEpoch}.png',
+      mimeType: 'image/png',
+    ),
+  ], text: 'From "$bookTitle" — Page $pageNumber\nAL Nisar App');
 }

@@ -87,7 +87,9 @@ class ThemeProvider extends ChangeNotifier {
       _themeMode = ThemeMode.light;
     }
     _colorPalette = AppColorPalette.fromName(prefs.getString(_paletteKey));
-    _fontScaleStep = clampFontScaleStep(prefs.getInt(_fontScaleStepKey) ?? defaultFontScaleStep);
+    _fontScaleStep = clampFontScaleStep(
+      prefs.getInt(_fontScaleStepKey) ?? defaultFontScaleStep,
+    );
     notifyListeners();
   }
 

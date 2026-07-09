@@ -32,12 +32,12 @@ class ShajraEntryModel {
   }
 
   Map<String, dynamic> toJson() => {
-        'number': number,
-        'fullTitle': fullTitle,
-        'shortName': shortName,
-        'detailUrl': detailUrl,
-        'language': language,
-      };
+    'number': number,
+    'fullTitle': fullTitle,
+    'shortName': shortName,
+    'detailUrl': detailUrl,
+    'language': language,
+  };
 
   factory ShajraEntryModel.fromJson(Map<String, dynamic> json) {
     return ShajraEntryModel(
@@ -52,10 +52,7 @@ class ShajraEntryModel {
 
 /// Arguments for the Shajra PDF viewer screen.
 class ShajraPdfRouteArgs {
-  const ShajraPdfRouteArgs({
-    required this.entry,
-    required this.assetPath,
-  });
+  const ShajraPdfRouteArgs({required this.entry, required this.assetPath});
 
   final ShajraEntryModel entry;
   final String assetPath;
@@ -83,10 +80,7 @@ class ShajraUrduPdfArgs {
 
 /// Arguments for [ShajraDetailScreen] (in-memory navigation only).
 class ShajraDetailRouteArgs {
-  const ShajraDetailRouteArgs({
-    required this.entry,
-    required this.allEntries,
-  });
+  const ShajraDetailRouteArgs({required this.entry, required this.allEntries});
 
   final ShajraEntryModel entry;
   final List<ShajraEntryModel> allEntries;

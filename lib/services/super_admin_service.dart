@@ -5,7 +5,7 @@ import '../auth/user_profile_model.dart';
 
 class SuperAdminService {
   SuperAdminService({FirebaseFirestore? firestore})
-      : _firestore = firestore ?? FirebaseFirestore.instance;
+    : _firestore = firestore ?? FirebaseFirestore.instance;
 
   final FirebaseFirestore _firestore;
 
@@ -18,7 +18,8 @@ class SuperAdminService {
   }
 
   Future<void> setUserRole(String uid, AppRole role) async {
-    await _firestore.collection('users').doc(uid).update({'role': role.firestoreValue});
+    await _firestore.collection('users').doc(uid).update({
+      'role': role.firestoreValue,
+    });
   }
 }
-

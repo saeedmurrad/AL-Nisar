@@ -6,4 +6,3 @@ extension ColorOpacityX on Color {
     return withValues(alpha: clamped);
   }
 }
-

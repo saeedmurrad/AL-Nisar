@@ -1,9 +1,8 @@
+import 'dart:typed_data';
+
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
-import 'dart:io';
 
 import '../models/irshad_firestore_model.dart';
 import '../models/irshadat_bookmark_model.dart';
@@ -11,6 +10,7 @@ import '../services/irshadat_bookmark_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
 import '../theme/color_utils.dart';
+import '../utils/file_bytes_utils.dart';
 import '../utils/responsive_layout.dart';
 import '../widgets/full_screen_image_viewer.dart';
 import '../widgets/gold_card.dart';
@@ -21,7 +21,8 @@ class IrshadatBookmarksScreen extends StatefulWidget {
   const IrshadatBookmarksScreen({super.key});
 
   @override
-  State<IrshadatBookmarksScreen> createState() => _IrshadatBookmarksScreenState();
+  State<IrshadatBookmarksScreen> createState() =>
+      _IrshadatBookmarksScreenState();
 }
 
 class _IrshadatBookmarksScreenState extends State<IrshadatBookmarksScreen> {
@@ -84,35 +85,25 @@ class _IrshadatBookmarksScreenState extends State<IrshadatBookmarksScreen> {
     }
 
     try {
-      final f = await _downloadToTemp(url, 'irshad_saved_${bm.id}');
-      if (f == null) {
+      final bytes = await _downloadToTemp(url);
+      if (bytes == null) {
         await Share.share('$msg\n\n$url');
         return;
       }
-      await Share.shareXFiles([XFile(f.path)], text: msg);
+      await Share.shareXFiles([
+        xFileFromBytes(
+          bytes,
+          name: 'irshad_saved_${bm.id}.${_guessImageExt(url)}',
+          mimeType: imageMimeTypeFromName(url),
+        ),
+      ], text: msg);
     } catch (_) {
       await Share.share('$msg\n\n$url');
     }
   }
 
-  Future<File?> _downloadToTemp(String url, String baseName) async {
-    final uri = Uri.tryParse(url);
-    if (uri == null) return null;
-    final dir = await getTemporaryDirectory();
-    final ext = _guessImageExt(uri.path);
-    final out = File('${dir.path}/$baseName.$ext');
-
-    final client = HttpClient();
-    try {
-      final req = await client.getUrl(uri);
-      final res = await req.close();
-      if (res.statusCode < 200 || res.statusCode >= 300) return null;
-      final bytes = await consolidateHttpClientResponseBytes(res);
-      await out.writeAsBytes(bytes, flush: true);
-      return out;
-    } finally {
-      client.close(force: true);
-    }
+  Future<Uint8List?> _downloadToTemp(String url) async {
+    return downloadUrlBytes(url);
   }
 
   String _guessImageExt(String path) {
@@ -122,10 +113,7 @@ class _IrshadatBookmarksScreenState extends State<IrshadatBookmarksScreen> {
     return 'jpg';
   }
 
-  void _openImageFullscreen(
-    List<IrshadatBookmarkModel> items,
-    int index,
-  ) {
+  void _openImageFullscreen(List<IrshadatBookmarkModel> items, int index) {
     final urls = <String>[];
     var galleryIndex = 0;
     int? targetIndex;
@@ -182,7 +170,10 @@ class _IrshadatBookmarksScreenState extends State<IrshadatBookmarksScreen> {
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       color: c.accentGold.o(0.15),
                       borderRadius: BorderRadius.circular(999),
@@ -255,28 +246,28 @@ class _IrshadatBookmarksScreenState extends State<IrshadatBookmarksScreen> {
               ],
               SingleChildScrollView(
                 child: bm.language.isRtl
-                      ? Directionality(
-                          textDirection: TextDirection.rtl,
-                          child: Text(
-                            bm.text,
-                            style: AppTheme.amiriUrdu(
-                              fontSize: 18,
-                              height: 2.0,
-                              color: c.textSecondary,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        )
-                      : Text(
+                    ? Directionality(
+                        textDirection: TextDirection.rtl,
+                        child: Text(
                           bm.text,
-                          style: TextStyle(
+                          style: AppTheme.amiriUrdu(
+                            fontSize: 18,
+                            height: 2.0,
                             color: c.textSecondary,
-                            fontSize: 15,
-                            height: 1.7,
-                            fontStyle: FontStyle.italic,
                           ),
                           textAlign: TextAlign.center,
                         ),
+                      )
+                    : Text(
+                        bm.text,
+                        style: TextStyle(
+                          color: c.textSecondary,
+                          fontSize: 15,
+                          height: 1.7,
+                          fontStyle: FontStyle.italic,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
               ),
               const SizedBox(height: 14),
               Row(
@@ -295,7 +286,10 @@ class _IrshadatBookmarksScreenState extends State<IrshadatBookmarksScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      child: Text('Share', style: AppTheme.lato(fontWeight: FontWeight.w800)),
+                      child: Text(
+                        'Share',
+                        style: AppTheme.lato(fontWeight: FontWeight.w800),
+                      ),
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -307,7 +301,8 @@ class _IrshadatBookmarksScreenState extends State<IrshadatBookmarksScreen> {
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: c.accentGold,
-                        foregroundColor: Theme.of(ctx).brightness == Brightness.dark
+                        foregroundColor:
+                            Theme.of(ctx).brightness == Brightness.dark
                             ? c.backgroundPrimary
                             : c.textPrimary,
                         padding: const EdgeInsets.symmetric(vertical: 12),
@@ -316,7 +311,10 @@ class _IrshadatBookmarksScreenState extends State<IrshadatBookmarksScreen> {
                         ),
                         elevation: 0,
                       ),
-                      child: Text('Remove', style: AppTheme.lato(fontWeight: FontWeight.w800)),
+                      child: Text(
+                        'Remove',
+                        style: AppTheme.lato(fontWeight: FontWeight.w800),
+                      ),
                     ),
                   ),
                 ],
@@ -368,7 +366,10 @@ class _IrshadatBookmarksScreenState extends State<IrshadatBookmarksScreen> {
               builder: (context, snap) {
                 final n = snap.data?.length ?? 0;
                 return Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: c.accentGold.o(0.2),
                     borderRadius: BorderRadius.circular(999),
@@ -403,7 +404,11 @@ class _IrshadatBookmarksScreenState extends State<IrshadatBookmarksScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.bookmark_border, size: 72, color: c.accentGold),
+                          Icon(
+                            Icons.bookmark_border,
+                            size: 72,
+                            color: c.accentGold,
+                          ),
                           const SizedBox(height: 20),
                           Text(
                             'No saved Irshadat yet',
@@ -417,7 +422,10 @@ class _IrshadatBookmarksScreenState extends State<IrshadatBookmarksScreen> {
                           Text(
                             'Tap Bookmark on an Irshad to save it here',
                             textAlign: TextAlign.center,
-                            style: AppTheme.lato(fontSize: 14, color: c.textMuted),
+                            style: AppTheme.lato(
+                              fontSize: 14,
+                              color: c.textMuted,
+                            ),
                           ),
                         ],
                       ),
@@ -428,7 +436,8 @@ class _IrshadatBookmarksScreenState extends State<IrshadatBookmarksScreen> {
                 return ListView.separated(
                   padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
                   itemCount: list.length,
-                  separatorBuilder: (context, index) => const SizedBox(height: 10),
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 10),
                   itemBuilder: (context, i) {
                     final bm = list[i];
                     return GoldCard(
@@ -457,14 +466,14 @@ class _IrshadatBookmarksScreenState extends State<IrshadatBookmarksScreen> {
                                     ),
                                     errorWidget: (context, url, error) =>
                                         Container(
-                                      width: 70,
-                                      height: 70,
-                                      color: c.backgroundInput,
-                                      child: Icon(
-                                        Icons.image_not_supported_outlined,
-                                        color: c.textMuted,
-                                      ),
-                                    ),
+                                          width: 70,
+                                          height: 70,
+                                          color: c.backgroundInput,
+                                          child: Icon(
+                                            Icons.image_not_supported_outlined,
+                                            color: c.textMuted,
+                                          ),
+                                        ),
                                   ),
                                 ),
                               ),
@@ -481,7 +490,10 @@ class _IrshadatBookmarksScreenState extends State<IrshadatBookmarksScreen> {
                                   width: 0.5,
                                 ),
                               ),
-                              child: Icon(Icons.format_quote, color: c.accentGold),
+                              child: Icon(
+                                Icons.format_quote,
+                                color: c.accentGold,
+                              ),
                             ),
                           const SizedBox(width: 12),
                           Expanded(
@@ -496,7 +508,9 @@ class _IrshadatBookmarksScreenState extends State<IrshadatBookmarksScreen> {
                                     children: [
                                       Expanded(
                                         child: Text(
-                                          bm.dateLabel.isEmpty ? 'Irshad' : bm.dateLabel,
+                                          bm.dateLabel.isEmpty
+                                              ? 'Irshad'
+                                              : bm.dateLabel,
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                           style: AppTheme.lato(
@@ -507,11 +521,19 @@ class _IrshadatBookmarksScreenState extends State<IrshadatBookmarksScreen> {
                                         ),
                                       ),
                                       Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 10,
+                                          vertical: 4,
+                                        ),
                                         decoration: BoxDecoration(
                                           color: c.backgroundElevated,
-                                          borderRadius: BorderRadius.circular(999),
-                                          border: Border.all(color: c.borderDefault, width: 0.5),
+                                          borderRadius: BorderRadius.circular(
+                                            999,
+                                          ),
+                                          border: Border.all(
+                                            color: c.borderDefault,
+                                            width: 0.5,
+                                          ),
                                         ),
                                         child: Text(
                                           bm.language.label,
@@ -539,7 +561,9 @@ class _IrshadatBookmarksScreenState extends State<IrshadatBookmarksScreen> {
                                             fontSize: 12,
                                             color: c.textMuted,
                                             height: 1.4,
-                                          ).copyWith(fontStyle: FontStyle.italic),
+                                          ).copyWith(
+                                            fontStyle: FontStyle.italic,
+                                          ),
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
@@ -570,4 +594,3 @@ class _IrshadatBookmarksScreenState extends State<IrshadatBookmarksScreen> {
     return '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
   }
 }
-

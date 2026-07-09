@@ -34,10 +34,10 @@ class FullScreenImageViewer extends StatefulWidget {
         opaque: false,
         pageBuilder: (context, animation, secondaryAnimation) =>
             FullScreenImageViewer(
-          imageUrls: imageUrls,
-          initialIndex: index,
-          caption: caption,
-        ),
+              imageUrls: imageUrls,
+              initialIndex: index,
+              caption: caption,
+            ),
         transitionsBuilder: (context, animation, secondaryAnimation, child) =>
             FadeTransition(opacity: animation, child: child),
       ),
@@ -88,9 +88,8 @@ class _FullScreenImageViewerState extends State<FullScreenImageViewer> {
               );
             },
             backgroundDecoration: BoxDecoration(color: c.backgroundPrimary),
-            loadingBuilder: (context, event) => const Center(
-              child: ShimmerPlaceholder(),
-            ),
+            loadingBuilder: (context, event) =>
+                const Center(child: ShimmerPlaceholder()),
           ),
           SafeArea(
             child: Padding(

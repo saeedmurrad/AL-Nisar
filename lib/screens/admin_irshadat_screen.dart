@@ -1,8 +1,6 @@
-import 'dart:io';
-
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import '../models/upload_file_data.dart';
 import '../models/irshad_firestore_model.dart';
 import '../services/admin_irshadat_service.dart';
 import '../theme/app_theme.dart';
@@ -12,6 +10,7 @@ import '../widgets/gold_card.dart';
 import '../widgets/screen_navigation_header.dart';
 import '../widgets/shimmer_placeholder.dart';
 import '../utils/responsive_layout.dart';
+import '../utils/upload_picker.dart';
 
 class AdminIrshadatScreen extends StatefulWidget {
   const AdminIrshadatScreen({
@@ -94,8 +93,9 @@ class _AdminIrshadatScreenState extends State<AdminIrshadatScreen> {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         backgroundColor: c.accentGold,
-        foregroundColor:
-            Theme.of(context).brightness == Brightness.dark ? c.backgroundPrimary : c.textPrimary,
+        foregroundColor: Theme.of(context).brightness == Brightness.dark
+            ? c.backgroundPrimary
+            : c.textPrimary,
         onPressed: () async {
           final created = await showModalBottomSheet<IrshadFirestoreModel?>(
             context: context,
@@ -135,7 +135,8 @@ class _AdminIrshadatScreenState extends State<AdminIrshadatScreen> {
                   child: _LangPill(
                     label: 'Urdu',
                     selected: _language == IrshadatLanguage.urdu,
-                    onTap: () => setState(() => _language = IrshadatLanguage.urdu),
+                    onTap: () =>
+                        setState(() => _language = IrshadatLanguage.urdu),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -143,7 +144,8 @@ class _AdminIrshadatScreenState extends State<AdminIrshadatScreen> {
                   child: _LangPill(
                     label: 'English',
                     selected: _language == IrshadatLanguage.english,
-                    onTap: () => setState(() => _language = IrshadatLanguage.english),
+                    onTap: () =>
+                        setState(() => _language = IrshadatLanguage.english),
                   ),
                 ),
               ],
@@ -193,22 +195,25 @@ class _AdminIrshadatScreenState extends State<AdminIrshadatScreen> {
                                       color: c.backgroundInput,
                                       child: const ShimmerPlaceholder(),
                                     ),
-                                    errorWidget: (context, url, error) => Container(
-                                      width: 64,
-                                      height: 64,
-                                      color: c.backgroundInput,
-                                      child: Icon(
-                                        Icons.image_not_supported_outlined,
-                                        color: c.textMuted,
-                                      ),
-                                    ),
+                                    errorWidget: (context, url, error) =>
+                                        Container(
+                                          width: 64,
+                                          height: 64,
+                                          color: c.backgroundInput,
+                                          child: Icon(
+                                            Icons.image_not_supported_outlined,
+                                            color: c.textMuted,
+                                          ),
+                                        ),
                                   ),
                                 ),
                                 const SizedBox(width: 12),
                               ],
                               Expanded(
                                 child: Text(
-                                  ir.dateLabel.isEmpty ? '(no date label)' : ir.dateLabel,
+                                  ir.dateLabel.isEmpty
+                                      ? '(no date label)'
+                                      : ir.dateLabel,
                                   style: AppTheme.lato(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w700,
@@ -221,7 +226,11 @@ class _AdminIrshadatScreenState extends State<AdminIrshadatScreen> {
                                 activeThumbColor: c.accentGold,
                                 onChanged: deleting
                                     ? null
-                                    : (v) => service.setActive(_language, ir.id, v),
+                                    : (v) => service.setActive(
+                                        _language,
+                                        ir.id,
+                                        v,
+                                      ),
                               ),
                             ],
                           ),
@@ -265,7 +274,8 @@ class _AdminIrshadatScreenState extends State<AdminIrshadatScreen> {
                                 )
                               else ...[
                                 TextButton(
-                                  onPressed: () => _confirmDeleteIrshad(service, ir),
+                                  onPressed: () =>
+                                      _confirmDeleteIrshad(service, ir),
                                   child: Text(
                                     'Delete',
                                     style: AppTheme.lato(
@@ -278,17 +288,22 @@ class _AdminIrshadatScreenState extends State<AdminIrshadatScreen> {
                                 TextButton(
                                   onPressed: () async {
                                     final updated =
-                                        await showModalBottomSheet<IrshadFirestoreModel?>(
-                                      context: context,
-                                      isScrollControlled: true,
-                                      backgroundColor: c.backgroundSurface,
-                                      shape: const RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.vertical(top: Radius.circular(16)),
-                                      ),
-                                      builder: (ctx) =>
-                                          _IrshadEditor(initial: ir, language: _language),
-                                    );
+                                        await showModalBottomSheet<
+                                          IrshadFirestoreModel?
+                                        >(
+                                          context: context,
+                                          isScrollControlled: true,
+                                          backgroundColor: c.backgroundSurface,
+                                          shape: const RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.vertical(
+                                              top: Radius.circular(16),
+                                            ),
+                                          ),
+                                          builder: (ctx) => _IrshadEditor(
+                                            initial: ir,
+                                            language: _language,
+                                          ),
+                                        );
                                     if (updated == null) return;
                                     await service.upsert(_language, updated);
                                   },
@@ -331,7 +346,7 @@ class _IrshadEditor extends StatefulWidget {
 class _IrshadEditorState extends State<_IrshadEditor> {
   late final _date = TextEditingController(text: widget.initial.dateLabel);
   late final _text = TextEditingController(text: widget.initial.text);
-  String? _imagePath;
+  UploadFileData? _imageFile;
   bool _saving = false;
 
   @override
@@ -342,14 +357,11 @@ class _IrshadEditorState extends State<_IrshadEditor> {
   }
 
   Future<void> _pickImage() async {
-    final res = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
+    final file = await pickUploadFile(
       allowedExtensions: const ['jpg', 'jpeg', 'png', 'webp'],
-      withData: false,
     );
-    final path = res?.files.single.path;
-    if (path == null || path.trim().isEmpty) return;
-    setState(() => _imagePath = path);
+    if (file == null) return;
+    setState(() => _imageFile = file);
   }
 
   Future<void> _pickDate() async {
@@ -364,16 +376,16 @@ class _IrshadEditorState extends State<_IrshadEditor> {
         return Theme(
           data: Theme.of(ctx).copyWith(
             colorScheme: Theme.of(ctx).colorScheme.copyWith(
-                  primary: c.accentGold,
-                  onPrimary: Theme.of(ctx).brightness == Brightness.dark
-                      ? c.backgroundPrimary
-                      : c.textPrimary,
-                  surface: c.backgroundSurface,
-                  onSurface: c.textPrimary,
-                ),
-            dialogTheme: Theme.of(ctx).dialogTheme.copyWith(
-                  backgroundColor: c.backgroundSurface,
-                ),
+              primary: c.accentGold,
+              onPrimary: Theme.of(ctx).brightness == Brightness.dark
+                  ? c.backgroundPrimary
+                  : c.textPrimary,
+              surface: c.backgroundSurface,
+              onSurface: c.textPrimary,
+            ),
+            dialogTheme: Theme.of(
+              ctx,
+            ).dialogTheme.copyWith(backgroundColor: c.backgroundSurface),
           ),
           child: child ?? const SizedBox.shrink(),
         );
@@ -423,20 +435,20 @@ class _IrshadEditorState extends State<_IrshadEditor> {
     setState(() => _saving = true);
     try {
       String imageUrl = widget.initial.imageUrl;
-      final img = _imagePath;
-      if (img != null && img.trim().isNotEmpty && File(img).existsSync()) {
-        final bytes = File(img).lengthSync();
+      final img = _imageFile;
+      if (img != null) {
+        final bytes = img.length;
         if (bytes > 10 * 1024 * 1024) {
           _snack('Image is too large (max 10 MB)');
           return;
         }
         imageUrl =
             (await AdminIrshadatService().uploadImage(
-                  language: widget.language,
-                  id: widget.initial.id,
-                  imagePath: img,
-                )) ??
-                imageUrl;
+              language: widget.language,
+              id: widget.initial.id,
+              image: img,
+            )) ??
+            imageUrl;
       }
 
       if (!mounted) return;
@@ -461,9 +473,7 @@ class _IrshadEditorState extends State<_IrshadEditor> {
   @override
   Widget build(BuildContext context) {
     final c = context.c;
-    final imgName = _imagePath == null
-        ? 'No image selected (optional)'
-        : _imagePath!.split(Platform.pathSeparator).last;
+    final imgName = _imageFile?.name ?? 'No image selected (optional)';
     return ResponsiveLayout.scrollableSheet(
       context: context,
       child: Column(
@@ -490,7 +500,9 @@ class _IrshadEditorState extends State<_IrshadEditor> {
           _Field(
             label: widget.language.label,
             controller: _text,
-            hintText: widget.language.isRtl ? 'اردو متن (optional)' : 'English text (optional)',
+            hintText: widget.language.isRtl
+                ? 'اردو متن (optional)'
+                : 'English text (optional)',
             maxLines: widget.language.isRtl ? 4 : 3,
             textDirection: widget.language.isRtl ? TextDirection.rtl : null,
           ),
@@ -543,8 +555,9 @@ class _IrshadEditorState extends State<_IrshadEditor> {
             onPressed: _saving ? null : _save,
             style: ElevatedButton.styleFrom(
               backgroundColor: c.accentGold,
-              foregroundColor:
-                  Theme.of(context).brightness == Brightness.dark ? c.backgroundPrimary : c.textPrimary,
+              foregroundColor: Theme.of(context).brightness == Brightness.dark
+                  ? c.backgroundPrimary
+                  : c.textPrimary,
               padding: const EdgeInsets.symmetric(vertical: 14),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -562,7 +575,10 @@ class _IrshadEditorState extends State<_IrshadEditor> {
                           : c.textPrimary,
                     ),
                   )
-                : Text('Save', style: AppTheme.lato(fontWeight: FontWeight.w700)),
+                : Text(
+                    'Save',
+                    style: AppTheme.lato(fontWeight: FontWeight.w700),
+                  ),
           ),
           const SizedBox(height: 8),
         ],
@@ -619,7 +635,11 @@ class _Field extends StatelessWidget {
             hintText: hintText,
             hintStyle: AppTheme.lato(fontSize: 13, color: c.textFaint),
             suffixIcon: readOnly
-                ? Icon(Icons.calendar_today_outlined, size: 18, color: c.accentGold)
+                ? Icon(
+                    Icons.calendar_today_outlined,
+                    size: 18,
+                    color: c.accentGold,
+                  )
                 : null,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
@@ -681,4 +701,3 @@ class _LangPill extends StatelessWidget {
     );
   }
 }
-

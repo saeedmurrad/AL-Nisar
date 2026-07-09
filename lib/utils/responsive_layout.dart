@@ -6,6 +6,34 @@ class ResponsiveLayout {
 
   static const double narrowWidth = 360;
 
+  /// Tablet-and-up breakpoint.
+  static const double mediumWidth = 700;
+
+  /// Desktop breakpoint: persistent side navigation replaces the drawer.
+  static const double expandedWidth = 1024;
+
+  /// Page content is centered and capped at this width on large screens.
+  static const double contentMaxWidth = 1120;
+
+  /// Forms (auth screens, centered dialogs-as-pages) cap at this width.
+  static const double formMaxWidth = 460;
+
+  static const double sideNavWidth = 264;
+
+  static bool isMedium(BuildContext context) =>
+      screenWidth(context) >= mediumWidth;
+
+  static bool isExpanded(BuildContext context) =>
+      screenWidth(context) >= expandedWidth;
+
+  /// Column count for card grids: 2 on phones, 3 on tablets, 4 on desktop.
+  static int gridColumns(BuildContext context) {
+    final w = screenWidth(context);
+    if (w >= expandedWidth) return 4;
+    if (w >= mediumWidth) return 3;
+    return 2;
+  }
+
   static double screenWidth(BuildContext context) =>
       MediaQuery.sizeOf(context).width;
 
@@ -18,8 +46,7 @@ class ResponsiveLayout {
   static double bottomSheetMaxHeight(
     BuildContext context, {
     double fraction = 0.92,
-  }) =>
-      screenHeight(context) * fraction;
+  }) => screenHeight(context) * fraction;
 
   /// Wraps bottom-sheet content with keyboard inset, max height, and scroll.
   static Widget scrollableSheet({
@@ -34,10 +61,7 @@ class ResponsiveLayout {
       padding: EdgeInsets.only(bottom: bottomInset),
       child: ConstrainedBox(
         constraints: BoxConstraints(maxHeight: maxHeight),
-        child: SingleChildScrollView(
-          padding: padding,
-          child: child,
-        ),
+        child: SingleChildScrollView(padding: padding, child: child),
       ),
     );
   }

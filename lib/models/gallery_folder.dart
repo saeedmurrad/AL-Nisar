@@ -45,13 +45,7 @@ class GalleryFolder {
     sortOrder: 4,
   );
 
-  static const all = [
-    saeenG,
-    blessedFamily,
-    banner,
-    general,
-    irshadat,
-  ];
+  static const all = [saeenG, blessedFamily, banner, general, irshadat];
 
   static const visibleInGallery = [
     saeenG,

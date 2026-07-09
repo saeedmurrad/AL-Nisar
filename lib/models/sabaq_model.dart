@@ -33,4 +33,3 @@ class SabaqPage {
   final String urdu;
   final String english;
 }
-

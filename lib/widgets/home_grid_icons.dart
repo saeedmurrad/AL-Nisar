@@ -55,7 +55,12 @@ class _HomeGridIconPainter extends CustomPainter {
 
     final s = size.shortestSide;
     final pad = s * 0.08;
-    final r = Rect.fromLTWH(pad, pad, size.width - pad * 2, size.height - pad * 2);
+    final r = Rect.fromLTWH(
+      pad,
+      pad,
+      size.width - pad * 2,
+      size.height - pad * 2,
+    );
 
     switch (kind) {
       case HomeGridIconKind.adminPanel:
@@ -222,7 +227,13 @@ class _HomeGridIconPainter extends CustomPainter {
     _drawStar(canvas, Offset(cx, cy), rs, fill, stroke);
   }
 
-  void _drawStar(Canvas canvas, Offset c, double radius, Paint fill, Paint stroke) {
+  void _drawStar(
+    Canvas canvas,
+    Offset c,
+    double radius,
+    Paint fill,
+    Paint stroke,
+  ) {
     const points = 5;
     final inner = radius * 0.45;
     final path = Path();
@@ -265,10 +276,26 @@ class _HomeGridIconPainter extends CustomPainter {
       Offset(r.right - r.width * 0.25, r.top + r.height * 0.72),
       stroke,
     );
-    canvas.drawCircle(Offset(r.left + r.width * 0.2, r.top + r.height * 0.35), 3, stroke);
-    canvas.drawCircle(Offset(r.right - r.width * 0.2, r.top + r.height * 0.28), 3, stroke);
-    canvas.drawCircle(Offset(r.left + r.width * 0.25, r.top + r.height * 0.72), 3, stroke);
-    canvas.drawCircle(Offset(r.right - r.width * 0.25, r.top + r.height * 0.72), 3, stroke);
+    canvas.drawCircle(
+      Offset(r.left + r.width * 0.2, r.top + r.height * 0.35),
+      3,
+      stroke,
+    );
+    canvas.drawCircle(
+      Offset(r.right - r.width * 0.2, r.top + r.height * 0.28),
+      3,
+      stroke,
+    );
+    canvas.drawCircle(
+      Offset(r.left + r.width * 0.25, r.top + r.height * 0.72),
+      3,
+      stroke,
+    );
+    canvas.drawCircle(
+      Offset(r.right - r.width * 0.25, r.top + r.height * 0.72),
+      3,
+      stroke,
+    );
   }
 
   void _fourSquares(Canvas canvas, Rect r, Paint stroke) {

@@ -37,9 +37,9 @@ class _ShajraDetailScreenState extends State<ShajraDetailScreen> {
   @override
   void initState() {
     super.initState();
-    _entries = List<ShajraEntryModel>.from(widget.args.allEntries)
-        .where((e) => e.number <= ShajraService.maxEntryNumber)
-        .toList();
+    _entries = List<ShajraEntryModel>.from(
+      widget.args.allEntries,
+    ).where((e) => e.number <= ShajraService.maxEntryNumber).toList();
     _index = _entries.indexWhere((e) => e.number == widget.args.entry.number);
     if (_index < 0) _index = 0;
     _load();
@@ -108,16 +108,19 @@ class _ShajraDetailScreenState extends State<ShajraDetailScreen> {
   }
 
   Future<void> _share() async {
-    final name = _entry.shortName.isNotEmpty ? _entry.shortName : _entry.fullTitle;
-    await Share.share(
-      'Shajra Pak — $name\nAL Nisar App',
-    );
+    final name = _entry.shortName.isNotEmpty
+        ? _entry.shortName
+        : _entry.fullTitle;
+    await Share.share('Shajra Pak — $name\nAL Nisar App');
   }
 
   void _openPdfIfAvailable() {
     final asset = _pdfs.assetFor(_entry);
     if (asset == null || asset.isEmpty) return;
-    context.push('/shajra/pdf', extra: ShajraPdfRouteArgs(entry: _entry, assetPath: asset));
+    context.push(
+      '/shajra/pdf',
+      extra: ShajraPdfRouteArgs(entry: _entry, assetPath: asset),
+    );
   }
 
   @override
@@ -133,25 +136,15 @@ class _ShajraDetailScreenState extends State<ShajraDetailScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _DetailHeader(
-              entry: _entry,
-              onBack: () => popOrGoHome(context),
-            ),
+            _DetailHeader(entry: _entry, onBack: () => popOrGoHome(context)),
             Expanded(
               child: Stack(
                 children: [
                   _loading
                       ? _DetailShimmer(c: c)
                       : _error != null
-                          ? _DetailError(
-                              c: c,
-                              onRetry: _load,
-                            )
-                          : _DetailScroll(
-                              c: c,
-                              entry: _entry,
-                              html: _html ?? '',
-                            ),
+                      ? _DetailError(c: c, onRetry: _load)
+                      : _DetailScroll(c: c, entry: _entry, html: _html ?? ''),
                   // Positioned(
                   //   right: 16,
                   //   bottom: 88,
@@ -193,7 +186,10 @@ class _ShajraDetailScreenState extends State<ShajraDetailScreen> {
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               color: c.accentGold.o(0.22),
-                              border: Border.all(color: c.accentGold, width: 1.2),
+                              border: Border.all(
+                                color: c.accentGold,
+                                width: 1.2,
+                              ),
                             ),
                             child: Center(
                               child: Icon(
@@ -253,7 +249,11 @@ class _DetailHeader extends StatelessWidget {
         children: [
           IconButton(
             onPressed: onBack,
-            icon: Icon(Icons.arrow_back_ios_new_rounded, color: c.accentGold, size: 20),
+            icon: Icon(
+              Icons.arrow_back_ios_new_rounded,
+              color: c.accentGold,
+              size: 20,
+            ),
           ),
           IconButton(
             onPressed: () => goAppHome(context),
@@ -281,8 +281,9 @@ class _DetailHeader extends StatelessWidget {
               entry.listDisplayName,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              textDirection:
-                  entry.language == ShajraEntryModel.urdu ? TextDirection.rtl : TextDirection.ltr,
+              textDirection: entry.language == ShajraEntryModel.urdu
+                  ? TextDirection.rtl
+                  : TextDirection.ltr,
               style: entry.language == ShajraEntryModel.urdu
                   ? AppTheme.amiriUrdu(
                       fontSize: 16,
@@ -318,10 +319,7 @@ class _DetailShimmer extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 14),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8),
-              child: const SizedBox(
-                height: 72,
-                child: ShimmerPlaceholder(),
-              ),
+              child: const SizedBox(height: 72, child: ShimmerPlaceholder()),
             ),
           );
         }),
@@ -369,8 +367,13 @@ class _DetailError extends StatelessWidget {
               style: OutlinedButton.styleFrom(
                 foregroundColor: c.accentGold,
                 side: BorderSide(color: c.accentGold, width: 1.2),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 22,
+                  vertical: 12,
+                ),
               ),
               child: Text(
                 'Try Again',
@@ -474,14 +477,8 @@ class _DetailScroll extends StatelessWidget {
               : BorderSide(color: c.accentGold, width: 3),
         ),
       ),
-      'strong': Style(
-        fontWeight: FontWeight.w700,
-        color: c.textPrimary,
-      ),
-      'em': Style(
-        fontStyle: FontStyle.italic,
-        color: c.accentGold.o(0.9),
-      ),
+      'strong': Style(fontWeight: FontWeight.w700, color: c.textPrimary),
+      'em': Style(fontStyle: FontStyle.italic, color: c.accentGold.o(0.9)),
       'img': Style(display: Display.none),
     };
 
@@ -490,8 +487,9 @@ class _DetailScroll extends StatelessWidget {
       child: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 96),
         child: Column(
-          crossAxisAlignment:
-              isUrdu ? CrossAxisAlignment.stretch : CrossAxisAlignment.stretch,
+          crossAxisAlignment: isUrdu
+              ? CrossAxisAlignment.stretch
+              : CrossAxisAlignment.stretch,
           children: [
             Container(
               padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
@@ -542,10 +540,12 @@ class _DetailScroll extends StatelessWidget {
 
   /// Avoid duplicating the honorific block already shown in the top card.
   static String _stripLeadingH2(String raw) {
-    return raw.replaceFirst(
-      RegExp(r'<h2[^>]*>[\s\S]*?</h2>', caseSensitive: false),
-      '',
-    ).trim();
+    return raw
+        .replaceFirst(
+          RegExp(r'<h2[^>]*>[\s\S]*?</h2>', caseSensitive: false),
+          '',
+        )
+        .trim();
   }
 }
 
@@ -569,7 +569,9 @@ class _OutlineNavButton extends StatelessWidget {
       style: OutlinedButton.styleFrom(
         foregroundColor: fg,
         disabledForegroundColor: c.textFaint,
-        side: BorderSide(color: enabled ? c.accentGold : c.borderDefault.o(0.5)),
+        side: BorderSide(
+          color: enabled ? c.accentGold : c.borderDefault.o(0.5),
+        ),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         padding: const EdgeInsets.symmetric(vertical: 12),
       ),
@@ -632,9 +634,27 @@ class _WifiOffPainter extends CustomPainter {
 
     final c = Offset(size.width / 2, size.height * 0.55);
     final w = size.width * 0.42;
-    canvas.drawArc(Rect.fromCenter(center: c, width: w, height: w * 0.55), 3.5, 2.2, false, p);
-    canvas.drawArc(Rect.fromCenter(center: c, width: w * 1.45, height: w * 0.9), 3.45, 2.3, false, p);
-    canvas.drawArc(Rect.fromCenter(center: c, width: w * 2.1, height: w * 1.25), 3.4, 2.35, false, p);
+    canvas.drawArc(
+      Rect.fromCenter(center: c, width: w, height: w * 0.55),
+      3.5,
+      2.2,
+      false,
+      p,
+    );
+    canvas.drawArc(
+      Rect.fromCenter(center: c, width: w * 1.45, height: w * 0.9),
+      3.45,
+      2.3,
+      false,
+      p,
+    );
+    canvas.drawArc(
+      Rect.fromCenter(center: c, width: w * 2.1, height: w * 1.25),
+      3.4,
+      2.35,
+      false,
+      p,
+    );
 
     canvas.drawLine(
       Offset(size.width * 0.2, size.height * 0.2),

@@ -65,66 +65,66 @@ class _AdminShajraUrduDetailsScreenState
             child: _loading
                 ? Center(child: CircularProgressIndicator(color: c.accentGold))
                 : _error != null
-                    ? _ErrorState(onRetry: _load)
-                    : ListView.builder(
-                        padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
-                        itemCount: _entries.length,
-                        itemBuilder: (ctx, i) {
-                          final e = _entries[i];
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 10),
-                            child: InkWell(
-                              onTap: () => context.push(
-                                '/admin/shajra-urdu/upload',
-                                extra: AdminShajraUrduUploadArgs(entry: e),
-                              ),
-                              borderRadius: BorderRadius.circular(14),
-                              child: GoldCard(
-                                backgroundColor: c.backgroundSurface,
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      width: 44,
-                                      height: 44,
-                                      alignment: Alignment.center,
-                                      decoration: BoxDecoration(
-                                        color: c.backgroundElevated,
-                                        borderRadius: BorderRadius.circular(12),
-                                        border: Border.all(
-                                          color: c.borderDefault,
-                                          width: 0.5,
-                                        ),
-                                      ),
-                                      child: Text(
-                                        '${e.number}',
-                                        style: AppTheme.lato(
-                                          fontWeight: FontWeight.w800,
-                                          color: c.accentGold,
-                                        ),
-                                      ),
+                ? _ErrorState(onRetry: _load)
+                : ListView.builder(
+                    padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
+                    itemCount: _entries.length,
+                    itemBuilder: (ctx, i) {
+                      final e = _entries[i];
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: InkWell(
+                          onTap: () => context.push(
+                            '/admin/shajra-urdu/upload',
+                            extra: AdminShajraUrduUploadArgs(entry: e),
+                          ),
+                          borderRadius: BorderRadius.circular(14),
+                          child: GoldCard(
+                            backgroundColor: c.backgroundSurface,
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 44,
+                                  height: 44,
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                    color: c.backgroundElevated,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: c.borderDefault,
+                                      width: 0.5,
                                     ),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                      child: Directionality(
-                                        textDirection: TextDirection.rtl,
-                                        child: Text(
-                                          e.listDisplayName,
-                                          style: AppTheme.amiriUrdu(
-                                            fontSize: 16,
-                                            height: 1.6,
-                                            color: c.textPrimary,
-                                          ),
-                                        ),
-                                      ),
+                                  ),
+                                  child: Text(
+                                    '${e.number}',
+                                    style: AppTheme.lato(
+                                      fontWeight: FontWeight.w800,
+                                      color: c.accentGold,
                                     ),
-                                    Icon(Icons.chevron_right, color: c.accentGold),
-                                  ],
+                                  ),
                                 ),
-                              ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Directionality(
+                                    textDirection: TextDirection.rtl,
+                                    child: Text(
+                                      e.listDisplayName,
+                                      style: AppTheme.amiriUrdu(
+                                        fontSize: 16,
+                                        height: 1.6,
+                                        color: c.textPrimary,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Icon(Icons.chevron_right, color: c.accentGold),
+                              ],
                             ),
-                          );
-                        },
-                      ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
           ),
         ],
       ),
@@ -168,4 +168,3 @@ class _ErrorState extends StatelessWidget {
     );
   }
 }
-

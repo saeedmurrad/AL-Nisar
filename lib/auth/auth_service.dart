@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:google_sign_in/google_sign_in.dart';
 
 import 'app_role.dart';
@@ -10,9 +11,15 @@ class AuthService {
     FirebaseAuth? auth,
     FirebaseFirestore? firestore,
     GoogleSignIn? googleSignIn,
-  })  : _auth = auth ?? FirebaseAuth.instance,
-        _firestore = firestore ?? FirebaseFirestore.instance,
-        _google = googleSignIn ?? GoogleSignIn();
+  }) : _auth = auth ?? FirebaseAuth.instance,
+       _firestore = firestore ?? FirebaseFirestore.instance,
+       _google =
+           googleSignIn ??
+           GoogleSignIn(
+             clientId: kIsWeb
+                 ? '4782847785-knrpvln5isjsm3tkldbqft5ij1haub3t.apps.googleusercontent.com'
+                 : null,
+           );
 
   final FirebaseAuth _auth;
   final FirebaseFirestore _firestore;
@@ -109,10 +116,9 @@ class AuthService {
     if (name.isEmpty) throw StateError('empty_name');
     await u.updateDisplayName(name);
     await u.reload();
-    await _firestore.collection('users').doc(u.uid).set(
-      {'displayName': name},
-      SetOptions(merge: true),
-    );
+    await _firestore.collection('users').doc(u.uid).set({
+      'displayName': name,
+    }, SetOptions(merge: true));
   }
 
   Future<void> _upsertUserProfile(User u) async {
@@ -130,18 +136,14 @@ class AuthService {
       if (ts is Timestamp) createdAt = ts.toDate();
     }
 
-    await ref.set(
-      {
-        'email': (u.email ?? '').trim().toLowerCase(),
-        'displayName': u.displayName ?? '',
-        'photoUrl': u.photoURL ?? '',
-        'role': AppRole.fromString(role).firestoreValue,
-        'authProviders': u.providerData.map((p) => p.providerId).toList(),
-        'createdAt': Timestamp.fromDate(createdAt),
-        'lastLoginAt': Timestamp.fromDate(now),
-      },
-      SetOptions(merge: true),
-    );
+    await ref.set({
+      'email': (u.email ?? '').trim().toLowerCase(),
+      'displayName': u.displayName ?? '',
+      'photoUrl': u.photoURL ?? '',
+      'role': AppRole.fromString(role).firestoreValue,
+      'authProviders': u.providerData.map((p) => p.providerId).toList(),
+      'createdAt': Timestamp.fromDate(createdAt),
+      'lastLoginAt': Timestamp.fromDate(now),
+    }, SetOptions(merge: true));
   }
 }
-
