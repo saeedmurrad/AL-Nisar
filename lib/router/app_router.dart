@@ -41,6 +41,7 @@ import '../screens/super_admin_panel_screen.dart';
 import '../screens/super_admin_users_screen.dart';
 import '../screens/admin_social_links_screen.dart';
 import '../screens/admin_sabaq_requests_screen.dart';
+import '../screens/design_showcase_screen.dart';
 import '../widgets/responsive_shell.dart';
 
 GoRouter createAppRouter(AuthProvider auth) {
@@ -49,7 +50,7 @@ GoRouter createAppRouter(AuthProvider auth) {
     refreshListenable: auth,
     redirect: (context, state) {
       final loc = state.matchedLocation;
-      const authRoutes = {'/login', '/signup', '/forgot-password'};
+      const authRoutes = {'/login', '/signup', '/forgot-password', '/showcase'};
       final onAuthRoute = authRoutes.contains(loc);
       final isAuthed = auth.isAuthenticated;
 
@@ -85,6 +86,10 @@ GoRouter createAppRouter(AuthProvider auth) {
     },
     routes: [
       GoRoute(path: '/', builder: (context, state) => const SplashScreen()),
+      GoRoute(
+        path: '/showcase',
+        builder: (context, state) => const DesignShowcaseScreen(),
+      ),
       GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
       GoRoute(
         path: '/signup',
