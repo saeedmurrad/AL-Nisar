@@ -109,11 +109,11 @@ class IslamicBorder extends StatelessWidget {
   final double thickness;
 
   const IslamicBorder({
-    Key? key,
+    super.key,
     required this.child,
     this.lineColor,
     this.thickness = 2.0,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -166,11 +166,11 @@ class IslamicDivider extends StatelessWidget {
   final double thickness;
 
   const IslamicDivider({
-    Key? key,
+    super.key,
     this.color,
     this.height = 20,
     this.thickness = 1.0,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -198,11 +198,11 @@ class IslamicHeader extends StatelessWidget {
   final bool showDecoration;
 
   const IslamicHeader({
-    Key? key,
+    super.key,
     required this.title,
     this.titleStyle,
     this.showDecoration = true,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

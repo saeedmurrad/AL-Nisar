@@ -20,6 +20,7 @@ import '../widgets/book_feature_icons.dart';
 import '../widgets/shimmer_placeholder.dart';
 import '../widgets/gold_card.dart';
 import '../widgets/standard_shell_header.dart';
+import '../widgets/islamic_decoration.dart';
 
 class BooksScreen extends StatefulWidget {
   const BooksScreen({super.key});
@@ -196,6 +197,7 @@ class _BooksScreenState extends State<BooksScreen> {
                   ],
                 ),
               ),
+              IslamicDivider(height: 20),
               SizedBox(
                 height: 44,
                 child: ListView.separated(
