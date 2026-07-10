@@ -4,6 +4,7 @@ import 'app_colors.dart';
 import 'app_theme_colors.dart';
 
 enum AppColorPalette {
+  islamic,
   emerald,
   gold,
   sapphire,
@@ -12,9 +13,10 @@ enum AppColorPalette {
   teal,
   sunset;
 
-  static const AppColorPalette defaultPalette = AppColorPalette.gold;
+  static const AppColorPalette defaultPalette = AppColorPalette.islamic;
 
   String get label => switch (this) {
+    AppColorPalette.islamic => 'Islamic',
     AppColorPalette.emerald => 'Emerald',
     AppColorPalette.gold => 'Gold',
     AppColorPalette.sapphire => 'Sapphire',
@@ -37,6 +39,19 @@ enum AppColorPalette {
   }
 
   AppThemeColors get lightColors => switch (this) {
+    AppColorPalette.islamic => const AppThemeColors(
+      backgroundPrimary: Color(0xFFF5F0EB),
+      backgroundSurface: Color(0xFFEBE0D5),
+      backgroundElevated: Color(0xFFDDD0C0),
+      backgroundInput: Color(0xFFF0E8DD),
+      accentGold: Color(0xFF1B5E3F),
+      textPrimary: Color(0xFF0D3B24),
+      textSecondary: Color(0xFF1A5E3F),
+      textMuted: Color(0xFF2D7A54),
+      textFaint: Color(0xFF4A9A74),
+      borderDefault: Color(0xFF7FC9AA),
+      borderFaint: Color(0xFFB5DCC7),
+    ),
     AppColorPalette.emerald => const AppThemeColors(
       backgroundPrimary: Color(0xFFE4F2E8),
       backgroundSurface: Color(0xFFD4E8DC),
@@ -131,6 +146,19 @@ enum AppColorPalette {
   };
 
   AppThemeColors get darkColors => switch (this) {
+    AppColorPalette.islamic => const AppThemeColors(
+      backgroundPrimary: Color(0xFF0F2418),
+      backgroundSurface: Color(0xFF173020),
+      backgroundElevated: Color(0xFF1E3A2A),
+      backgroundInput: Color(0xFF152E22),
+      accentGold: Color(0xFFD4AF37),
+      textPrimary: Color(0xFFD4E8D8),
+      textSecondary: Color(0xFFC4D8C8),
+      textMuted: Color(0xFF6BA880),
+      textFaint: Color(0xFF4A8060),
+      borderDefault: Color(0xFF2D5F40),
+      borderFaint: Color(0xFF1A3A28),
+    ),
     AppColorPalette.emerald => const AppThemeColors(
       backgroundPrimary: Color(0xFF040F0A),
       backgroundSurface: Color(0xFF081A12),

@@ -15,6 +15,7 @@ import '../widgets/home_grid_icons.dart';
 import '../widgets/irshad_of_the_day_card.dart';
 import '../widgets/murshid_avatar.dart';
 import '../widgets/social_connect_section.dart';
+import '../widgets/islamic_decoration.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -37,10 +38,19 @@ class HomeScreen extends StatelessWidget {
             child: ListView(
               padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
               children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: IslamicHeader(
+                    title: 'Welcome to Al-Nisar',
+                    showDecoration: true,
+                  ),
+                ),
                 const IrshadOfTheDayCard(),
                 const SizedBox(height: 16),
+                IslamicDivider(height: 24),
                 const SocialConnectSection(),
                 const SizedBox(height: 16),
+                IslamicDivider(height: 24),
                 _HomeGrid(
                   showAdminPanel: auth.isAdminOrHigher,
                   onAdminPanel: () => context.go('/admin'),
