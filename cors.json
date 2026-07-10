@@ -1,0 +1,12 @@
+[
+  {
+    "origin": [
+      "https://saeedmurrad.github.io",
+      "https://engr-furqan-dev.github.io",
+      "http://localhost:8090"
+    ],
+    "method": ["GET", "HEAD"],
+    "responseHeader": ["Content-Type", "Content-Length", "Cache-Control"],
+    "maxAgeSeconds": 3600
+  }
+]

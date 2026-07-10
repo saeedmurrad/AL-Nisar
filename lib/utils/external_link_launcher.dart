@@ -122,7 +122,7 @@ Future<bool> launchFacebookUrl(
   final candidates = <Uri>[
     httpsUri,
     if (androidFacebookIntentUri(httpsUri) case final intent?) intent,
-    facebookAppUri(trimmed),
+    if (!kIsWeb) facebookAppUri(trimmed),
   ];
 
   return _launchWithCandidates(
@@ -150,8 +150,10 @@ Future<bool> launchYouTubeUrl(
     return false;
   }
 
+  // On web there is no YouTube app to hand off to; the vnd.youtube:// scheme
+  // just opens a dead blank tab. Use the HTTPS URL directly.
   final candidates = <Uri>[
-    youtubeAppUri(trimmed),
+    if (!kIsWeb) youtubeAppUri(trimmed),
     if (androidYouTubeIntentUri(httpsUri) case final intent?) intent,
     httpsUri,
   ];
