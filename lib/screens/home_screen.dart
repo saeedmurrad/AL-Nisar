@@ -16,6 +16,7 @@ import '../widgets/irshad_of_the_day_card.dart';
 import '../widgets/murshid_avatar.dart';
 import '../widgets/social_connect_section.dart';
 import '../widgets/islamic_decoration.dart';
+import '../widgets/hero_banner.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -36,32 +37,62 @@ class HomeScreen extends StatelessWidget {
           ),
           Expanded(
             child: ListView(
-              padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+              padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
               children: [
+                HeroBanner(
+                  title: 'Al-Nisar',
+                  subtitle: 'Spiritual Wisdom & Islamic Guidance',
+                  backgroundColor: context.c.backgroundPrimary,
+                  height: ResponsiveLayout.isExpanded(context) ? 280 : 240,
+                ),
                 Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.fromLTRB(16, 20, 16, 12),
                   child: IslamicHeader(
-                    title: 'Welcome to Al-Nisar',
+                    title: 'Welcome to Your Journey',
                     showDecoration: true,
                   ),
                 ),
-                const IrshadOfTheDayCard(),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: IslamicQuote(
+                    quote: 'The heart is a mirror; polish it with the remembrance of God.',
+                    attribution: 'Sufi Wisdom',
+                    showDecoration: true,
+                  ),
+                ),
                 const SizedBox(height: 16),
-                IslamicDivider(height: 24),
-                const SocialConnectSection(),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: const IrshadOfTheDayCard(),
+                ),
                 const SizedBox(height: 16),
-                IslamicDivider(height: 24),
-                _HomeGrid(
-                  showAdminPanel: auth.isAdminOrHigher,
-                  onAdminPanel: () => context.go('/admin'),
-                  showAsbaqTareeqat: auth.isAdminOrHigher,
-                  onAsbaqTareeqat: () => context.go('/asbaq'),
-                  onSabaq: () => context.go('/sabaq'),
-                  onBooks: () => context.go('/books'),
-                  onIrshad: () => context.go('/irshadat'),
-                  onNewsEvents: () => context.go('/news-events'),
-                  onShajra: () => context.go('/shijra'),
-                  onGallery: () => context.go('/gallery'),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: IslamicDivider(height: 24),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: const SocialConnectSection(),
+                ),
+                const SizedBox(height: 16),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: IslamicDivider(height: 24),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: _HomeGrid(
+                    showAdminPanel: auth.isAdminOrHigher,
+                    onAdminPanel: () => context.go('/admin'),
+                    showAsbaqTareeqat: auth.isAdminOrHigher,
+                    onAsbaqTareeqat: () => context.go('/asbaq'),
+                    onSabaq: () => context.go('/sabaq'),
+                    onBooks: () => context.go('/books'),
+                    onIrshad: () => context.go('/irshadat'),
+                    onNewsEvents: () => context.go('/news-events'),
+                    onShajra: () => context.go('/shijra'),
+                    onGallery: () => context.go('/gallery'),
+                  ),
                 ),
               ],
             ),
