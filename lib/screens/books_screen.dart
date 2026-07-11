@@ -295,12 +295,7 @@ class _BooksBody extends StatelessWidget {
 
     return GridView.builder(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: ResponsiveLayout.gridColumns(context),
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 14,
-        childAspectRatio: ResponsiveLayout.booksGridAspectRatio(context),
-      ),
+      gridDelegate: ResponsiveLayout.bookGridDelegate(context),
       itemCount: books.length,
       itemBuilder: (context, i) {
         final b = books[i];
@@ -313,17 +308,18 @@ class _BooksBody extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(14),
-                    topRight: Radius.circular(14),
-                  ),
-                  child: Stack(
-                    children: [
-                      SizedBox(
-                        height: 160,
-                        width: double.infinity,
-                        child: CachedNetworkImage(
+                // Cover flexes to fill the fixed cell height, so cards are
+                // uniform and never leave dead space below the text.
+                Expanded(
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(14),
+                      topRight: Radius.circular(14),
+                    ),
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        CachedNetworkImage(
                           imageUrl: b.coverImageUrl,
                           fit: BoxFit.cover,
                           placeholder: (context, url) =>
@@ -331,7 +327,6 @@ class _BooksBody extends StatelessWidget {
                           errorWidget: (context, url, error) =>
                               const GoldPatternError(),
                         ),
-                      ),
                       Positioned(
                         right: 8,
                         bottom: 8,
@@ -361,6 +356,7 @@ class _BooksBody extends StatelessWidget {
                     ],
                   ),
                 ),
+              ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(10, 10, 10, 8),
                   child: Column(
@@ -417,12 +413,7 @@ class _BooksShimmerGrid extends StatelessWidget {
     final c = context.c;
     return GridView.builder(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: ResponsiveLayout.gridColumns(context),
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 14,
-        childAspectRatio: ResponsiveLayout.booksGridAspectRatio(context),
-      ),
+      gridDelegate: ResponsiveLayout.bookGridDelegate(context),
       itemCount: 6,
       itemBuilder: (context, i) {
         return Shimmer.fromColors(
@@ -438,13 +429,14 @@ class _BooksShimmerGrid extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Container(
-                  height: 160,
-                  decoration: BoxDecoration(
-                    color: c.backgroundElevated,
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(12),
-                      topRight: Radius.circular(12),
+                Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: c.backgroundElevated,
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(12),
+                        topRight: Radius.circular(12),
+                      ),
                     ),
                   ),
                 ),

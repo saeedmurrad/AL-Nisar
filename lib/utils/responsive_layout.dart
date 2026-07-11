@@ -66,12 +66,34 @@ class ResponsiveLayout {
     );
   }
 
-  /// Taller cells on narrow phones to avoid grid overflow.
-  static double booksGridAspectRatio(BuildContext context) {
-    final w = screenWidth(context);
-    if (w < 340) return 0.50;
-    if (w < narrowWidth) return 0.54;
-    return 0.58;
+  /// Width of the page content column (accounts for the desktop side nav
+  /// and the capped content width applied by the responsive shell).
+  static double contentWidth(BuildContext context) {
+    final w =
+        screenWidth(context) - (isExpanded(context) ? sideNavWidth : 0.0);
+    return w > contentMaxWidth ? contentMaxWidth : w;
+  }
+
+  /// Book-card grids: fixed cell height derived from the actual cell width
+  /// (portrait cover + text block), so cards stay compact and uniform on
+  /// every viewport instead of stretching tall on wide screens.
+  static SliverGridDelegateWithFixedCrossAxisCount bookGridDelegate(
+    BuildContext context, {
+    double horizontalPadding = 32,
+    double crossAxisSpacing = 12,
+    double mainAxisSpacing = 14,
+  }) {
+    final cols = gridColumns(context);
+    final cellWidth =
+        (contentWidth(context) - horizontalPadding - crossAxisSpacing * (cols - 1)) /
+        cols;
+    final coverHeight = (cellWidth * 1.05).clamp(150.0, 230.0);
+    return SliverGridDelegateWithFixedCrossAxisCount(
+      crossAxisCount: cols,
+      crossAxisSpacing: crossAxisSpacing,
+      mainAxisSpacing: mainAxisSpacing,
+      mainAxisExtent: coverHeight + 102,
+    );
   }
 
   static double homeGridAspectRatio(BuildContext context) {

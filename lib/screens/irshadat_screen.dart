@@ -180,142 +180,150 @@ class _IrshadatScreenState extends State<IrshadatScreen> {
                   );
                 }
 
-                return ListView.separated(
-                  padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
-                  itemCount: filtered.length,
-                  separatorBuilder: (context, index) =>
-                      const SizedBox(height: 12),
-                  itemBuilder: (context, i) {
-                    final ir = filtered[i];
-                    final bookmarked = _bookmarkedKeys.contains(
-                      _bookmarkKey(ir),
-                    );
-                    final hasText = ir.text.trim().isNotEmpty;
-                    return GoldCard(
-                      backgroundColor: c.backgroundInput,
-                      padding: EdgeInsets.zero,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(14),
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              AspectRatio(
-                                aspectRatio: 16 / 9,
-                                child: Material(
-                                  color: Colors.transparent,
-                                  child: InkWell(
-                                    onTap: () =>
-                                        _openImageFullscreen(filtered, i),
-                                    borderRadius: BorderRadius.circular(12),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(12),
-                                      child: Stack(
-                                        fit: StackFit.expand,
-                                        children: [
-                                          CachedNetworkImage(
-                                            imageUrl: _resolveImageUrl(ir),
-                                            fit: BoxFit.cover,
-                                            filterQuality: FilterQuality.high,
-                                            placeholder: (context, url) =>
-                                                const ShimmerPlaceholder(),
-                                            errorWidget:
-                                                (context, url, error) =>
-                                                    const GoldPatternError(),
-                                          ),
-                                          Positioned(
-                                            right: 8,
-                                            bottom: 8,
-                                            child: Container(
-                                              padding: const EdgeInsets.all(6),
-                                              decoration: BoxDecoration(
-                                                color: c.backgroundPrimary.o(
-                                                  0.55,
-                                                ),
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
+                // Cap the feed width so irshad images stay elegant on
+                // wide screens instead of stretching across the page.
+                return Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 672),
+                    child:
+                        ListView.separated(
+                      padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
+                      itemCount: filtered.length,
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(height: 12),
+                      itemBuilder: (context, i) {
+                        final ir = filtered[i];
+                        final bookmarked = _bookmarkedKeys.contains(
+                          _bookmarkKey(ir),
+                        );
+                        final hasText = ir.text.trim().isNotEmpty;
+                        return GoldCard(
+                          backgroundColor: c.backgroundInput,
+                          padding: EdgeInsets.zero,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(14),
+                            child: Padding(
+                              padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  AspectRatio(
+                                    aspectRatio: 16 / 9,
+                                    child: Material(
+                                      color: Colors.transparent,
+                                      child: InkWell(
+                                        onTap: () =>
+                                            _openImageFullscreen(filtered, i),
+                                        borderRadius: BorderRadius.circular(12),
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(12),
+                                          child: Stack(
+                                            fit: StackFit.expand,
+                                            children: [
+                                              CachedNetworkImage(
+                                                imageUrl: _resolveImageUrl(ir),
+                                                fit: BoxFit.cover,
+                                                filterQuality: FilterQuality.high,
+                                                placeholder: (context, url) =>
+                                                    const ShimmerPlaceholder(),
+                                                errorWidget:
+                                                    (context, url, error) =>
+                                                        const GoldPatternError(),
                                               ),
-                                              child: Icon(
-                                                Icons.fullscreen_rounded,
-                                                size: 18,
-                                                color: c.accentGold,
+                                              Positioned(
+                                                right: 8,
+                                                bottom: 8,
+                                                child: Container(
+                                                  padding: const EdgeInsets.all(6),
+                                                  decoration: BoxDecoration(
+                                                    color: c.backgroundPrimary.o(
+                                                      0.55,
+                                                    ),
+                                                    borderRadius:
+                                                        BorderRadius.circular(8),
+                                                  ),
+                                                  child: Icon(
+                                                    Icons.fullscreen_rounded,
+                                                    size: 18,
+                                                    color: c.accentGold,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  Text(
+                                    ir.dateLabel,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: c.textMuted,
+                                      fontSize: 12,
+                                      letterSpacing: 1.2,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  const OrnamentDivider(),
+                                  if (hasText) ...[
+                                    const SizedBox(height: 14),
+                                    _language.isRtl
+                                        ? Directionality(
+                                            textDirection: TextDirection.rtl,
+                                            child: Text(
+                                              ir.text,
+                                              textAlign: TextAlign.center,
+                                              style: AppTheme.amiriUrdu(
+                                                fontSize: 18,
+                                                height: 2.1,
+                                                color: c.textSecondary,
                                               ),
                                             ),
+                                          )
+                                        : Text(
+                                            ir.text,
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              color: c.textSecondary,
+                                              fontSize: 14,
+                                              height: 1.7,
+                                              fontStyle: FontStyle.italic,
+                                            ),
                                           ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 12),
-                              Text(
-                                ir.dateLabel,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: c.textMuted,
-                                  fontSize: 12,
-                                  letterSpacing: 1.2,
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              const OrnamentDivider(),
-                              if (hasText) ...[
-                                const SizedBox(height: 14),
-                                _language.isRtl
-                                    ? Directionality(
-                                        textDirection: TextDirection.rtl,
-                                        child: Text(
-                                          ir.text,
-                                          textAlign: TextAlign.center,
-                                          style: AppTheme.amiriUrdu(
-                                            fontSize: 18,
-                                            height: 2.1,
-                                            color: c.textSecondary,
-                                          ),
-                                        ),
-                                      )
-                                    : Text(
-                                        ir.text,
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          color: c.textSecondary,
-                                          fontSize: 14,
-                                          height: 1.7,
-                                          fontStyle: FontStyle.italic,
+                                  ],
+                                  const SizedBox(height: 12),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: _ActionPill(
+                                          label: bookmarked ? 'Saved' : 'Bookmark',
+                                          iconSvg: bookmarked
+                                              ? _bookmarkFilledSvg
+                                              : _bookmarkSvg,
+                                          active: bookmarked,
+                                          onTap: () => _toggleBookmark(ir),
                                         ),
                                       ),
-                              ],
-                              const SizedBox(height: 12),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: _ActionPill(
-                                      label: bookmarked ? 'Saved' : 'Bookmark',
-                                      iconSvg: bookmarked
-                                          ? _bookmarkFilledSvg
-                                          : _bookmarkSvg,
-                                      active: bookmarked,
-                                      onTap: () => _toggleBookmark(ir),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Expanded(
-                                    child: _ActionPill(
-                                      label: 'Share',
-                                      iconSvg: _shareSvg,
-                                      onTap: () => _shareIrshad(ir),
-                                    ),
+                                      const SizedBox(width: 10),
+                                      Expanded(
+                                        child: _ActionPill(
+                                          label: 'Share',
+                                          iconSvg: _shareSvg,
+                                          onTap: () => _shareIrshad(ir),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
-                            ],
+                            ),
                           ),
-                        ),
-                      ),
-                    );
-                  },
+                        );
+                      },
+                    ),
+                  ),
                 );
               },
             ),
