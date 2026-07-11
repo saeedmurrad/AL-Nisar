@@ -3,17 +3,20 @@ import 'package:flutter/material.dart';
 import '../theme/app_theme_colors.dart';
 import '../utils/responsive_layout.dart';
 import 'app_nav_panel.dart';
+import 'islamic_ui.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final c = context.c;
     return Drawer(
-      backgroundColor: c.backgroundSurface,
+      backgroundColor: kEmerald,
       child: SafeArea(
-        child: AppNavPanel(onNavigated: () => Navigator.of(context).pop()),
+        child: Theme(
+          data: emeraldChromeTheme(context),
+          child: AppNavPanel(onNavigated: () => Navigator.of(context).pop()),
+        ),
       ),
     );
   }

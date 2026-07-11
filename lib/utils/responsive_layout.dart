@@ -76,9 +76,9 @@ class ResponsiveLayout {
 
   static double homeGridAspectRatio(BuildContext context) {
     final w = screenWidth(context);
-    if (w < 340) return 1.0;
-    if (w < narrowWidth) return 1.06;
-    return 1.12;
+    if (w < 340) return 0.94;
+    if (w < narrowWidth) return 1.0;
+    return 1.06;
   }
 
   /// Lesson reader page viewport — scales with screen height.

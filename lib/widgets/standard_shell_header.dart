@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import '../navigation/go_router_helpers.dart';
 import '../theme/app_layout.dart';
 import '../theme/app_theme.dart';
-import '../theme/app_theme_colors.dart';
 import 'app_shell_chrome.dart';
+import 'islamic_ui.dart';
 
 /// Top bar for shell screens: **Back** (via [popOrGoHome]), title, optional trailing and bottom row.
 class StandardShellHeader extends StatelessWidget {
@@ -31,7 +31,9 @@ class StandardShellHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = context.c;
+    // The header sits on the fixed emerald chrome band, so its own inline
+    // styles use the on-emerald tokens (theme overrides only affect widgets
+    // built *below* AppShellChrome, not styles computed in this method).
     return AppShellChrome(
       padding: padding,
       child: Column(
@@ -52,14 +54,21 @@ class StandardShellHeader extends StatelessWidget {
                   onPressed: disableBack
                       ? null
                       : (onBack ?? () => popOrGoHome(context)),
-                  icon: Icon(Icons.arrow_back, color: c.accentGold),
+                  icon: Icon(
+                    Icons.arrow_back,
+                    color: kOnEmeraldColors.accentGold,
+                  ),
                 ),
               Expanded(
                 child:
                     titleWidget ??
                     Text(
                       title,
-                      style: AppTheme.displayTitle(color: c.textPrimary),
+                      style: AppTheme.displayTitle(
+                        fontSize: 22,
+                        color: kOnEmeraldColors.textPrimary,
+                        letterSpacing: 0.8,
+                      ),
                     ),
               ),
               if (trailing case final t?) t,

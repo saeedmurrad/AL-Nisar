@@ -12,6 +12,7 @@ import '../theme/app_theme_colors.dart';
 import '../theme/color_utils.dart';
 import '../widgets/shimmer_placeholder.dart';
 import '../widgets/standard_shell_header.dart';
+import '../widgets/islamic_ui.dart';
 
 class ShijraScreen extends StatefulWidget {
   const ShijraScreen({super.key});
@@ -153,7 +154,7 @@ class _ShijraScreenState extends State<ShijraScreen> {
                     style: AppTheme.cormorantGaramond(
                       fontSize: 22,
                       fontWeight: FontWeight.w600,
-                      color: c.textPrimary,
+                      color: kOnEmeraldColors.textPrimary,
                       letterSpacing: 0.8,
                     ),
                   ),
@@ -164,7 +165,7 @@ class _ShijraScreenState extends State<ShijraScreen> {
                       style: AppTheme.amiriUrdu(
                         fontSize: 16,
                         height: 1.5,
-                        color: c.textSecondary,
+                        color: kOnEmeraldColors.textMuted,
                       ),
                     ),
                   ),

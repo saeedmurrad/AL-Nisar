@@ -20,7 +20,7 @@ import '../widgets/book_feature_icons.dart';
 import '../widgets/shimmer_placeholder.dart';
 import '../widgets/gold_card.dart';
 import '../widgets/standard_shell_header.dart';
-import '../widgets/islamic_decoration.dart';
+import '../widgets/islamic_ui.dart';
 
 class BooksScreen extends StatefulWidget {
   const BooksScreen({super.key});
@@ -128,7 +128,7 @@ class _BooksScreenState extends State<BooksScreen> {
                       style: AppTheme.cormorantGaramond(
                         fontSize: 20,
                         letterSpacing: 0.6,
-                        color: c.textPrimary,
+                        color: kOnEmeraldColors.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -139,7 +139,7 @@ class _BooksScreenState extends State<BooksScreen> {
                         style: AppTheme.amiriUrdu(
                           fontSize: 15,
                           height: 1.35,
-                          color: c.textSecondary,
+                          color: kOnEmeraldColors.textMuted,
                         ),
                       ),
                     ),
@@ -197,7 +197,7 @@ class _BooksScreenState extends State<BooksScreen> {
                   ],
                 ),
               ),
-              IslamicDivider(height: 20),
+              const SizedBox(height: 12),
               SizedBox(
                 height: 44,
                 child: ListView.separated(

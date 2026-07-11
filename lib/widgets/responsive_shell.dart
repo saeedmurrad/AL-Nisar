@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../theme/app_theme_colors.dart';
+import '../theme/color_utils.dart';
 import '../utils/responsive_layout.dart';
 import 'app_nav_panel.dart';
+import 'islamic_ui.dart';
 
 /// Web/desktop chrome around every signed-in screen.
 ///
@@ -20,7 +21,6 @@ class ResponsiveShell extends StatelessWidget {
       return child;
     }
 
-    final c = context.c;
     return Material(
       color: Theme.of(context).scaffoldBackgroundColor,
       child: Row(
@@ -29,12 +29,19 @@ class ResponsiveShell extends StatelessWidget {
           Container(
             width: ResponsiveLayout.sideNavWidth,
             decoration: BoxDecoration(
-              color: c.backgroundSurface,
+              gradient: const LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [kEmeraldSoft, kEmerald, kDeepEmerald],
+              ),
               border: Border(
-                right: BorderSide(color: c.borderDefault, width: 0.5),
+                right: BorderSide(color: kHeroGold.o(0.35), width: 0.8),
               ),
             ),
-            child: const SafeArea(child: AppNavPanel()),
+            child: Theme(
+              data: emeraldChromeTheme(context),
+              child: const SafeArea(child: AppNavPanel()),
+            ),
           ),
           Expanded(
             child: Center(

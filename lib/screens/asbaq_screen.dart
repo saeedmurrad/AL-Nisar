@@ -12,6 +12,7 @@ import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
 import '../widgets/gold_card.dart';
 import '../widgets/standard_shell_header.dart';
+import '../widgets/islamic_ui.dart';
 import '../widgets/shimmer_placeholder.dart';
 
 class AsbaqScreen extends StatelessWidget {
@@ -35,7 +36,7 @@ class AsbaqScreen extends StatelessWidget {
                   style: AppTheme.cormorantGaramond(
                     fontSize: 20,
                     letterSpacing: 0.8,
-                    color: c.textPrimary,
+                    color: kOnEmeraldColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -46,7 +47,7 @@ class AsbaqScreen extends StatelessWidget {
                     style: AppTheme.amiriUrdu(
                       fontSize: 15,
                       height: 1.4,
-                      color: c.textSecondary,
+                      color: kOnEmeraldColors.textMuted,
                     ),
                   ),
                 ),

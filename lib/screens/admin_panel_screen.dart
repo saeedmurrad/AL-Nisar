@@ -7,13 +7,13 @@ import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
 import '../widgets/gold_card.dart';
 import '../widgets/screen_navigation_header.dart';
+import '../widgets/islamic_ui.dart';
 
 class AdminPanelScreen extends StatelessWidget {
   const AdminPanelScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final c = context.c;
     final auth = context.watch<AuthProvider>();
 
     return Scaffold(
@@ -32,7 +32,7 @@ class AdminPanelScreen extends StatelessWidget {
                 style: AppTheme.lato(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
-                  color: c.accentGold,
+                  color: kOnEmeraldColors.accentGold,
                 ),
               ),
             ),

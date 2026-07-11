@@ -15,6 +15,7 @@ import '../utils/responsive_layout.dart';
 import '../widgets/full_screen_image_viewer.dart';
 import '../widgets/gold_card.dart';
 import '../widgets/standard_shell_header.dart';
+import '../widgets/islamic_ui.dart';
 import '../widgets/shimmer_placeholder.dart';
 
 class IrshadatBookmarksScreen extends StatefulWidget {
@@ -345,7 +346,7 @@ class _IrshadatBookmarksScreenState extends State<IrshadatBookmarksScreen> {
                   'Saved Irshadat',
                   style: AppTheme.cormorantGaramond(
                     fontSize: 22,
-                    color: c.textPrimary,
+                    color: kOnEmeraldColors.textPrimary,
                   ),
                 ),
                 Directionality(
@@ -355,7 +356,7 @@ class _IrshadatBookmarksScreenState extends State<IrshadatBookmarksScreen> {
                     style: AppTheme.amiriUrdu(
                       fontSize: 15,
                       height: 1.3,
-                      color: c.textSecondary,
+                      color: kOnEmeraldColors.textMuted,
                     ),
                   ),
                 ),
@@ -371,16 +372,16 @@ class _IrshadatBookmarksScreenState extends State<IrshadatBookmarksScreen> {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: c.accentGold.o(0.2),
+                    color: kOnEmeraldColors.accentGold.o(0.2),
                     borderRadius: BorderRadius.circular(999),
-                    border: Border.all(color: c.accentGold.o(0.5)),
+                    border: Border.all(color: kOnEmeraldColors.accentGold.o(0.5)),
                   ),
                   child: Text(
                     '$n saved',
                     style: AppTheme.lato(
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
-                      color: c.textPrimary,
+                      color: kOnEmeraldColors.textPrimary,
                     ),
                   ),
                 );

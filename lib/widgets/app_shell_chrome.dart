@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 
 import '../theme/app_layout.dart';
-import '../theme/app_theme_colors.dart';
+import '../theme/color_utils.dart';
+import 'islamic_ui.dart';
 
-/// Shared top-bar surface: background, safe area, bottom hairline.
+/// Shared top-bar surface: deep emerald band with a gilded hairline, like a
+/// website navbar. Wraps its child in on-emerald theme tokens so titles,
+/// search fields, and buttons recolor automatically.
 class AppShellChrome extends StatelessWidget {
   const AppShellChrome({
     super.key,
@@ -16,14 +19,22 @@ class AppShellChrome extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = context.c;
     return Container(
       decoration: BoxDecoration(
-        color: c.backgroundSurface,
-        border: Border(bottom: BorderSide(color: c.borderDefault, width: 0.5)),
+        gradient: const LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [kEmeraldSoft, kEmerald],
+        ),
+        border: Border(
+          bottom: BorderSide(color: kHeroGold.o(0.45), width: 1),
+        ),
       ),
       padding: padding,
-      child: SafeArea(bottom: false, child: child),
+      child: SafeArea(
+        bottom: false,
+        child: Theme(data: emeraldChromeTheme(context), child: child),
+      ),
     );
   }
 }

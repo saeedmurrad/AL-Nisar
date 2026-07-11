@@ -55,9 +55,9 @@ class AppNavPanel extends StatelessWidget {
               child: Text(
                 'AL Nisar',
                 style: AppTheme.displayTitle(
-                  fontSize: 20,
-                  letterSpacing: 1.2,
-                  color: c.textPrimary,
+                  fontSize: 22,
+                  letterSpacing: 2.4,
+                  color: c.accentGold,
                 ),
               ),
             ),

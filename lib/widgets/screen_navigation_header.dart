@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import '../navigation/go_router_helpers.dart';
 import '../theme/app_layout.dart';
 import '../theme/app_theme.dart';
-import '../theme/app_theme_colors.dart';
 import 'app_shell_chrome.dart';
+import 'islamic_ui.dart';
 
 /// Top bar with working **Back** (pop or dashboard) and **Home**, plus title and optional trailing.
 class ScreenNavigationHeader extends StatelessWidget {
@@ -35,7 +35,7 @@ class ScreenNavigationHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = context.c;
+    // On the fixed emerald band — use on-emerald tokens for inline styles.
     return AppShellChrome(
       padding: padding,
       child: Row(
@@ -46,18 +46,31 @@ class ScreenNavigationHeader extends StatelessWidget {
               onPressed: disableBack
                   ? null
                   : (onBack ?? () => popOrGoHome(context)),
-              icon: Icon(Icons.arrow_back, color: c.accentGold),
+              icon: Icon(
+                Icons.arrow_back,
+                color: kOnEmeraldColors.accentGold,
+              ),
             ),
           if (homeEnabled)
             IconButton(
               tooltip: 'Home',
               onPressed: onHome ?? () => goAppHome(context),
-              icon: Icon(Icons.home_outlined, color: c.accentGold),
+              icon: Icon(
+                Icons.home_outlined,
+                color: kOnEmeraldColors.accentGold,
+              ),
             ),
           Expanded(
             child:
                 titleWidget ??
-                Text(title, style: AppTheme.displayTitle(color: c.textPrimary)),
+                Text(
+                  title,
+                  style: AppTheme.displayTitle(
+                    fontSize: 22,
+                    color: kOnEmeraldColors.textPrimary,
+                    letterSpacing: 0.8,
+                  ),
+                ),
           ),
           if (trailing case final t?) t,
         ],

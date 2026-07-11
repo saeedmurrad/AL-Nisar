@@ -39,18 +39,20 @@ enum AppColorPalette {
   }
 
   AppThemeColors get lightColors => switch (this) {
+    // Modern web look: crisp near-white canvas, pure-white cards, and a
+    // vivid emerald accent. Gold lives on the fixed emerald chrome surfaces.
     AppColorPalette.islamic => const AppThemeColors(
-      backgroundPrimary: Color(0xFFFAF8F4),
-      backgroundSurface: Color(0xFFF0E8DE),
-      backgroundElevated: Color(0xFFE6DCC8),
-      backgroundInput: Color(0xFFF5F0E8),
-      accentGold: Color(0xFF1B5E3F),
-      textPrimary: Color(0xFF0A2E1A),
-      textSecondary: Color(0xFF1A5E3F),
-      textMuted: Color(0xFF4A8A6A),
-      textFaint: Color(0xFF6BA88A),
-      borderDefault: Color(0xFFA8D4B8),
-      borderFaint: Color(0xFFD0E4D0),
+      backgroundPrimary: Color(0xFFF5F8F5),
+      backgroundSurface: Color(0xFFFFFFFF),
+      backgroundElevated: Color(0xFFE9F2EB),
+      backgroundInput: Color(0xFFF0F5F1),
+      accentGold: Color(0xFF0E7A55),
+      textPrimary: Color(0xFF10251A),
+      textSecondary: Color(0xFF2C523E),
+      textMuted: Color(0xFF5F836E),
+      textFaint: Color(0xFF8CA997),
+      borderDefault: Color(0xFFC9DCD0),
+      borderFaint: Color(0xFFE2EDE5),
     ),
     AppColorPalette.emerald => const AppThemeColors(
       backgroundPrimary: Color(0xFFE4F2E8),
@@ -146,18 +148,19 @@ enum AppColorPalette {
   };
 
   AppThemeColors get darkColors => switch (this) {
+    // Rich emerald night with luminous gold and high-contrast cream text.
     AppColorPalette.islamic => const AppThemeColors(
-      backgroundPrimary: Color(0xFF0D1F18),
-      backgroundSurface: Color(0xFF152B24),
-      backgroundElevated: Color(0xFF1D3A32),
-      backgroundInput: Color(0xFF132920),
-      accentGold: Color(0xFFD4AF37),
-      textPrimary: Color(0xFFE8F0E8),
-      textSecondary: Color(0xFFD0E0D4),
-      textMuted: Color(0xFF7AB890),
-      textFaint: Color(0xFF5A9070),
-      borderDefault: Color(0xFF2D6050),
-      borderFaint: Color(0xFF1A3A32),
+      backgroundPrimary: Color(0xFF081611),
+      backgroundSurface: Color(0xFF0E211A),
+      backgroundElevated: Color(0xFF163126),
+      backgroundInput: Color(0xFF0C1D16),
+      accentGold: Color(0xFFD9B44A),
+      textPrimary: Color(0xFFF2EFE2),
+      textSecondary: Color(0xFFCFE0D2),
+      textMuted: Color(0xFF83A791),
+      textFaint: Color(0xFF5C8069),
+      borderDefault: Color(0xFF27503E),
+      borderFaint: Color(0xFF16301F),
     ),
     AppColorPalette.emerald => const AppThemeColors(
       backgroundPrimary: Color(0xFF040F0A),

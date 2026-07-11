@@ -19,7 +19,6 @@ import '../utils/responsive_layout.dart';
 import '../widgets/gold_card.dart';
 import '../widgets/shimmer_placeholder.dart';
 import '../widgets/standard_shell_header.dart';
-import '../widgets/islamic_decoration.dart';
 
 class GalleryScreen extends StatefulWidget {
   const GalleryScreen({super.key});
@@ -46,7 +45,6 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 ? null
                 : () => setState(() => _openFolder = null),
           ),
-          IslamicDivider(height: 20),
           Expanded(
             child: StreamBuilder<List<GalleryImageModel>>(
               stream: _service.streamActive(),

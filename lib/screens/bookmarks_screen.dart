@@ -12,6 +12,7 @@ import '../theme/app_theme_colors.dart';
 import '../theme/color_utils.dart';
 import '../widgets/book_feature_icons.dart';
 import '../widgets/standard_shell_header.dart';
+import '../widgets/islamic_ui.dart';
 
 class BookmarksScreen extends StatefulWidget {
   const BookmarksScreen({super.key});
@@ -143,7 +144,7 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
                   'My Bookmarks',
                   style: AppTheme.cormorantGaramond(
                     fontSize: 22,
-                    color: c.textPrimary,
+                    color: kOnEmeraldColors.textPrimary,
                   ),
                 ),
                 Directionality(
@@ -153,7 +154,7 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
                     style: AppTheme.amiriUrdu(
                       fontSize: 15,
                       height: 1.3,
-                      color: c.textSecondary,
+                      color: kOnEmeraldColors.textMuted,
                     ),
                   ),
                 ),
@@ -169,16 +170,16 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: c.accentGold.o(0.2),
+                    color: kOnEmeraldColors.accentGold.o(0.2),
                     borderRadius: BorderRadius.circular(999),
-                    border: Border.all(color: c.accentGold.o(0.5)),
+                    border: Border.all(color: kOnEmeraldColors.accentGold.o(0.5)),
                   ),
                   child: Text(
                     '$n bookmarks',
                     style: AppTheme.lato(
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
-                      color: c.textPrimary,
+                      color: kOnEmeraldColors.textPrimary,
                     ),
                   ),
                 );

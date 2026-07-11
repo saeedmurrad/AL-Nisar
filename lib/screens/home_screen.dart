@@ -1,22 +1,20 @@
 import 'package:flutter/material.dart';
-import '../widgets/notification_bell_button.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../auth/auth_provider.dart';
 import '../theme/app_theme.dart';
-import '../theme/color_utils.dart';
 import '../theme/app_theme_colors.dart';
+import '../theme/color_utils.dart';
 import '../utils/responsive_layout.dart';
-import '../widgets/app_shell_chrome.dart';
 import '../widgets/app_drawer.dart';
-import '../widgets/gold_card.dart';
+import '../widgets/app_shell_chrome.dart';
 import '../widgets/home_grid_icons.dart';
 import '../widgets/irshad_of_the_day_card.dart';
+import '../widgets/islamic_ui.dart';
 import '../widgets/murshid_avatar.dart';
+import '../widgets/notification_bell_button.dart';
 import '../widgets/social_connect_section.dart';
-import '../widgets/islamic_decoration.dart';
-import '../widgets/hero_banner.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -27,6 +25,10 @@ class HomeScreen extends StatelessWidget {
     final name = auth.profile?.displayName.trim().isNotEmpty == true
         ? auth.profile!.displayName
         : (auth.user?.displayName ?? 'Member');
+
+    final isMedium = ResponsiveLayout.isMedium(context);
+    final hPad = EdgeInsets.symmetric(horizontal: isMedium ? 24.0 : 16.0);
+
     return Scaffold(
       drawer: ResponsiveLayout.isExpanded(context) ? null : const AppDrawer(),
       body: Column(
@@ -37,50 +39,60 @@ class HomeScreen extends StatelessWidget {
           ),
           Expanded(
             child: ListView(
-              padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
+              padding: EdgeInsets.zero,
               children: [
-                HeroBanner(
-                  title: 'Al-Nisar',
-                  subtitle: 'Spiritual Wisdom & Islamic Guidance',
-                  backgroundColor: context.c.backgroundPrimary,
-                  height: ResponsiveLayout.isExpanded(context) ? 280 : 240,
-                ),
+                // ── Hero ────────────────────────────────────────────────
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 20, 16, 12),
-                  child: IslamicHeader(
-                    title: 'Welcome to Your Journey',
-                    showDecoration: true,
+                  // Full-bleed on phones; inset card on tablet/desktop.
+                  padding: isMedium
+                      ? const EdgeInsets.fromLTRB(24, 20, 24, 0)
+                      : EdgeInsets.zero,
+                  child: IslamicHeroBanner(
+                    title: 'AL Nisar',
+                    subtitle:
+                        'A sanctuary of spiritual wisdom, sacred knowledge,\n'
+                        'and the remembrance of Allah',
+                    showAvatar: true,
+                    primaryAction: HeroAction(
+                      label: 'BEGIN YOUR SABAQ',
+                      onTap: () => context.go('/sabaq'),
+                    ),
+                    secondaryAction: HeroAction(
+                      label: 'SACRED BOOKS',
+                      onTap: () => context.go('/books'),
+                    ),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: IslamicQuote(
-                    quote: 'The heart is a mirror; polish it with the remembrance of God.',
-                    attribution: 'Sufi Wisdom',
-                    showDecoration: true,
-                  ),
+                const SizedBox(height: 36),
+
+                // ── Daily guidance ─────────────────────────────────────
+                const SectionHeader(
+                  caption: 'Daily Guidance',
+                  title: 'Irshad of the Day',
+                  urdu: 'ارشادِ پاک',
                 ),
-                const SizedBox(height: 16),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: const IrshadOfTheDayCard(),
+                const SizedBox(height: 18),
+                Padding(padding: hPad, child: const IrshadOfTheDayCard()),
+                const SizedBox(height: 36),
+
+                // ── Quote band ─────────────────────────────────────────
+                const QuoteBand(
+                  quote:
+                      'The heart is a mirror — polish it with the '
+                      'remembrance of God.',
+                  attribution: 'Sufi Wisdom',
                 ),
-                const SizedBox(height: 16),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: IslamicDivider(height: 24),
+                const SizedBox(height: 36),
+
+                // ── Explore grid ───────────────────────────────────────
+                const SectionHeader(
+                  caption: 'Explore',
+                  title: 'The Path of Knowledge',
+                  urdu: 'علم کا راستہ',
                 ),
+                const SizedBox(height: 18),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: const SocialConnectSection(),
-                ),
-                const SizedBox(height: 16),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: IslamicDivider(height: 24),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: hPad,
                   child: _HomeGrid(
                     showAdminPanel: auth.isAdminOrHigher,
                     onAdminPanel: () => context.go('/admin'),
@@ -94,6 +106,19 @@ class HomeScreen extends StatelessWidget {
                     onGallery: () => context.go('/gallery'),
                   ),
                 ),
+                const SizedBox(height: 36),
+
+                // ── Community ──────────────────────────────────────────
+                const SectionHeader(
+                  caption: 'Stay Connected',
+                  title: 'Join Our Community',
+                ),
+                const SizedBox(height: 18),
+                Padding(padding: hPad, child: const SocialConnectSection()),
+                const SizedBox(height: 44),
+
+                // ── Footer ─────────────────────────────────────────────
+                const AppFooter(),
               ],
             ),
           ),
@@ -111,7 +136,6 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = context.c;
     return AppShellChrome(
       padding: const EdgeInsets.fromLTRB(16, 18, 16, 14),
       child: Row(
@@ -129,8 +153,8 @@ class _Header extends StatelessWidget {
                 Text(
                   'As-Salaam-Alaikum',
                   style: AppTheme.sectionCaption(
-                    color: c.textMuted.o(0.95),
-                    letterSpacing: 1.0,
+                    color: kHeroGold.o(0.9),
+                    letterSpacing: 1.6,
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -140,8 +164,8 @@ class _Header extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.center,
                   style: AppTheme.displayTitle(
-                    fontSize: 16,
-                    color: c.textPrimary,
+                    fontSize: 17,
+                    color: kHeroCream,
                   ),
                 ),
               ],
@@ -181,21 +205,25 @@ class _HomeGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = context.c;
-    return GridView.count(
-      crossAxisCount: ResponsiveLayout.gridColumns(context),
-      shrinkWrap: true,
-      mainAxisSpacing: 12,
-      crossAxisSpacing: 12,
-      physics: const NeverScrollableScrollPhysics(),
-      childAspectRatio: ResponsiveLayout.homeGridAspectRatio(context),
-      children: [
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final cols = ResponsiveLayout.gridColumns(context);
+        final cellWidth = (constraints.maxWidth - 12 * (cols - 1)) / cols;
+        // Uniform card height regardless of viewport width.
+        final ratio = (cellWidth / 172).clamp(0.9, 2.1);
+        return GridView.count(
+          crossAxisCount: cols,
+          shrinkWrap: true,
+          mainAxisSpacing: 12,
+          crossAxisSpacing: 12,
+          physics: const NeverScrollableScrollPhysics(),
+          childAspectRatio: ratio,
+          children: [
         if (showAdminPanel)
           _HomeGridCard(
             label: 'Admin Panel',
             sublabel: 'Manage content',
             iconKind: HomeGridIconKind.adminPanel,
-            accent: c.accentGold,
             onTap: onAdminPanel,
           ),
         if (showAsbaqTareeqat)
@@ -203,103 +231,146 @@ class _HomeGrid extends StatelessWidget {
             label: 'Asbaq-e-Tareeqat',
             sublabel: 'Spiritual lessons',
             iconKind: HomeGridIconKind.asbaqTareeqat,
-            accent: c.accentGold,
             onTap: onAsbaqTareeqat,
           ),
         _HomeGridCard(
           label: 'Sabaq',
           sublabel: 'Lessons',
           iconKind: HomeGridIconKind.sabaqLessons,
-          accent: c.accentGold,
           onTap: onSabaq,
         ),
         _HomeGridCard(
           label: 'Books',
           sublabel: 'Sacred readings',
           iconKind: HomeGridIconKind.books,
-          accent: c.accentGold,
           onTap: onBooks,
         ),
         _HomeGridCard(
           label: 'Irshadat',
           sublabel: 'Daily guidance',
           iconKind: HomeGridIconKind.irshadat,
-          accent: c.accentGold,
           onTap: onIrshad,
         ),
         _HomeGridCard(
           label: 'News & Events',
           sublabel: 'Updates & gatherings',
           iconKind: HomeGridIconKind.newsEvents,
-          accent: c.accentGold,
           onTap: onNewsEvents,
         ),
         _HomeGridCard(
           label: 'Shajra Pak',
           sublabel: 'Silsila tree',
           iconKind: HomeGridIconKind.shijraPak,
-          accent: c.accentGold,
           onTap: onShajra,
         ),
-        _HomeGridCard(
-          label: 'Gallery',
-          sublabel: 'Sacred visuals',
-          iconKind: HomeGridIconKind.gallery,
-          accent: c.accentGold,
-          onTap: onGallery,
-        ),
-      ],
+            _HomeGridCard(
+              label: 'Gallery',
+              sublabel: 'Sacred visuals',
+              iconKind: HomeGridIconKind.gallery,
+              onTap: onGallery,
+            ),
+          ],
+        );
+      },
     );
   }
 }
 
+/// Medallion-style destination card: gold-ringed icon, centered serif label.
 class _HomeGridCard extends StatelessWidget {
   const _HomeGridCard({
     required this.label,
     required this.sublabel,
     required this.iconKind,
-    required this.accent,
     required this.onTap,
   });
 
   final String label;
   final String sublabel;
   final HomeGridIconKind iconKind;
-  final Color accent;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final c = context.c;
-    return InkWell(
-      onTap: onTap,
-      child: GoldCard(
-        backgroundColor: c.backgroundSurface,
-        showWatermark: true,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            HomeGridIcon(kind: iconKind, color: accent, size: 40),
-            const SizedBox(height: 10),
-            Text(
-              label,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: AppTheme.cinzelHeading(
-                fontSize: 15,
-                letterSpacing: 1.2,
-                color: c.textPrimary,
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final chipTop = c.accentGold;
+    final chipBottom =
+        Color.lerp(c.accentGold, isDark ? Colors.black : Colors.white, 0.22)!;
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(18),
+        child: Ink(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(18),
+            color: c.backgroundSurface,
+            border: Border.all(color: c.borderFaint, width: 1),
+            boxShadow: [
+              BoxShadow(
+                color: c.accentGold.o(isDark ? 0.10 : 0.14),
+                blurRadius: 18,
+                offset: const Offset(0, 6),
               ),
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 54,
+                  height: 54,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [chipBottom, chipTop],
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: c.accentGold.o(0.35),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: HomeGridIcon(
+                      kind: iconKind,
+                      color: isDark ? kDeepEmerald : Colors.white,
+                      size: 26,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 11),
+                Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: AppTheme.cinzelHeading(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.6,
+                    color: c.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  sublabel,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: AppTheme.lato(color: c.textMuted, fontSize: 10.5),
+                ),
+              ],
             ),
-            const SizedBox(height: 4),
-            Text(
-              sublabel,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: AppTheme.lato(color: c.textMuted, fontSize: 11),
-            ),
-          ],
+          ),
         ),
       ),
     );

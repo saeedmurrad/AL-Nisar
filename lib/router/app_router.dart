@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 import '../screens/asbaq_screen.dart';
 import '../models/book_model.dart';
 import '../models/book_reader_args.dart';
-import '../models/irshad_firestore_model.dart';
 import '../models/event_firestore_model.dart';
 import '../models/news_firestore_model.dart';
 import '../auth/auth_provider.dart';
@@ -41,7 +40,6 @@ import '../screens/super_admin_panel_screen.dart';
 import '../screens/super_admin_users_screen.dart';
 import '../screens/admin_social_links_screen.dart';
 import '../screens/admin_sabaq_requests_screen.dart';
-import '../screens/design_showcase_screen.dart';
 import '../widgets/responsive_shell.dart';
 
 GoRouter createAppRouter(AuthProvider auth) {
@@ -50,7 +48,7 @@ GoRouter createAppRouter(AuthProvider auth) {
     refreshListenable: auth,
     redirect: (context, state) {
       final loc = state.matchedLocation;
-      const authRoutes = {'/login', '/signup', '/forgot-password', '/showcase'};
+      const authRoutes = {'/login', '/signup', '/forgot-password'};
       final onAuthRoute = authRoutes.contains(loc);
       final isAuthed = auth.isAuthenticated;
 
@@ -86,10 +84,6 @@ GoRouter createAppRouter(AuthProvider auth) {
     },
     routes: [
       GoRoute(path: '/', builder: (context, state) => const SplashScreen()),
-      GoRoute(
-        path: '/showcase',
-        builder: (context, state) => const DesignShowcaseScreen(),
-      ),
       GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
       GoRoute(
         path: '/signup',

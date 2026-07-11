@@ -11,6 +11,7 @@ import '../widgets/gold_card.dart';
 import '../widgets/news_cover_image.dart';
 import '../widgets/branded_state_view.dart';
 import '../widgets/standard_shell_header.dart';
+import '../widgets/islamic_ui.dart';
 
 class NewsEventsScreen extends StatefulWidget {
   const NewsEventsScreen({super.key});
@@ -85,7 +86,7 @@ class _NewsEventsScreenState extends State<NewsEventsScreen>
               style: AppTheme.cormorantGaramond(
                 fontSize: 20,
                 letterSpacing: 0.5,
-                color: c.textPrimary,
+                color: kOnEmeraldColors.textPrimary,
               ),
             ),
             bottom: Column(
