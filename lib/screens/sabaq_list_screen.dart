@@ -396,6 +396,20 @@ class _SabaqListScreenState extends State<SabaqListScreen> {
                 final ordered = _ordered(use);
                 final uid = auth.user?.uid ?? '';
 
+                // A signed-out visitor must never see the locked member list
+                // (everything would render as "Locked", including the free
+                // first Sabaq). The router normally prevents this state; this
+                // is a safety net for expired sessions.
+                if (!auth.isAuthenticated || uid.isEmpty) {
+                  return const BrandedStateView(
+                    icon: Icons.lock_outlined,
+                    title: 'Sign in required',
+                    message:
+                        'Please sign in to read your Sabaq lessons. The first '
+                        'Sabaq is open to every member.',
+                  );
+                }
+
                 if (auth.isAdminOrHigher) {
                   return ListView.separated(
                     padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
