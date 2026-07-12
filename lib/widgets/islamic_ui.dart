@@ -1,14 +1,20 @@
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
 import '../theme/color_utils.dart';
+import '../utils/external_link_launcher.dart';
 import '../utils/responsive_layout.dart';
 import 'murshid_avatar.dart';
 import 'ornament_divider.dart';
+
+/// Google Play listing for the native Android app.
+const kPlayStoreUrl =
+    'https://play.google.com/store/apps/details?id=com.alnisar.alnisarapp';
 
 /// Fixed palette for the hero and footer surfaces. These are deliberately
 /// theme-independent: a deep emerald night with gold accents reads richly in
@@ -520,6 +526,11 @@ class AppFooter extends StatelessWidget {
                     ),
                 ],
               ),
+              // Native Android app — only offered on the web build.
+              if (kIsWeb) ...[
+                const SizedBox(height: 20),
+                const _GetOnPlayButton(),
+              ],
               const SizedBox(height: 20),
               const OrnamentDivider(
                 color: kHeroGold,
@@ -556,6 +567,67 @@ class AppFooter extends StatelessWidget {
                 ),
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// "Get it on Google Play" badge-style button for the web footer.
+class _GetOnPlayButton extends StatelessWidget {
+  const _GetOnPlayButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(12),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: () => launchExternalUrl(
+            context,
+            kPlayStoreUrl,
+            failureMessage: 'Could not open Google Play',
+          ),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+            decoration: BoxDecoration(
+              color: kDeepEmerald,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: kHeroGold.o(0.7), width: 1),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.play_arrow_rounded, color: kHeroGold, size: 26),
+                const SizedBox(width: 12),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'GET IT ON',
+                      style: AppTheme.lato(
+                        fontSize: 8.5,
+                        letterSpacing: 2,
+                        color: kHeroCream.o(0.7),
+                      ),
+                    ),
+                    Text(
+                      'Google Play',
+                      style: AppTheme.cormorantGaramond(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: kHeroCream,
+                        height: 1.1,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
