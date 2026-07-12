@@ -93,8 +93,8 @@ class HomeScreen extends StatelessWidget {
                 // ── Explore grid ───────────────────────────────────────
                 const SectionHeader(
                   caption: 'Explore',
-                  title: 'The Path of Knowledge',
-                  urdu: 'علم کا راستہ',
+                  title: 'The Path of Gnosis',
+                  urdu: 'معرفت کا راستہ',
                 ),
                 const SizedBox(height: 18),
                 ContentColumn(
