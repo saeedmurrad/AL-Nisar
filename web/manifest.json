@@ -1,11 +1,12 @@
 {
-    "name": "AL Nisar App",
+    "name": "AL Nisar",
     "short_name": "AL Nisar",
-    "start_url": ".",
+    "start_url": "/",
+    "scope": "/",
     "display": "standalone",
-    "background_color": "#1a1a2e",
-    "theme_color": "#1a1a2e",
-    "description": "A new Flutter project.",
+    "background_color": "#07150F",
+    "theme_color": "#0E2B1F",
+    "description": "AL Nisar — spiritual wisdom, sacred books, and daily guidance.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

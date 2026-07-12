@@ -36,7 +36,7 @@ class AlNisarApp extends StatelessWidget {
     final themeProvider = context.watch<ThemeProvider>();
 
     return MaterialApp.router(
-      title: 'AL Nisar App',
+      title: 'AL Nisar',
       debugShowCheckedModeBanner: false,
       theme: themeProvider.lightTheme,
       darkTheme: themeProvider.darkTheme,
