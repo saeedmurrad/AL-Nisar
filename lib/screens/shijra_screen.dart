@@ -173,6 +173,8 @@ class _ShijraScreenState extends State<ShijraScreen> {
               ),
             ),
             Expanded(
+              child: ContentColumn(
+              maxWidth: 760,
               child: SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
                 child: Column(
@@ -211,6 +213,7 @@ class _ShijraScreenState extends State<ShijraScreen> {
                   ],
                 ),
               ),
+            ),
             ),
           ],
         ),

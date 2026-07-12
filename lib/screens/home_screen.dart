@@ -72,7 +72,13 @@ class HomeScreen extends StatelessWidget {
                   urdu: 'ارشادِ پاک',
                 ),
                 const SizedBox(height: 18),
-                Padding(padding: hPad, child: const IrshadOfTheDayCard()),
+                ContentColumn(
+                  maxWidth: 720,
+                  child: Padding(
+                    padding: hPad,
+                    child: const IrshadOfTheDayCard(),
+                  ),
+                ),
                 const SizedBox(height: 36),
 
                 // ── Quote band ─────────────────────────────────────────
@@ -91,19 +97,22 @@ class HomeScreen extends StatelessWidget {
                   urdu: 'علم کا راستہ',
                 ),
                 const SizedBox(height: 18),
-                Padding(
-                  padding: hPad,
-                  child: _HomeGrid(
-                    showAdminPanel: auth.isAdminOrHigher,
-                    onAdminPanel: () => context.go('/admin'),
-                    showAsbaqTareeqat: auth.isAdminOrHigher,
-                    onAsbaqTareeqat: () => context.go('/asbaq'),
-                    onSabaq: () => context.go('/sabaq'),
-                    onBooks: () => context.go('/books'),
-                    onIrshad: () => context.go('/irshadat'),
-                    onNewsEvents: () => context.go('/news-events'),
-                    onShajra: () => context.go('/shijra'),
-                    onGallery: () => context.go('/gallery'),
+                ContentColumn(
+                  maxWidth: ResponsiveLayout.contentMaxWidth,
+                  child: Padding(
+                    padding: hPad,
+                    child: _HomeGrid(
+                      showAdminPanel: auth.isAdminOrHigher,
+                      onAdminPanel: () => context.go('/admin'),
+                      showAsbaqTareeqat: auth.isAdminOrHigher,
+                      onAsbaqTareeqat: () => context.go('/asbaq'),
+                      onSabaq: () => context.go('/sabaq'),
+                      onBooks: () => context.go('/books'),
+                      onIrshad: () => context.go('/irshadat'),
+                      onNewsEvents: () => context.go('/news-events'),
+                      onShajra: () => context.go('/shijra'),
+                      onGallery: () => context.go('/gallery'),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 36),
@@ -114,7 +123,13 @@ class HomeScreen extends StatelessWidget {
                   title: 'Join Our Community',
                 ),
                 const SizedBox(height: 18),
-                Padding(padding: hPad, child: const SocialConnectSection()),
+                ContentColumn(
+                  maxWidth: 720,
+                  child: Padding(
+                    padding: hPad,
+                    child: const SocialConnectSection(),
+                  ),
+                ),
                 const SizedBox(height: 44),
 
                 // ── Footer ─────────────────────────────────────────────

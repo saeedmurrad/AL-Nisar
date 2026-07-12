@@ -43,16 +43,9 @@ class ResponsiveShell extends StatelessWidget {
               child: const SafeArea(child: AppNavPanel()),
             ),
           ),
-          Expanded(
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(
-                  maxWidth: ResponsiveLayout.contentMaxWidth,
-                ),
-                child: child,
-              ),
-            ),
-          ),
+          // Full width beside the nav: header bands span edge-to-edge like a
+          // website navbar; each page caps its own content column.
+          Expanded(child: child),
         ],
       ),
     );

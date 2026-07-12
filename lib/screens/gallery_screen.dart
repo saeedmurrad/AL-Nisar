@@ -18,6 +18,7 @@ import '../utils/file_bytes_utils.dart';
 import '../utils/responsive_layout.dart';
 import '../widgets/gold_card.dart';
 import '../widgets/shimmer_placeholder.dart';
+import '../widgets/islamic_ui.dart';
 import '../widgets/standard_shell_header.dart';
 
 class GalleryScreen extends StatefulWidget {
@@ -46,7 +47,9 @@ class _GalleryScreenState extends State<GalleryScreen> {
                 : () => setState(() => _openFolder = null),
           ),
           Expanded(
-            child: StreamBuilder<List<GalleryImageModel>>(
+            child: ContentColumn(
+              maxWidth: ResponsiveLayout.contentMaxWidth,
+              child: StreamBuilder<List<GalleryImageModel>>(
               stream: _service.streamActive(),
               builder: (context, snap) {
                 final list = snap.data ?? const <GalleryImageModel>[];
@@ -98,6 +101,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
                   onOpenFolder: (f) => setState(() => _openFolder = f),
                 );
               },
+            ),
             ),
           ),
         ],

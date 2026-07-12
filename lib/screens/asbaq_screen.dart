@@ -60,7 +60,9 @@ class AsbaqScreen extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: StreamBuilder<List<AsbaqPdfModel>>(
+            child: ContentColumn(
+              maxWidth: 760,
+              child: StreamBuilder<List<AsbaqPdfModel>>(
               stream: service.streamAsbaqPdfs(),
               builder: (context, snap) {
                 final list = snap.data;
@@ -123,6 +125,7 @@ class AsbaqScreen extends StatelessWidget {
                   ],
                 );
               },
+            ),
             ),
           ),
         ],

@@ -7,9 +7,7 @@ import '../navigation/app_destinations.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
 import '../theme/color_utils.dart';
-import '../widgets/theme_palette_picker.dart';
 import '../widgets/theme_toggle_button.dart';
-import '../widgets/font_scale_control.dart';
 import '../widgets/mandala_painter.dart';
 
 /// Navigation panel body shared by the mobile [Drawer] and the persistent
@@ -81,10 +79,12 @@ class AppNavPanel extends StatelessWidget {
           ),
         ),
         Divider(height: 1, color: c.borderDefault),
+        // Minimal footer: just the light/dark toggle. Color themes and font
+        // size live in Profile → Appearance.
         Padding(
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 14),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 'Appearance',
@@ -94,15 +94,7 @@ class AppNavPanel extends StatelessWidget {
                   letterSpacing: 0.6,
                 ),
               ),
-              const SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [ThemeToggleButton()],
-              ),
-              const SizedBox(height: 12),
-              const ThemePalettePicker(compact: true),
-              const SizedBox(height: 12),
-              const FontScaleControl(compact: true),
+              const ThemeToggleButton(),
             ],
           ),
         ),

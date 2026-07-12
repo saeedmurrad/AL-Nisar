@@ -293,114 +293,117 @@ class _BooksBody extends StatelessWidget {
       return const _BooksEmptyState();
     }
 
-    return GridView.builder(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-      gridDelegate: ResponsiveLayout.bookGridDelegate(context),
-      itemCount: books.length,
-      itemBuilder: (context, i) {
-        final b = books[i];
-        return InkWell(
-          onTap: () => onOpenBook(b),
-          borderRadius: BorderRadius.circular(14),
-          child: GoldCard(
-            clipChild: true,
-            padding: EdgeInsets.zero,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Cover flexes to fill the fixed cell height, so cards are
-                // uniform and never leave dead space below the text.
-                Expanded(
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(14),
-                      topRight: Radius.circular(14),
-                    ),
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        CachedNetworkImage(
-                          imageUrl: b.coverImageUrl,
-                          fit: BoxFit.cover,
-                          placeholder: (context, url) =>
-                              const ShimmerPlaceholder(),
-                          errorWidget: (context, url, error) =>
-                              const GoldPatternError(),
-                        ),
-                      Positioned(
-                        right: 8,
-                        bottom: 8,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
+    return ContentColumn(
+      maxWidth: ResponsiveLayout.contentMaxWidth,
+      child: GridView.builder(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+        gridDelegate: ResponsiveLayout.bookGridDelegate(context),
+        itemCount: books.length,
+        itemBuilder: (context, i) {
+          final b = books[i];
+          return InkWell(
+            onTap: () => onOpenBook(b),
+            borderRadius: BorderRadius.circular(14),
+            child: GoldCard(
+              clipChild: true,
+              padding: EdgeInsets.zero,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Cover flexes to fill the fixed cell height, so cards are
+                  // uniform and never leave dead space below the text.
+                  Expanded(
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(14),
+                        topRight: Radius.circular(14),
+                      ),
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          CachedNetworkImage(
+                            imageUrl: b.coverImageUrl,
+                            fit: BoxFit.cover,
+                            placeholder: (context, url) =>
+                                const ShimmerPlaceholder(),
+                            errorWidget: (context, url, error) =>
+                                const GoldPatternError(),
                           ),
-                          decoration: BoxDecoration(
-                            color: c.accentGold.o(0.92),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            b.category,
-                            style: AppTheme.lato(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w700,
-                              color:
-                                  Theme.of(context).brightness ==
-                                      Brightness.dark
-                                  ? c.backgroundPrimary
-                                  : c.textPrimary,
+                        Positioned(
+                          right: 8,
+                          bottom: 8,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: c.accentGold.o(0.92),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              b.category,
+                              style: AppTheme.lato(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w700,
+                                color:
+                                    Theme.of(context).brightness ==
+                                        Brightness.dark
+                                    ? c.backgroundPrimary
+                                    : c.textPrimary,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(10, 10, 10, 8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        b.title,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: AppTheme.cormorantGaramond(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: c.textPrimary,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Directionality(
-                        textDirection: TextDirection.rtl,
-                        child: Text(
-                          b.titleUrdu,
-                          maxLines: 1,
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(10, 10, 10, 8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          b.title,
+                          maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          style: AppTheme.amiriUrdu(
-                            fontSize: 12,
-                            height: 1.3,
-                            color: c.textMuted,
+                          style: AppTheme.cormorantGaramond(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: c.textPrimary,
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        b.author,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: AppTheme.lato(fontSize: 11, color: c.textMuted),
-                      ),
-                    ],
+                        const SizedBox(height: 2),
+                        Directionality(
+                          textDirection: TextDirection.rtl,
+                          child: Text(
+                            b.titleUrdu,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTheme.amiriUrdu(
+                              fontSize: 12,
+                              height: 1.3,
+                              color: c.textMuted,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          b.author,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTheme.lato(fontSize: 11, color: c.textMuted),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }
@@ -411,63 +414,66 @@ class _BooksShimmerGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.c;
-    return GridView.builder(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-      gridDelegate: ResponsiveLayout.bookGridDelegate(context),
-      itemCount: 6,
-      itemBuilder: (context, i) {
-        return Shimmer.fromColors(
-          baseColor: c.backgroundSurface,
-          highlightColor: c.borderDefault.withValues(alpha: 0.35),
-          period: const Duration(milliseconds: 1400),
-          child: Container(
-            decoration: BoxDecoration(
-              color: c.backgroundSurface,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: c.borderFaint, width: 0.5),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: c.backgroundElevated,
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(12),
-                        topRight: Radius.circular(12),
+    return ContentColumn(
+      maxWidth: ResponsiveLayout.contentMaxWidth,
+      child: GridView.builder(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+        gridDelegate: ResponsiveLayout.bookGridDelegate(context),
+        itemCount: 6,
+        itemBuilder: (context, i) {
+          return Shimmer.fromColors(
+            baseColor: c.backgroundSurface,
+            highlightColor: c.borderDefault.withValues(alpha: 0.35),
+            period: const Duration(milliseconds: 1400),
+            child: Container(
+              decoration: BoxDecoration(
+                color: c.backgroundSurface,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: c.borderFaint, width: 0.5),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: c.backgroundElevated,
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(12),
+                          topRight: Radius.circular(12),
+                        ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 12),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: Container(
-                    height: 12,
-                    decoration: BoxDecoration(
-                      color: c.backgroundElevated,
-                      borderRadius: BorderRadius.circular(4),
+                  const SizedBox(height: 12),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Container(
+                      height: 12,
+                      decoration: BoxDecoration(
+                        color: c.backgroundElevated,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 8),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: Container(
-                    height: 10,
-                    width: 80,
-                    decoration: BoxDecoration(
-                      color: c.backgroundElevated,
-                      borderRadius: BorderRadius.circular(4),
+                  const SizedBox(height: 8),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Container(
+                      height: 10,
+                      width: 80,
+                      decoration: BoxDecoration(
+                        color: c.backgroundElevated,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }
