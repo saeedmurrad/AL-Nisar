@@ -187,7 +187,8 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
             ),
           ),
           Expanded(
-            child: FutureBuilder<List<BookmarkModel>>(
+            child: ContentColumn(
+              child: FutureBuilder<List<BookmarkModel>>(
               future: _future,
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
@@ -344,6 +345,7 @@ class _BookmarksScreenState extends State<BookmarksScreen> {
                   },
                 );
               },
+            ),
             ),
           ),
         ],

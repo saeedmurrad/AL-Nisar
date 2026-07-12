@@ -389,7 +389,8 @@ class _IrshadatBookmarksScreenState extends State<IrshadatBookmarksScreen> {
             ),
           ),
           Expanded(
-            child: FutureBuilder<List<IrshadatBookmarkModel>>(
+            child: ContentColumn(
+              child: FutureBuilder<List<IrshadatBookmarkModel>>(
               future: _future,
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
@@ -584,6 +585,7 @@ class _IrshadatBookmarksScreenState extends State<IrshadatBookmarksScreen> {
                   },
                 );
               },
+            ),
             ),
           ),
         ],

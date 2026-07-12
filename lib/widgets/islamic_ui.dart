@@ -418,6 +418,25 @@ class QuoteBand extends StatelessWidget {
   }
 }
 
+/// Centers page content in a capped column on wide screens, so lists and
+/// feeds stay elegant instead of stretching across the whole viewport.
+class ContentColumn extends StatelessWidget {
+  const ContentColumn({super.key, required this.child, this.maxWidth = 760});
+
+  final Widget child;
+  final double maxWidth;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: maxWidth),
+        child: child,
+      ),
+    );
+  }
+}
+
 /// One footer navigation entry.
 class FooterLink {
   const FooterLink(this.label, this.route);

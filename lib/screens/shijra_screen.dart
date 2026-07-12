@@ -234,29 +234,35 @@ class _LanguageToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: _LangPill(
-            c: c,
-            selected: englishSelected,
-            title: 'English',
-            subtitle: 'Shajra Pak',
-            onTap: onEnglish,
-          ),
+    // Cap the pills so they stay compact on wide screens.
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 560),
+        child: Row(
+          children: [
+            Expanded(
+              child: _LangPill(
+                c: c,
+                selected: englishSelected,
+                title: 'English',
+                subtitle: 'Shajra Pak',
+                onTap: onEnglish,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: _LangPill(
+                c: c,
+                selected: !englishSelected,
+                title: 'Urdu',
+                subtitle: 'شجرہ پاک',
+                onTap: onUrdu,
+                urduSubtitle: true,
+              ),
+            ),
+          ],
         ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: _LangPill(
-            c: c,
-            selected: !englishSelected,
-            title: 'Urdu',
-            subtitle: 'شجرہ پاک',
-            onTap: onUrdu,
-            urduSubtitle: true,
-          ),
-        ),
-      ],
+      ),
     );
   }
 }

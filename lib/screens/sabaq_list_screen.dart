@@ -19,6 +19,7 @@ import '../theme/app_theme_colors.dart';
 import '../theme/color_utils.dart';
 import '../widgets/branded_state_view.dart';
 import '../widgets/gold_card.dart';
+import '../widgets/islamic_ui.dart';
 import '../widgets/standard_shell_header.dart';
 import '../widgets/shimmer_placeholder.dart';
 
@@ -362,7 +363,8 @@ class _SabaqListScreenState extends State<SabaqListScreen> {
             padding: EdgeInsets.fromLTRB(4, 18, 16, 14),
           ),
           Expanded(
-            child: StreamBuilder<List<SabaqPdfModel>>(
+            child: ContentColumn(
+              child: StreamBuilder<List<SabaqPdfModel>>(
               stream: _sabaq.streamSabaqPdfs(),
               builder: (context, snap) {
                 if (snap.connectionState == ConnectionState.waiting &&
@@ -519,6 +521,7 @@ class _SabaqListScreenState extends State<SabaqListScreen> {
                   },
                 );
               },
+            ),
             ),
           ),
         ],

@@ -106,9 +106,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
             padding: EdgeInsets.fromLTRB(4, 18, 16, 14),
           ),
           Expanded(
-            child: ListView(
-              padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
-              children: [
+            // Cap settings column width so cards stay elegant on wide screens.
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 720),
+                child: ListView(
+                  padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
+                  children: [
                 GoldCard(
                   backgroundColor: c.backgroundSurface,
                   child: Column(
@@ -470,6 +474,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 SizedBox(height: MediaQuery.paddingOf(context).bottom + 8),
               ],
             ),
+              ),
+            )
           ),
         ],
       ),

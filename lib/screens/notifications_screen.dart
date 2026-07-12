@@ -9,6 +9,7 @@ import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
 import '../widgets/branded_state_view.dart';
 import '../widgets/gold_card.dart';
+import '../widgets/islamic_ui.dart';
 import '../widgets/standard_shell_header.dart';
 
 class NotificationsScreen extends StatelessWidget {
@@ -27,20 +28,28 @@ class NotificationsScreen extends StatelessWidget {
             padding: EdgeInsets.fromLTRB(4, 18, 16, 12),
           ),
           Expanded(
-            child: auth.isSuperAdmin
-                ? _AdminNotificationsList(colors: c)
-                : auth.isAuthenticated
-                ? _MemberNotificationsList(colors: c, userId: auth.user!.uid)
-                : Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(24),
-                      child: Text(
-                        'Sign in to view notifications.',
-                        textAlign: TextAlign.center,
-                        style: AppTheme.lato(color: c.textMuted, fontSize: 14),
+            child: ContentColumn(
+              child: auth.isSuperAdmin
+                  ? _AdminNotificationsList(colors: c)
+                  : auth.isAuthenticated
+                  ? _MemberNotificationsList(
+                      colors: c,
+                      userId: auth.user!.uid,
+                    )
+                  : Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: Text(
+                          'Sign in to view notifications.',
+                          textAlign: TextAlign.center,
+                          style: AppTheme.lato(
+                            color: c.textMuted,
+                            fontSize: 14,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+            ),
           ),
         ],
       ),
