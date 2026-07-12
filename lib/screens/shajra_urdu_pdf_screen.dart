@@ -8,6 +8,7 @@ import '../services/pdf_cache_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
 import '../theme/color_utils.dart';
+import '../widgets/pdf_nav_controls.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
@@ -188,20 +189,33 @@ class _ShajraUrduPdfScreenState extends State<ShajraUrduPdfScreen> {
                         ),
                       ),
                     )
-                  : SfPdfViewerTheme(
-                      data: SfPdfViewerThemeData(
-                        backgroundColor: c.backgroundPrimary,
-                        progressBarColor: c.accentGold,
-                      ),
-                      child: SfPdfViewer.memory(
-                        _pdfBytes!,
-                        controller: _pdf,
-                        scrollDirection: PdfScrollDirection.horizontal,
-                        pageLayoutMode: PdfPageLayoutMode.single,
-                        enableTextSelection: true,
-                        canShowScrollHead: true,
-                        canShowScrollStatus: true,
-                      ),
+                  : Stack(
+                      children: [
+                        Positioned.fill(
+                          child: SfPdfViewerTheme(
+                            data: SfPdfViewerThemeData(
+                              backgroundColor: c.backgroundPrimary,
+                              progressBarColor: c.accentGold,
+                            ),
+                            // Urdu shajra reads right-to-left.
+                            child: Directionality(
+                              textDirection: TextDirection.rtl,
+                              child: SfPdfViewer.memory(
+                                _pdfBytes!,
+                                controller: _pdf,
+                                scrollDirection: PdfScrollDirection.horizontal,
+                                pageLayoutMode: PdfPageLayoutMode.single,
+                                enableTextSelection: true,
+                                canShowScrollHead: true,
+                                canShowScrollStatus: true,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Positioned.fill(
+                          child: PdfNavControls(controller: _pdf, rtl: true),
+                        ),
+                      ],
                     ),
             ),
           ],

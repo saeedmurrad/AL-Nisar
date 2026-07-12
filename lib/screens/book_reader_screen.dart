@@ -20,6 +20,7 @@ import '../services/share_page_image_helper.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
 import '../utils/file_bytes_utils.dart';
+import '../widgets/pdf_nav_controls.dart';
 
 class BookReaderScreen extends StatefulWidget {
   const BookReaderScreen({super.key, required this.args});
@@ -596,6 +597,9 @@ class _BookReaderScreenState extends State<BookReaderScreen> {
   Widget build(BuildContext context) {
     final c = context.c;
     final book = widget.args.book;
+    // Urdu (Arabic-script) books read right-to-left; page-turn direction and
+    // the viewer layout follow suit.
+    final isRtl = isRtlText(book.titleUrdu) || isRtlText(book.title);
 
     if (_loading) {
       return Scaffold(
@@ -691,27 +695,38 @@ class _BookReaderScreenState extends State<BookReaderScreen> {
                     backgroundColor: c.backgroundPrimary,
                     progressBarColor: c.accentGold,
                   ),
-                  child: SfPdfViewer.memory(
-                    _pdfBytes!,
-                    controller: _pdf,
-                    scrollDirection: PdfScrollDirection.horizontal,
-                    pageLayoutMode: PdfPageLayoutMode.single,
-                    enableTextSelection: true,
-                    canShowScrollHead: true,
-                    canShowScrollStatus: true,
-                    initialZoomLevel: _zoomLevel,
-                    currentSearchTextHighlightColor: c.accentGold.withValues(
-                      alpha: 0.45,
+                  child: Directionality(
+                    textDirection: isRtl
+                        ? TextDirection.rtl
+                        : TextDirection.ltr,
+                    child: SfPdfViewer.memory(
+                      _pdfBytes!,
+                      controller: _pdf,
+                      scrollDirection: PdfScrollDirection.horizontal,
+                      pageLayoutMode: PdfPageLayoutMode.single,
+                      enableTextSelection: true,
+                      canShowScrollHead: true,
+                      canShowScrollStatus: true,
+                      initialZoomLevel: _zoomLevel,
+                      currentSearchTextHighlightColor: c.accentGold.withValues(
+                        alpha: 0.45,
+                      ),
+                      otherSearchTextHighlightColor: c.accentGold.withValues(
+                        alpha: 0.22,
+                      ),
+                      onDocumentLoaded: _onDocumentLoaded,
+                      onPageChanged: _onPageChanged,
                     ),
-                    otherSearchTextHighlightColor: c.accentGold.withValues(
-                      alpha: 0.22,
-                    ),
-                    onDocumentLoaded: _onDocumentLoaded,
-                    onPageChanged: _onPageChanged,
                   ),
                 ),
               ),
             ),
+            // Left / right page-turn buttons — appear with the chrome bars and
+            // follow the book's reading direction.
+            if (_barsVisible && !_searchOpen)
+              Positioned.fill(
+                child: PdfNavControls(controller: _pdf, rtl: isRtl),
+              ),
             AnimatedSlide(
               duration: const Duration(milliseconds: 220),
               offset: _barsVisible || _searchOpen

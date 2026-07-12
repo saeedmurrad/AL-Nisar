@@ -7,6 +7,7 @@ import '../models/shajra_entry_model.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
 import '../theme/color_utils.dart';
+import '../widgets/pdf_nav_controls.dart';
 
 class ShajraPdfScreen extends StatefulWidget {
   const ShajraPdfScreen({super.key, required this.args});
@@ -37,18 +38,31 @@ class _ShajraPdfScreenState extends State<ShajraPdfScreen> {
             Expanded(
               child: _missingAsset
                   ? _MissingPdf(title: title, assetPath: widget.args.assetPath)
-                  : SfPdfViewerTheme(
-                      data: SfPdfViewerThemeData(
-                        backgroundColor: c.backgroundPrimary,
-                        progressBarColor: c.accentGold,
-                      ),
-                      child: SfPdfViewer.asset(
-                        widget.args.assetPath,
-                        controller: _pdf,
-                        onDocumentLoadFailed: (_) {
-                          if (mounted) setState(() => _missingAsset = true);
-                        },
-                      ),
+                  : Stack(
+                      children: [
+                        Positioned.fill(
+                          child: SfPdfViewerTheme(
+                            data: SfPdfViewerThemeData(
+                              backgroundColor: c.backgroundPrimary,
+                              progressBarColor: c.accentGold,
+                            ),
+                            child: SfPdfViewer.asset(
+                              widget.args.assetPath,
+                              controller: _pdf,
+                              scrollDirection: PdfScrollDirection.horizontal,
+                              pageLayoutMode: PdfPageLayoutMode.single,
+                              onDocumentLoadFailed: (_) {
+                                if (mounted) {
+                                  setState(() => _missingAsset = true);
+                                }
+                              },
+                            ),
+                          ),
+                        ),
+                        Positioned.fill(
+                          child: PdfNavControls(controller: _pdf, rtl: false),
+                        ),
+                      ],
                     ),
             ),
           ],
