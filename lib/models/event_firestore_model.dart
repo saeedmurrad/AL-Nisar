@@ -33,6 +33,28 @@ class EventFirestoreModel {
   final DateTime createdAt;
   final bool isActive;
 
+  /// The event's actual calendar date, parsed from its stored date fields.
+  DateTime get eventDate => EventDateLabels.parse(
+    fullDateLine: fullDateLine,
+    day: day,
+    monthAbbr: monthAbbr,
+  );
+
+  /// True once the whole event day has elapsed (so an event happening today
+  /// still counts as upcoming).
+  bool get isPast {
+    final d = eventDate;
+    final endOfDay = DateTime(d.year, d.month, d.day, 23, 59, 59);
+    return endOfDay.isBefore(DateTime.now());
+  }
+
+  /// True when the event falls on today's date.
+  bool get isToday {
+    final d = eventDate;
+    final now = DateTime.now();
+    return d.year == now.year && d.month == now.month && d.day == now.day;
+  }
+
   factory EventFirestoreModel.fromFirestore(
     DocumentSnapshot<Map<String, dynamic>> doc,
   ) {

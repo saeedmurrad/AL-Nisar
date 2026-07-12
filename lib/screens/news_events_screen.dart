@@ -7,7 +7,7 @@ import '../services/news_events_service.dart';
 import '../theme/app_theme.dart';
 import '../theme/color_utils.dart';
 import '../theme/app_theme_colors.dart';
-import '../widgets/gold_card.dart';
+import '../utils/event_date_labels.dart';
 import '../widgets/news_cover_image.dart';
 import '../widgets/branded_state_view.dart';
 import '../widgets/standard_shell_header.dart';
@@ -179,10 +179,7 @@ class _NewsEventsScreenState extends State<NewsEventsScreen>
                       return _emptyState(c, 'No events scheduled yet.');
                     }
 
-                    return _EventsTabFirestore(
-                      nextEvent: use.first,
-                      events: use,
-                    );
+                    return _EventsTabFirestore(events: use);
                   },
                 ),
               ],
@@ -255,6 +252,47 @@ class _PillTabButton extends StatelessWidget {
   }
 }
 
+/// A small gold uppercase section label with an optional count chip.
+class _SectionLabel extends StatelessWidget {
+  const _SectionLabel({required this.label, this.count});
+
+  final String label;
+  final int? count;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.c;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(2, 4, 2, 12),
+      child: Row(
+        children: [
+          Text(
+            label.toUpperCase(),
+            style: AppTheme.sectionCaption(
+              color: c.accentGold,
+              fontSize: 12,
+              letterSpacing: 2.2,
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(child: Container(height: 1, color: c.borderFaint)),
+          if (count != null) ...[
+            const SizedBox(width: 10),
+            Text(
+              '$count',
+              style: AppTheme.lato(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: c.textMuted,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
 class _NewsTabFirestore extends StatelessWidget {
   const _NewsTabFirestore({
     required this.featured,
@@ -266,407 +304,646 @@ class _NewsTabFirestore extends StatelessWidget {
   final List<NewsFirestoreModel> items;
   final Color onGold;
 
+  static String _publishedLabel(NewsFirestoreModel n) =>
+      n.dateLabel.trim().isNotEmpty
+      ? n.dateLabel
+      : EventDateLabels.newsDateLabel(n.createdAt);
+
   @override
   Widget build(BuildContext context) {
-    final c = context.c;
-    // Cap feed width so cards stay elegant on wide screens.
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 760),
         child: ListView(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-            children: [
-              InkWell(
-                onTap: () =>
-                    context.push('/news-events/news-detail', extra: featured),
-                borderRadius: BorderRadius.circular(14),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(14),
-                  child: Stack(
-                    children: [
-                      NewsCoverImage(
-                        imageUrl: featured.imageUrl,
-                        height: 180,
-                        width: double.infinity,
-                      ),
-                      Container(
-                        height: 180,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              c.backgroundPrimary.o(0.05),
-                              c.backgroundPrimary.o(0.75),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        top: 12,
-                        left: 12,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 5,
-                          ),
-                          decoration: BoxDecoration(
-                            color: c.accentGold.o(0.95),
-                            borderRadius: BorderRadius.circular(999),
-                          ),
-                          child: Text(
-                            featured.category,
-                            style: AppTheme.lato(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w800,
-                              color: onGold,
-                              letterSpacing: 0.6,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 14,
-                        right: 14,
-                        bottom: 36,
-                        child: Text(
-                          featured.title,
-                          style: AppTheme.cormorantGaramond(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: c.textPrimary,
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        right: 12,
-                        bottom: 12,
-                        child: Text(
-                          featured.dateLabel,
-                          style: AppTheme.lato(fontSize: 11, color: c.textMuted),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+          children: [
+            // Featured story — large image with overlaid meta.
+            _FeaturedNewsCard(
+              news: featured,
+              publishedLabel: _publishedLabel(featured),
+              onGold: onGold,
+            ),
+            if (items.isNotEmpty) ...[
+              const SizedBox(height: 22),
+              _SectionLabel(label: 'More Stories', count: items.length),
               ...items.map(
                 (n) => Padding(
                   padding: const EdgeInsets.only(bottom: 12),
-                  child: InkWell(
-                    onTap: () => context.push('/news-events/news-detail', extra: n),
-                    borderRadius: BorderRadius.circular(14),
-                    child: GoldCard(
-                      clipChild: true,
-                      padding: const EdgeInsets.all(12),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: NewsCoverImage(
-                              imageUrl: n.imageUrl,
-                              width: 80,
-                              height: 80,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  n.category.toUpperCase(),
-                                  style: AppTheme.sectionCaption(
-                                    color: c.accentGold,
-                                    letterSpacing: 1,
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  n.title,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: AppTheme.cormorantGaramond(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w600,
-                                    color: c.textPrimary,
-                                  ),
-                                ),
-                                const SizedBox(height: 6),
-                                Text(
-                                  '${n.dateLabel} · ${n.readTime}',
-                                  style: AppTheme.lato(
-                                    fontSize: 11,
-                                    color: c.textMuted,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                  child: _NewsRowCard(
+                    news: n,
+                    publishedLabel: _publishedLabel(n),
                   ),
                 ),
               ),
             ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _FeaturedNewsCard extends StatelessWidget {
+  const _FeaturedNewsCard({
+    required this.news,
+    required this.publishedLabel,
+    required this.onGold,
+  });
+
+  final NewsFirestoreModel news;
+  final String publishedLabel;
+  final Color onGold;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.c;
+    return Material(
+      color: c.backgroundSurface,
+      borderRadius: BorderRadius.circular(20),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => context.push('/news-events/news-detail', extra: news),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Stack(
+              children: [
+                NewsCoverImage(
+                  imageUrl: news.imageUrl,
+                  height: 210,
+                  width: double.infinity,
+                ),
+                Positioned(
+                  top: 14,
+                  left: 14,
+                  child: _Pill(
+                    text: news.category.isEmpty ? 'NEWS' : news.category,
+                    bg: c.accentGold,
+                    fg: onGold,
+                  ),
+                ),
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    news.title,
+                    style: AppTheme.cormorantGaramond(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w600,
+                      height: 1.25,
+                      color: c.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  _MetaRow(
+                    icon: Icons.calendar_today_rounded,
+                    text: 'Published · $publishedLabel',
+                    trailing: news.readTime,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _NewsRowCard extends StatelessWidget {
+  const _NewsRowCard({required this.news, required this.publishedLabel});
+
+  final NewsFirestoreModel news;
+  final String publishedLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.c;
+    return Material(
+      color: c.backgroundSurface,
+      borderRadius: BorderRadius.circular(16),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => context.push('/news-events/news-detail', extra: news),
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              NewsCoverImage(
+                imageUrl: news.imageUrl,
+                width: 84,
+                height: 84,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (news.category.trim().isNotEmpty)
+                      Text(
+                        news.category.toUpperCase(),
+                        style: AppTheme.sectionCaption(
+                          color: c.accentGold,
+                          fontSize: 10.5,
+                          letterSpacing: 1.2,
+                        ),
+                      ),
+                    const SizedBox(height: 3),
+                    Text(
+                      news.title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTheme.cormorantGaramond(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        height: 1.2,
+                        color: c.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.calendar_today_rounded,
+                          size: 12,
+                          color: c.textMuted,
+                        ),
+                        const SizedBox(width: 5),
+                        Expanded(
+                          child: Text(
+                            '$publishedLabel · ${news.readTime}',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTheme.lato(
+                              fontSize: 11.5,
+                              color: c.textMuted,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
+        ),
       ),
     );
   }
 }
 
 class _EventsTabFirestore extends StatelessWidget {
-  const _EventsTabFirestore({required this.nextEvent, required this.events});
+  const _EventsTabFirestore({required this.events});
 
-  final EventFirestoreModel nextEvent;
   final List<EventFirestoreModel> events;
 
   @override
   Widget build(BuildContext context) {
-    final c = context.c;
-    // Cap feed width so cards stay elegant on wide screens.
+    // Split by the event's real date and order each group sensibly.
+    final upcoming = events.where((e) => !e.isPast).toList()
+      ..sort((a, b) => a.eventDate.compareTo(b.eventDate));
+    final past = events.where((e) => e.isPast).toList()
+      ..sort((a, b) => b.eventDate.compareTo(a.eventDate));
+
+    final children = <Widget>[];
+
+    if (upcoming.isNotEmpty) {
+      final next = upcoming.first;
+      children.add(_NextEventHero(event: next));
+      final rest = upcoming.skip(1).toList();
+      if (rest.isNotEmpty) {
+        children
+          ..add(const SizedBox(height: 22))
+          ..add(_SectionLabel(label: 'Upcoming', count: rest.length));
+        for (final e in rest) {
+          children.add(
+            Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: _EventRowCard(event: e, past: false),
+            ),
+          );
+        }
+      }
+    } else {
+      children.add(const _NoUpcomingBanner());
+    }
+
+    if (past.isNotEmpty) {
+      children
+        ..add(const SizedBox(height: 22))
+        ..add(_SectionLabel(label: 'Past Events', count: past.length));
+      for (final e in past) {
+        children.add(
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: _EventRowCard(event: e, past: true),
+          ),
+        );
+      }
+    }
+
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 760),
         child: ListView(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+          children: children,
+        ),
+      ),
+    );
+  }
+}
+
+/// Prominent card for the soonest upcoming event.
+class _NextEventHero extends StatelessWidget {
+  const _NextEventHero({required this.event});
+
+  final EventFirestoreModel event;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.c;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final label = event.isToday ? 'HAPPENING TODAY' : 'NEXT EVENT';
+
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(20),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => context.push('/news-events/event-detail', extra: event),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color.alphaBlend(c.accentGold.o(0.14), c.backgroundSurface),
+                c.backgroundSurface,
+              ],
+            ),
+            border: Border.all(color: c.accentGold.o(0.4), width: 1),
+          ),
+          padding: const EdgeInsets.all(18),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-                decoration: BoxDecoration(
-                  color: c.backgroundSurface,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: c.accentGold.o(0.35), width: 0.8),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 5,
-                      ),
-                      decoration: BoxDecoration(
-                        color: c.accentGold.o(0.12),
-                        borderRadius: BorderRadius.circular(999),
-                      ),
-                      child: Text(
-                        'NEXT EVENT',
-                        style: AppTheme.lato(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 1.6,
-                          color: c.accentGold,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      nextEvent.title,
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppTheme.cormorantGaramond(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: c.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.calendar_today_outlined,
-                          size: 16,
-                          color: c.accentGold,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            nextEvent.fullDateLine,
-                            style: AppTheme.lato(
-                              fontSize: 13,
-                              color: c.textSecondary,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
+              Row(
+                children: [
+                  _CalendarTile(
+                    day: event.day,
+                    month: event.monthAbbr,
+                    past: false,
+                    large: true,
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(
-                          Icons.location_on_outlined,
-                          size: 16,
-                          color: c.accentGold,
+                        _Pill(
+                          text: label,
+                          bg: c.accentGold,
+                          fg: isDark ? kDeepEmerald : Colors.white,
                         ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            nextEvent.location,
-                            style: AppTheme.lato(
-                              fontSize: 13,
-                              color: c.textSecondary,
-                            ),
+                        const SizedBox(height: 8),
+                        Text(
+                          event.title,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTheme.cormorantGaramond(
+                            fontSize: 21,
+                            fontWeight: FontWeight.w600,
+                            height: 1.2,
+                            color: c.textPrimary,
                           ),
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 14),
-                    SizedBox(
-                      width: double.infinity,
-                      child: OutlinedButton(
-                        onPressed: () => context.push(
-                          '/news-events/event-detail',
-                          extra: nextEvent,
-                        ),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: c.accentGold,
-                          side: BorderSide(color: c.accentGold.o(0.55), width: 1.0),
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        child: Text(
-                          'View Details',
-                          style: AppTheme.lato(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w700,
-                            color: c.accentGold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-              ...events.map(
-                (e) => Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: InkWell(
-                    onTap: () => context.push('/news-events/event-detail', extra: e),
-                    borderRadius: BorderRadius.circular(14),
-                    child: GoldCard(
-                      padding: const EdgeInsets.all(12),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            width: 60,
-                            height: 60,
-                            decoration: BoxDecoration(
-                              color: c.accentGold.o(0.12),
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(
-                                color: c.accentGold.o(0.30),
-                                width: 0.8,
+                        if (event.urduTitle.trim().isNotEmpty)
+                          Directionality(
+                            textDirection: TextDirection.rtl,
+                            child: Text(
+                              event.urduTitle,
+                              style: AppTheme.amiriUrdu(
+                                fontSize: 14,
+                                height: 1.4,
+                                color: c.textMuted,
                               ),
                             ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  '${e.day}',
-                                  style: AppTheme.lato(
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.w800,
-                                    color: c.accentGold,
-                                  ),
-                                ),
-                                Text(
-                                  e.monthAbbr,
-                                  style: AppTheme.lato(
-                                    color: c.textMuted,
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w600,
-                                    letterSpacing: 1,
-                                  ),
-                                ),
-                              ],
-                            ),
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  e.title,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: AppTheme.cormorantGaramond(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                    color: c.textPrimary,
-                                  ),
-                                ),
-                                const SizedBox(height: 2),
-                                Directionality(
-                                  textDirection: TextDirection.rtl,
-                                  child: Text(
-                                    e.urduTitle,
-                                    style: AppTheme.amiriUrdu(
-                                      fontSize: 13,
-                                      height: 1.3,
-                                      color: c.textSecondary,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 6),
-                                Row(
-                                  children: [
-                                    Icon(
-                                      Icons.location_on_outlined,
-                                      size: 14,
-                                      color: c.accentGold.o(0.75),
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Expanded(
-                                      child: Text(
-                                        e.location,
-                                        style: AppTheme.lato(
-                                          fontSize: 12,
-                                          color: c.textSecondary,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 4),
-                                Row(
-                                  children: [
-                                    Icon(
-                                      Icons.schedule_outlined,
-                                      size: 14,
-                                      color: c.accentGold.o(0.75),
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      e.timeLabel,
-                                      style: AppTheme.lato(
-                                        fontSize: 12,
-                                        color: c.textMuted,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              _MetaRow(
+                icon: Icons.calendar_today_rounded,
+                text: event.fullDateLine,
+              ),
+              const SizedBox(height: 8),
+              _MetaRow(icon: Icons.schedule_rounded, text: event.timeLabel),
+              const SizedBox(height: 8),
+              _MetaRow(
+                icon: Icons.location_on_rounded,
+                text: event.location,
+              ),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton(
+                  onPressed: () => context.push(
+                    '/news-events/event-detail',
+                    extra: event,
+                  ),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: c.accentGold,
+                    foregroundColor: isDark ? kDeepEmerald : Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 13),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: Text(
+                    'View Details',
+                    style: AppTheme.lato(
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.4,
+                      color: isDark ? kDeepEmerald : Colors.white,
                     ),
                   ),
                 ),
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _EventRowCard extends StatelessWidget {
+  const _EventRowCard({required this.event, required this.past});
+
+  final EventFirestoreModel event;
+  final bool past;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.c;
+    return Material(
+      color: past ? c.backgroundElevated.o(0.5) : c.backgroundSurface,
+      borderRadius: BorderRadius.circular(16),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => context.push('/news-events/event-detail', extra: event),
+        child: Opacity(
+          opacity: past ? 0.72 : 1,
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _CalendarTile(
+                  day: event.day,
+                  month: event.monthAbbr,
+                  past: past,
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              event.title,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppTheme.cormorantGaramond(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: c.textPrimary,
+                              ),
+                            ),
+                          ),
+                          if (past) ...[
+                            const SizedBox(width: 8),
+                            _Pill(
+                              text: 'ENDED',
+                              bg: c.textMuted.o(0.16),
+                              fg: c.textMuted,
+                            ),
+                          ],
+                        ],
+                      ),
+                      if (event.urduTitle.trim().isNotEmpty) ...[
+                        const SizedBox(height: 2),
+                        Directionality(
+                          textDirection: TextDirection.rtl,
+                          child: Text(
+                            event.urduTitle,
+                            style: AppTheme.amiriUrdu(
+                              fontSize: 13,
+                              height: 1.3,
+                              color: c.textSecondary,
+                            ),
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: 6),
+                      _MetaRow(
+                        icon: Icons.location_on_rounded,
+                        text: event.location,
+                        small: true,
+                      ),
+                      const SizedBox(height: 4),
+                      _MetaRow(
+                        icon: Icons.schedule_rounded,
+                        text: event.timeLabel,
+                        small: true,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Rounded day/month calendar tile — gold for upcoming, muted for past.
+class _CalendarTile extends StatelessWidget {
+  const _CalendarTile({
+    required this.day,
+    required this.month,
+    required this.past,
+    this.large = false,
+  });
+
+  final int day;
+  final String month;
+  final bool past;
+  final bool large;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.c;
+    final accent = past ? c.textMuted : c.accentGold;
+    final size = large ? 68.0 : 58.0;
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: accent.o(past ? 0.10 : 0.14),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: accent.o(0.35), width: 0.8),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            '$day',
+            style: AppTheme.cormorantGaramond(
+              fontSize: large ? 28 : 24,
+              fontWeight: FontWeight.w700,
+              height: 1,
+              color: accent,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            month,
+            style: AppTheme.lato(
+              fontSize: large ? 11 : 10,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 1.2,
+              color: past ? c.textMuted : c.textSecondary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _NoUpcomingBanner extends StatelessWidget {
+  const _NoUpcomingBanner();
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.c;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 22),
+      decoration: BoxDecoration(
+        color: c.backgroundSurface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: c.borderFaint),
+      ),
+      child: Column(
+        children: [
+          Icon(Icons.event_available_rounded, size: 30, color: c.accentGold),
+          const SizedBox(height: 10),
+          Text(
+            'No upcoming events',
+            style: AppTheme.cormorantGaramond(
+              fontSize: 18,
+              color: c.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Past gatherings are listed below.',
+            textAlign: TextAlign.center,
+            style: AppTheme.lato(fontSize: 12.5, color: c.textMuted),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Icon + text meta line used across event/news cards.
+class _MetaRow extends StatelessWidget {
+  const _MetaRow({
+    required this.icon,
+    required this.text,
+    this.trailing,
+    this.small = false,
+  });
+
+  final IconData icon;
+  final String text;
+  final String? trailing;
+  final bool small;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.c;
+    if (text.trim().isEmpty && (trailing == null || trailing!.isEmpty)) {
+      return const SizedBox.shrink();
+    }
+    return Row(
+      children: [
+        Icon(icon, size: small ? 13 : 15, color: c.accentGold.o(0.8)),
+        const SizedBox(width: 7),
+        Expanded(
+          child: Text(
+            text,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: AppTheme.lato(
+              fontSize: small ? 12 : 13,
+              color: c.textSecondary,
+            ),
+          ),
+        ),
+        if (trailing != null && trailing!.isNotEmpty)
+          Text(
+            trailing!,
+            style: AppTheme.lato(fontSize: small ? 11 : 12, color: c.textMuted),
+          ),
+      ],
+    );
+  }
+}
+
+class _Pill extends StatelessWidget {
+  const _Pill({required this.text, required this.bg, required this.fg});
+
+  final String text;
+  final Color bg;
+  final Color fg;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        text.toUpperCase(),
+        style: AppTheme.lato(
+          fontSize: 10,
+          fontWeight: FontWeight.w800,
+          letterSpacing: 0.8,
+          color: fg,
+        ),
       ),
     );
   }
