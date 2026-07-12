@@ -36,9 +36,9 @@ jobs:
         run: flutter pub get
 
       - name: Build web
-        # base-href must match the repo name so asset paths resolve under
-        # https://<user>.github.io/AL-Nisar/
-        run: flutter build web --release --base-href /AL-Nisar/
+        # Served from the custom domain root (https://al-nisar.com/), so the
+        # base href is "/". web/CNAME carries the domain into the artifact.
+        run: flutter build web --release --base-href /
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
