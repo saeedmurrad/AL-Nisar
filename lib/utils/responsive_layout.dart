@@ -13,12 +13,18 @@ class ResponsiveLayout {
   static const double expandedWidth = 1024;
 
   /// Page content is centered and capped at this width on large screens.
-  static const double contentMaxWidth = 1120;
+  static const double contentMaxWidth = 1240;
 
   /// Forms (auth screens, centered dialogs-as-pages) cap at this width.
   static const double formMaxWidth = 460;
 
   static const double sideNavWidth = 264;
+
+  /// Width of the side navigation when collapsed to icons only.
+  static const double sideNavCollapsedWidth = 76;
+
+  /// Height of the desktop top utility bar (collapse toggle + profile menu).
+  static const double desktopTopBarHeight = 52;
 
   static bool isMedium(BuildContext context) =>
       screenWidth(context) >= mediumWidth;

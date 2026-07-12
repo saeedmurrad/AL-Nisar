@@ -186,7 +186,11 @@ class _Header extends StatelessWidget {
               ],
             ),
           ),
-          NotificationBellButton(onTap: onBellTap),
+          // On desktop the top utility bar carries the bell; avoid duplicating.
+          if (ResponsiveLayout.isExpanded(context))
+            const SizedBox(width: 40)
+          else
+            NotificationBellButton(onTap: onBellTap),
         ],
       ),
     );

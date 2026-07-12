@@ -2,11 +2,17 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_layout.dart';
 import '../theme/color_utils.dart';
+import '../utils/responsive_layout.dart';
 import 'islamic_ui.dart';
 
 /// Shared top-bar surface: deep emerald band with a gilded hairline, like a
 /// website navbar. Wraps its child in on-emerald theme tokens so titles,
 /// search fields, and buttons recolor automatically.
+///
+/// On desktop the emerald background spans the full width, but the inner
+/// content (title, search, actions) is centered in a column capped at
+/// [ResponsiveLayout.contentMaxWidth] — the same width the page body uses —
+/// so headings line up with the content below instead of hugging the edge.
 class AppShellChrome extends StatelessWidget {
   const AppShellChrome({
     super.key,
@@ -19,6 +25,18 @@ class AppShellChrome extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themed = Theme(data: emeraldChromeTheme(context), child: child);
+    final aligned = ResponsiveLayout.isExpanded(context)
+        ? Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxWidth: ResponsiveLayout.contentMaxWidth,
+              ),
+              child: themed,
+            ),
+          )
+        : themed;
+
     return Container(
       decoration: BoxDecoration(
         gradient: const LinearGradient(
@@ -31,10 +49,7 @@ class AppShellChrome extends StatelessWidget {
         ),
       ),
       padding: padding,
-      child: SafeArea(
-        bottom: false,
-        child: Theme(data: emeraldChromeTheme(context), child: child),
-      ),
+      child: SafeArea(bottom: false, child: aligned),
     );
   }
 }
