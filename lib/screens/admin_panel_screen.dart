@@ -46,7 +46,7 @@ class AdminPanelScreen extends StatelessWidget {
                   _Tile(
                     icon: Icons.verified_user_outlined,
                     title: 'Super Admin Panel',
-                    subtitle: 'Users, roles, and member requests',
+                    subtitle: 'Users, roles, and Sabaq access requests',
                     onTap: () => context.push('/super-admin'),
                   ),
                   const SizedBox(height: 16),

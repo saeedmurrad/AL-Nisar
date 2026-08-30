@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import '../auth/auth_provider.dart';
 import '../models/sabaq_access_request_model.dart';
 import '../services/sabaq_access_service.dart';
 import '../theme/app_theme.dart';
@@ -11,6 +14,14 @@ class AdminSabaqRequestsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final auth = context.watch<AuthProvider>();
+    if (!auth.isSuperAdmin) {
+      Future.microtask(() {
+        if (context.mounted) context.go('/home');
+      });
+      return const SizedBox.shrink();
+    }
+
     final c = context.c;
     final service = SabaqAccessService();
 

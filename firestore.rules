@@ -78,15 +78,15 @@ service cloud.firestore {
         && request.resource.data.userId == request.auth.uid
         && request.resource.data.status == 'pending';
 
-      // Users can read their own requests; admins can read all.
+      // Users can read their own requests; super admin can read all.
       allow read: if signedIn()
         && (
           resource.data.userId == request.auth.uid
-          || isAdmin()
+          || isSuperAdmin()
         );
 
-      // Admins approve/deny; members may resubmit after denial (denied → pending).
-      allow update: if isAdmin()
+      // Super Admin approve/deny; members may resubmit after denial (denied → pending).
+      allow update: if isSuperAdmin()
         || (
           signedIn()
           && resource.data.userId == request.auth.uid
@@ -152,10 +152,10 @@ service cloud.firestore {
         allow read, write: if signedIn() && request.auth.uid == uid;
       }
 
-      // Per-user Sabaq access grants (written by admins on approval)
+      // Per-user Sabaq access grants (written by super admin on approval)
       match /sabaq_access/{sabaqId} {
         allow read: if signedIn() && request.auth.uid == uid;
-        allow write: if isAdmin();
+        allow write: if isSuperAdmin();
       }
 
       // Per-user in-app notifications (written by admins on Sabaq decisions)

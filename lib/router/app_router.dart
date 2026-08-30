@@ -76,6 +76,9 @@ GoRouter createAppRouter(AuthProvider auth) {
       if (loc.startsWith('/super-admin') && !auth.isSuperAdmin) {
         return '/home';
       }
+      if (loc == '/admin/sabaq-requests' && !auth.isSuperAdmin) {
+        return '/home';
+      }
       // Asbaq-e-Tareeqat: Admin / Super Admin only (same as home grid).
       if (loc == '/asbaq' || loc.startsWith('/asbaq/')) {
         if (!auth.isAdminOrHigher) return '/home';
