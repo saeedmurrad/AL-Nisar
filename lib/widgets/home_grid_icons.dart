@@ -8,6 +8,7 @@ enum HomeGridIconKind {
   sabaqLessons,
   books,
   irshadat,
+  tafseer,
   newsEvents,
   shijraPak,
   gallery,
@@ -78,6 +79,9 @@ class _HomeGridIconPainter extends CustomPainter {
       case HomeGridIconKind.irshadat:
         _heart(canvas, r, stroke);
         break;
+      case HomeGridIconKind.tafseer:
+        _illuminatedBook(canvas, r, stroke, fill);
+        break;
       case HomeGridIconKind.newsEvents:
         _calendarStar(canvas, r, stroke, fill);
         break;
@@ -87,6 +91,43 @@ class _HomeGridIconPainter extends CustomPainter {
       case HomeGridIconKind.gallery:
         _fourSquares(canvas, r, stroke);
         break;
+    }
+  }
+
+  /// Open book beneath a radiant star — commentary that illuminates the text.
+  void _illuminatedBook(Canvas canvas, Rect r, Paint stroke, Paint fill) {
+    final mid = r.center.dx;
+    final top = r.top + r.height * 0.42;
+    final bottom = r.bottom - r.height * 0.08;
+    final w = r.width * 0.40;
+
+    final spread = Path()
+      ..moveTo(mid, top + r.height * 0.06)
+      ..quadraticBezierTo(mid - w * 0.55, top - r.height * 0.02, mid - w, top + r.height * 0.05)
+      ..lineTo(mid - w, bottom - r.height * 0.04)
+      ..quadraticBezierTo(mid - w * 0.55, bottom - r.height * 0.12, mid, bottom - r.height * 0.06)
+      ..quadraticBezierTo(mid + w * 0.55, bottom - r.height * 0.12, mid + w, bottom - r.height * 0.04)
+      ..lineTo(mid + w, top + r.height * 0.05)
+      ..quadraticBezierTo(mid + w * 0.55, top - r.height * 0.02, mid, top + r.height * 0.06);
+    canvas.drawPath(spread, stroke);
+    canvas.drawLine(
+      Offset(mid, top + r.height * 0.06),
+      Offset(mid, bottom - r.height * 0.06),
+      stroke,
+    );
+
+    // Radiant star above the spine.
+    final cx = mid;
+    final cy = r.top + r.height * 0.20;
+    final rad = r.height * 0.075;
+    canvas.drawCircle(Offset(cx, cy), rad, fill);
+    for (var i = 0; i < 8; i++) {
+      final a = (math.pi * 2 / 8) * i;
+      canvas.drawLine(
+        Offset(cx + math.cos(a) * rad * 1.8, cy + math.sin(a) * rad * 1.8),
+        Offset(cx + math.cos(a) * rad * 2.9, cy + math.sin(a) * rad * 2.9),
+        stroke,
+      );
     }
   }
 

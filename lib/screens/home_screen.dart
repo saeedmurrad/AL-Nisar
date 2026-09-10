@@ -108,6 +108,7 @@ class HomeScreen extends StatelessWidget {
                       onAsbaqTareeqat: () => context.go('/asbaq'),
                       onSabaq: () => context.go('/sabaq'),
                       onBooks: () => context.go('/books'),
+                      onTafseer: () => context.go('/tafseer'),
                       onIrshad: () => context.go('/irshadat'),
                       onNewsEvents: () => context.go('/news-events'),
                       onShajra: () => context.go('/shijra'),
@@ -206,6 +207,7 @@ class _HomeGrid extends StatelessWidget {
     required this.onSabaq,
     required this.onBooks,
     required this.onIrshad,
+    required this.onTafseer,
     required this.onNewsEvents,
     required this.onShajra,
     required this.onGallery,
@@ -218,6 +220,7 @@ class _HomeGrid extends StatelessWidget {
   final VoidCallback onSabaq;
   final VoidCallback onBooks;
   final VoidCallback onIrshad;
+  final VoidCallback onTafseer;
   final VoidCallback onNewsEvents;
   final VoidCallback onShajra;
   final VoidCallback onGallery;
@@ -263,6 +266,12 @@ class _HomeGrid extends StatelessWidget {
           sublabel: 'Sacred readings',
           iconKind: HomeGridIconKind.books,
           onTap: onBooks,
+        ),
+        _HomeGridCard(
+          label: 'Tafseer',
+          sublabel: 'Ishari commentary',
+          iconKind: HomeGridIconKind.tafseer,
+          onTap: onTafseer,
         ),
         _HomeGridCard(
           label: 'Irshadat',

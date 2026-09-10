@@ -39,6 +39,11 @@ List<AppDestination> _memberDestinationsFor(AuthProvider auth) => [
     icon: Icons.library_books_outlined,
   ),
   const AppDestination(
+    route: '/tafseer',
+    label: 'Tafseer',
+    icon: Icons.menu_book_rounded,
+  ),
+  const AppDestination(
     route: '/irshadat',
     label: 'Irshadat',
     icon: Icons.favorite_outline,

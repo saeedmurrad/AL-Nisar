@@ -26,6 +26,9 @@ import '../screens/shajra_pdf_screen.dart';
 import '../screens/shajra_urdu_pdf_screen.dart';
 import '../screens/shijra_screen.dart';
 import '../screens/splash_screen.dart';
+import '../screens/tafseer_list_screen.dart';
+import '../screens/tafseer_ruku_screen.dart';
+import '../screens/tafseer_surah_screen.dart';
 import '../screens/admin_panel_screen.dart';
 import '../screens/admin_upload_book_screen.dart';
 import '../screens/admin_irshadat_screen.dart';
@@ -114,6 +117,28 @@ GoRouter createAppRouter(AuthProvider auth) {
           GoRoute(
             path: '/irshadat',
             builder: (context, state) => const IrshadatScreen(),
+          ),
+          GoRoute(
+            path: '/tafseer',
+            builder: (context, state) => const TafseerListScreen(),
+            routes: [
+              GoRoute(
+                path: ':surahId',
+                builder: (context, state) => TafseerSurahScreen(
+                  surahId: state.pathParameters['surahId'] ?? '',
+                ),
+                routes: [
+                  GoRoute(
+                    path: ':ruku',
+                    builder: (context, state) => TafseerRukuScreen(
+                      surahId: state.pathParameters['surahId'] ?? '',
+                      rukuNumber:
+                          int.tryParse(state.pathParameters['ruku'] ?? '') ?? 0,
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
           GoRoute(
             path: '/shijra',

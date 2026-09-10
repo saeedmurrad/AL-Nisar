@@ -97,6 +97,9 @@ flutter:
     - assets/shajra/english/details/
     - assets/shajra/urdu/list.json
     - assets/shajra/urdu/details/
+    - assets/tafseer/index.json
+    - assets/tafseer/yusuf/surah.json
+    - assets/tafseer/yusuf/rukus/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
