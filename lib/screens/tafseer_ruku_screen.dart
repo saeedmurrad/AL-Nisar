@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_html/flutter_html.dart';
 import 'package:go_router/go_router.dart';
 
 import '../models/tafseer_models.dart';
@@ -378,27 +377,24 @@ class _GlossaryDefinition extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.c;
-    return Html(
-      data: '<p>$html</p>',
-      shrinkWrap: true,
-      style: {
-        'body': Style(
-          margin: Margins.zero,
-          padding: HtmlPaddings.zero,
-          backgroundColor: Colors.transparent,
+    final base = TextStyle(
+      fontFamily: tafseerUrduFamily,
+      fontSize: 14,
+      height: 2.1,
+      color: c.textSecondary,
+    );
+    return Text.rich(
+      TextSpan(
+        children: tafseerInlineSpans(
+          html,
+          base: base,
+          bold: base.copyWith(
+            fontWeight: FontWeight.w600,
+            color: c.accentGold,
+          ),
         ),
-        'p': Style(
-          margin: Margins.zero,
-          padding: HtmlPaddings.zero,
-          fontFamily: tafseerUrduFamily,
-          fontSize: FontSize(14),
-          lineHeight: LineHeight(2.1),
-          color: c.textSecondary,
-          textAlign: TextAlign.right,
-          direction: TextDirection.rtl,
-        ),
-        'b': Style(fontWeight: FontWeight.w600, color: c.accentGold),
-      },
+      ),
+      textAlign: TextAlign.right,
     );
   }
 }

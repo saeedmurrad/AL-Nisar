@@ -79,13 +79,70 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   setUpAll(() => GoogleFonts.config.allowRuntimeFetching = false);
 
-  testWidgets('index screen lists Surah Yusuf', (tester) async {
+  testWidgets('index screen lists both bundled surahs', (tester) async {
+    tester.view.physicalSize = const Size(900, 1600);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
     await _pump(tester, TafseerListScreen(service: _service));
 
     expect(find.text('Ishari Commentary'), findsOneWidget);
+
     expect(find.text('سورۂ یوسف'), findsOneWidget);
     expect(find.text('12 rukus · Urdu'), findsOneWidget);
     expect(find.text('۱۲'), findsOneWidget); // surah number badge
+
+    expect(find.text('سورۂ رعد'), findsOneWidget);
+    expect(find.text('6 rukus · Urdu'), findsOneWidget);
+    expect(find.text('۱۳'), findsOneWidget);
+  });
+
+  testWidgets('Ar-Rad surah screen renders its own front matter', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(900, 2400);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
+    await _pump(tester, TafseerSurahScreen(surahId: 'raad', service: _service));
+
+    expect(find.text('فہرستِ رکوع'), findsOneWidget);
+    expect(find.text('ایک پانی، مختلف پھل'), findsOneWidget);
+    expect(find.text('محو و اثبات اور اُمّ الکتاب'), findsOneWidget);
+    expect(find.text('۶'), findsOneWidget); // six rukus, so ۶ is the last row
+    expect(find.text('۷'), findsNothing);
+  });
+
+  testWidgets('Ar-Rad reader renders body and glossary, and ends at ruku 6', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(900, 4000);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
+    await _pump(
+      tester,
+      TafseerRukuScreen(surahId: 'raad', rukuNumber: 6, service: _service),
+    );
+
+    expect(find.text('چھٹا رکوع · آیات ۳۸ تا ۴۳'), findsOneWidget);
+    expect(find.text('محو و اثبات اور اُمّ الکتاب'), findsOneWidget);
+    expect(find.text('مشکل الفاظ اور اصطلاحاتِ فقر'), findsOneWidget);
+
+    final next = tester.widget<OutlinedButton>(
+      find.ancestor(
+        of: find.text('اگلا رکوع →'),
+        matching: find.byType(OutlinedButton),
+      ),
+    );
+    final prev = tester.widget<OutlinedButton>(
+      find.ancestor(
+        of: find.text('← پچھلا رکوع'),
+        matching: find.byType(OutlinedButton),
+      ),
+    );
+    expect(next.onPressed, isNull); // last ruku of this surah
+    expect(prev.onPressed, isNotNull);
   });
 
   testWidgets('reader adopts the dark paper palette in dark mode', (

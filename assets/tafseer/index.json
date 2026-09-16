@@ -4,8 +4,17 @@
     "surahNumber": 12,
     "nameUrdu": "سورۂ یوسف",
     "titleUrdu": "تفسیرِ ابنِ عربی",
-    "subtitleUrdu": "اشاری تفسیر · بارہ رکوع",
+    "subtitleUrdu": "اشاری تفسیر · ۱۲ رکوع",
     "rukuCount": 12,
+    "isAvailable": true
+  },
+  {
+    "id": "raad",
+    "surahNumber": 13,
+    "nameUrdu": "سورۂ رعد",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۶ رکوع",
+    "rukuCount": 6,
     "isAvailable": true
   }
 ]

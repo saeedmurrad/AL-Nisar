@@ -87,3 +87,36 @@ class TafseerHtml extends StatelessWidget {
     );
   }
 }
+
+/// Splits a glossary definition into spans, honouring the only inline markup
+/// the bundled content uses: `<b>`.
+///
+/// The definitions are short and 93% of them carry no markup at all, so
+/// rendering each through the full HTML parser is wasted work — a ruku can hold
+/// two dozen of them. Anything unexpected is degraded to plain text rather than
+/// shown as raw tags.
+List<TextSpan> tafseerInlineSpans(
+  String html, {
+  required TextStyle base,
+  required TextStyle bold,
+}) {
+  final spans = <TextSpan>[];
+  final pattern = RegExp(r'<b>(.*?)</b>', caseSensitive: false, dotAll: true);
+  var index = 0;
+
+  void addPlain(String raw) {
+    if (raw.isEmpty) return;
+    final text = raw.replaceAll(RegExp(r'<[^>]+>'), '');
+    if (text.isNotEmpty) spans.add(TextSpan(text: text, style: base));
+  }
+
+  for (final m in pattern.allMatches(html)) {
+    addPlain(html.substring(index, m.start));
+    final inner = (m.group(1) ?? '').replaceAll(RegExp(r'<[^>]+>'), '');
+    if (inner.isNotEmpty) spans.add(TextSpan(text: inner, style: bold));
+    index = m.end;
+  }
+  addPlain(html.substring(index));
+
+  return spans;
+}
