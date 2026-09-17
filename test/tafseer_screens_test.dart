@@ -79,8 +79,8 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   setUpAll(() => GoogleFonts.config.allowRuntimeFetching = false);
 
-  testWidgets('index screen lists both bundled surahs', (tester) async {
-    tester.view.physicalSize = const Size(900, 1600);
+  testWidgets('index screen lists every bundled surah', (tester) async {
+    tester.view.physicalSize = const Size(900, 3000);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
 
@@ -88,29 +88,71 @@ void main() {
 
     expect(find.text('Ishari Commentary'), findsOneWidget);
 
-    expect(find.text('سورۂ یوسف'), findsOneWidget);
-    expect(find.text('12 rukus · Urdu'), findsOneWidget);
-    expect(find.text('۱۲'), findsOneWidget); // surah number badge
+    // One card per surah, each with its own Urdu name and number badge.
+    for (final (name, badge) in const [
+      ('سورۂ یوسف', '۱۲'),
+      ('سورۂ رعد', '۱۳'),
+      ('سورۂ ابراہیم', '۱۴'),
+      ('سورۂ الحجر', '۱۵'),
+    ]) {
+      expect(find.text(name), findsOneWidget, reason: name);
+      expect(find.text(badge), findsOneWidget, reason: badge);
+    }
 
-    expect(find.text('سورۂ رعد'), findsOneWidget);
-    expect(find.text('6 rukus · Urdu'), findsOneWidget);
-    expect(find.text('۱۳'), findsOneWidget);
+    expect(find.text('12 rukus · Urdu'), findsOneWidget);
+    expect(find.text('7 rukus · Urdu'), findsOneWidget);
+    // Ar-Ra'd and Al-Hijr both have six.
+    expect(find.text('6 rukus · Urdu'), findsNWidgets(2));
   });
 
-  testWidgets('Ar-Rad surah screen renders its own front matter', (
-    tester,
-  ) async {
-    tester.view.physicalSize = const Size(900, 2400);
+  testWidgets('each surah screen renders its own contents', (tester) async {
+    tester.view.physicalSize = const Size(900, 2600);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
 
-    await _pump(tester, TafseerSurahScreen(surahId: 'raad', service: _service));
+    for (final (id, first, last, lastNum, pastEnd) in const [
+      ('raad', 'ایک پانی، مختلف پھل', 'محو و اثبات اور اُمّ الکتاب', '۶', '۷'),
+      ('ibrahim', 'ظلمات سے نور تک', 'تبدیلِ ارض اور بلاغ', '۷', '۸'),
+      ('hijr', 'ذکرِ محفوظ اور مسحور نگاہ', 'یقین کی آمد تک', '۶', '۷'),
+    ]) {
+      await _pump(tester, TafseerSurahScreen(surahId: id, service: _service));
 
-    expect(find.text('فہرستِ رکوع'), findsOneWidget);
-    expect(find.text('ایک پانی، مختلف پھل'), findsOneWidget);
-    expect(find.text('محو و اثبات اور اُمّ الکتاب'), findsOneWidget);
-    expect(find.text('۶'), findsOneWidget); // six rukus, so ۶ is the last row
-    expect(find.text('۷'), findsNothing);
+      expect(find.text('فہرستِ رکوع'), findsOneWidget, reason: id);
+      expect(find.text(first), findsOneWidget, reason: '$id first');
+      expect(find.text(last), findsOneWidget, reason: '$id last');
+      // The contents stop at this surah's own ruku count.
+      expect(find.text(lastNum), findsOneWidget, reason: '$id last number');
+      expect(find.text(pastEnd), findsNothing, reason: '$id past end');
+    }
+  });
+
+  testWidgets('Al-Hijr reader renders the Iblis ruku with its glossary', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(900, 6000);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
+    await _pump(
+      tester,
+      TafseerRukuScreen(surahId: 'hijr', rukuNumber: 3, service: _service),
+    );
+
+    expect(find.text('تیسرا رکوع · آیات ۲۶ تا ۴۴'), findsOneWidget);
+    expect(find.text('نفخِ روح اور سجدۂ ملائک'), findsOneWidget);
+    expect(find.text('مشکل الفاظ اور اصطلاحاتِ فقر'), findsOneWidget);
+    expect(find.text('صلصال'), findsOneWidget); // a glossary term
+
+    // Mid-surah: both directions available.
+    for (final label in const ['← پچھلا رکوع', 'اگلا رکوع →']) {
+      final b = tester.widget<OutlinedButton>(
+        find.ancestor(
+          of: find.text(label),
+          matching: find.byType(OutlinedButton),
+        ),
+      );
+      expect(b.onPressed, isNotNull, reason: label);
+    }
   });
 
   testWidgets('Ar-Rad reader renders body and glossary, and ends at ruku 6', (

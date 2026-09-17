@@ -16,5 +16,23 @@
     "subtitleUrdu": "اشاری تفسیر · ۶ رکوع",
     "rukuCount": 6,
     "isAvailable": true
+  },
+  {
+    "id": "ibrahim",
+    "surahNumber": 14,
+    "nameUrdu": "سورۂ ابراہیم",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۷ رکوع",
+    "rukuCount": 7,
+    "isAvailable": true
+  },
+  {
+    "id": "hijr",
+    "surahNumber": 15,
+    "nameUrdu": "سورۂ الحجر",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۶ رکوع",
+    "rukuCount": 6,
+    "isAvailable": true
   }
 ]

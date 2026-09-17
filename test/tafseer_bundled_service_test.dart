@@ -16,8 +16,13 @@ void main() {
 
   test('index lists the bundled surahs in surah order', () async {
     final index = await service.loadIndex();
-    expect(index.map((s) => s.id).toList(), ['yusuf', 'raad']);
-    expect(index.map((s) => s.surahNumber).toList(), [12, 13]);
+    expect(index.map((s) => s.id).toList(), [
+      'yusuf',
+      'raad',
+      'ibrahim',
+      'hijr',
+    ]);
+    expect(index.map((s) => s.surahNumber).toList(), [12, 13, 14, 15]);
 
     final yusuf = index.firstWhere((s) => s.id == 'yusuf');
     expect(yusuf.surahNumber, 12);
@@ -32,40 +37,73 @@ void main() {
     expect(raad.nameUrdu, contains('رعد'));
   });
 
-  test('Surah Ar-Rad parses with 6 ordered rukus and full front matter', () async {
-    final surah = await service.loadSurah('raad');
-    expect(surah, isNotNull);
+  // Table-driven so adding a surah means adding one row, and a malformed
+  // source page fails here rather than shipping empty rukus.
+  const bundled = <String, ({int number, String name, int rukus, String first, String last})>{
+    'raad': (
+      number: 13,
+      name: 'سورۂ رعد',
+      rukus: 6,
+      first: 'ایک پانی، مختلف پھل',
+      last: 'محو و اثبات اور اُمّ الکتاب',
+    ),
+    'ibrahim': (
+      number: 14,
+      name: 'سورۂ ابراہیم',
+      rukus: 7,
+      first: 'ظلمات سے نور تک',
+      last: 'تبدیلِ ارض اور بلاغ',
+    ),
+    'hijr': (
+      number: 15,
+      name: 'سورۂ الحجر',
+      rukus: 6,
+      first: 'ذکرِ محفوظ اور مسحور نگاہ',
+      last: 'یقین کی آمد تک',
+    ),
+  };
 
-    expect(surah!.rukus.map((r) => r.number).toList(), [1, 2, 3, 4, 5, 6]);
-    expect(surah.nameUrdu, 'سورۂ رعد');
-    expect(surah.titleUrdu, 'تفسیرِ ابنِ عربی');
-    expect(surah.basmala, contains('بِسْمِ'));
-    expect(surah.prefaceHtml, hasLength(3));
-    expect(surah.key, hasLength(9));
-    expect(surah.key.first.term, 'رعد');
-    expect(surah.colophonHtml, isNotEmpty);
+  bundled.forEach((id, want) {
+    test('$id parses with ${want.rukus} ordered rukus and full front matter', () async {
+      final surah = await service.loadSurah(id);
+      expect(surah, isNotNull, reason: id);
 
-    // The preface carries highlighted terms that the reader styles lapis.
-    expect(surah.prefaceHtml.join(), contains('class="hl"'));
+      expect(
+        surah!.rukus.map((r) => r.number).toList(),
+        List<int>.generate(want.rukus, (i) => i + 1),
+      );
+      expect(surah.surahNumber, want.number);
+      expect(surah.nameUrdu, want.name);
+      expect(surah.titleUrdu, 'تفسیرِ ابنِ عربی');
+      expect(surah.basmala, contains('بِسْمِ'));
+      expect(surah.prefaceHtml, isNotEmpty);
+      expect(surah.key, isNotEmpty);
+      expect(surah.colophonHtml, isNotEmpty);
 
-    expect(surah.rukus.first.titleUrdu, 'ایک پانی، مختلف پھل');
-    expect(surah.rukus.first.eyebrow, 'پہلا رکوع · آیات ۱ تا ۷');
-    expect(surah.rukus.last.titleUrdu, 'محو و اثبات اور اُمّ الکتاب');
+      // The preface carries highlighted terms the reader styles lapis.
+      expect(surah.prefaceHtml.join(), contains('class="hl"'));
 
-    for (final r in surah.rukus) {
-      expect(r.ayahBlock, isNotEmpty, reason: 'ruku \${r.number} ayah block');
-      expect(r.glossary, isNotEmpty, reason: 'ruku \${r.number} glossary');
-    }
-  });
+      expect(surah.rukus.first.titleUrdu, want.first);
+      expect(surah.rukus.last.titleUrdu, want.last);
 
-  test('Ar-Rad ruku bodies load and keep their ayah spans', () async {
-    for (var n = 1; n <= 6; n++) {
-      final html = await service.loadRukuHtml('raad', n);
-      expect(html, isNotNull, reason: 'ruku \$n');
-      expect(html!.trim(), startsWith('<p>'), reason: 'ruku \$n');
-      expect(html.contains('class="ayah"'), isTrue, reason: 'ruku \$n');
-    }
-    expect(await service.loadRukuHtml('raad', 7), isNull);
+      for (final r in surah.rukus) {
+        expect(r.titleUrdu, isNotEmpty, reason: '$id ruku ${r.number} title');
+        expect(r.ayahBlock, isNotEmpty, reason: '$id ruku ${r.number} ayah');
+        expect(r.glossary, isNotEmpty, reason: '$id ruku ${r.number} glossary');
+        expect(r.ordinalUrdu, contains('رکوع'), reason: '$id ruku ${r.number}');
+        expect(r.ayahRangeUrdu, contains('تا'), reason: '$id ruku ${r.number}');
+      }
+    });
+
+    test('$id ruku bodies load and keep their ayah spans', () async {
+      for (var n = 1; n <= want.rukus; n++) {
+        final html = await service.loadRukuHtml(id, n);
+        expect(html, isNotNull, reason: '$id ruku $n');
+        expect(html!.trim(), startsWith('<p>'), reason: '$id ruku $n');
+        expect(html.contains('class="ayah"'), isTrue, reason: '$id ruku $n');
+      }
+      expect(await service.loadRukuHtml(id, want.rukus + 1), isNull);
+    });
   });
 
   test('Surah Yusuf parses with 12 ordered rukus and full front matter', () async {

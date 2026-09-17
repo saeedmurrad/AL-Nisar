@@ -9,6 +9,15 @@ index.json              list of surahs shown on /tafseer
 <id>/rukus/NN.html      one ruku's body paragraphs, zero-padded
 ```
 
+Currently bundled, in surah order:
+
+| # | id | surah | rukus |
+|---|----|-------|-------|
+| 12 | `yusuf` | سورۂ یوسف | 12 |
+| 13 | `raad` | سورۂ رعد | 6 |
+| 14 | `ibrahim` | سورۂ ابراہیم | 7 |
+| 15 | `hijr` | سورۂ الحجر | 6 |
+
 ## Adding a surah
 
 1. Author the page in the same HTML shape as the Surah Yusuf source (see the
@@ -19,11 +28,13 @@ index.json              list of surahs shown on /tafseer
        --id raad --number 13 --name 'سورۂ رعد'
    ```
    The surah is merged into `index.json` — other surahs are preserved and the
-   list stays sorted by surah number. Pass `--subtitle` to override the
-   auto-generated index-card line.
+   list stays sorted by surah number.
 3. Register the new folder in `pubspec.yaml` under `flutter: assets:`
    (`assets/tafseer/<id>/surah.json` and `assets/tafseer/<id>/rukus/`).
-4. Push to `main` — GitHub Actions redeploys the web build.
+4. Add a row to the `bundled` table in `test/tafseer_bundled_service_test.dart`
+   (id, surah number, Urdu name, ruku count, first and last ruku titles) so a
+   malformed source page fails the build instead of shipping empty rukus.
+5. Push to `main` — GitHub Actions redeploys the web build.
 
 Body HTML is rendered by `lib/widgets/tafseer_html.dart`. Keep the inline
 `<span class="ayah">` (Quranic fragments, saffron Amiri) and `<span class="hl">`
