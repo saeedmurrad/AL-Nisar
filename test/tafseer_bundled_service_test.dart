@@ -21,8 +21,9 @@ void main() {
       'raad',
       'ibrahim',
       'hijr',
+      'nahl',
     ]);
-    expect(index.map((s) => s.surahNumber).toList(), [12, 13, 14, 15]);
+    expect(index.map((s) => s.surahNumber).toList(), [12, 13, 14, 15, 16]);
 
     final yusuf = index.firstWhere((s) => s.id == 'yusuf');
     expect(yusuf.surahNumber, 12);
@@ -60,6 +61,13 @@ void main() {
       rukus: 6,
       first: 'ذکرِ محفوظ اور مسحور نگاہ',
       last: 'یقین کی آمد تک',
+    ),
+    'nahl': (
+      number: 16,
+      name: 'سورۂ النحل',
+      rukus: 16,
+      first: 'امر کی آمد اور سیدھی راہ',
+      last: 'ایک فرد، پوری امت',
     ),
   };
 

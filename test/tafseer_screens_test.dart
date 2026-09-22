@@ -80,7 +80,7 @@ void main() {
   setUpAll(() => GoogleFonts.config.allowRuntimeFetching = false);
 
   testWidgets('index screen lists every bundled surah', (tester) async {
-    tester.view.physicalSize = const Size(900, 3000);
+    tester.view.physicalSize = const Size(900, 3800);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
 
@@ -94,19 +94,21 @@ void main() {
       ('سورۂ رعد', '۱۳'),
       ('سورۂ ابراہیم', '۱۴'),
       ('سورۂ الحجر', '۱۵'),
+      ('سورۂ النحل', '۱۶'),
     ]) {
       expect(find.text(name), findsOneWidget, reason: name);
       expect(find.text(badge), findsOneWidget, reason: badge);
     }
 
     expect(find.text('12 rukus · Urdu'), findsOneWidget);
+    expect(find.text('16 rukus · Urdu'), findsOneWidget);
     expect(find.text('7 rukus · Urdu'), findsOneWidget);
     // Ar-Ra'd and Al-Hijr both have six.
     expect(find.text('6 rukus · Urdu'), findsNWidgets(2));
   });
 
   testWidgets('each surah screen renders its own contents', (tester) async {
-    tester.view.physicalSize = const Size(900, 2600);
+    tester.view.physicalSize = const Size(900, 4200);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
 
@@ -114,6 +116,7 @@ void main() {
       ('raad', 'ایک پانی، مختلف پھل', 'محو و اثبات اور اُمّ الکتاب', '۶', '۷'),
       ('ibrahim', 'ظلمات سے نور تک', 'تبدیلِ ارض اور بلاغ', '۷', '۸'),
       ('hijr', 'ذکرِ محفوظ اور مسحور نگاہ', 'یقین کی آمد تک', '۶', '۷'),
+      ('nahl', 'امر کی آمد اور سیدھی راہ', 'ایک فرد، پوری امت', '۱۶', '۱۷'),
     ]) {
       await _pump(tester, TafseerSurahScreen(surahId: id, service: _service));
 

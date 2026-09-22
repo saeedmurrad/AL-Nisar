@@ -17,6 +17,7 @@ Currently bundled, in surah order:
 | 13 | `raad` | سورۂ رعد | 6 |
 | 14 | `ibrahim` | سورۂ ابراہیم | 7 |
 | 15 | `hijr` | سورۂ الحجر | 6 |
+| 16 | `nahl` | سورۂ النحل | 16 |
 
 ## Adding a surah
 

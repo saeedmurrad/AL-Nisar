@@ -34,5 +34,14 @@
     "subtitleUrdu": "اشاری تفسیر · ۶ رکوع",
     "rukuCount": 6,
     "isAvailable": true
+  },
+  {
+    "id": "nahl",
+    "surahNumber": 16,
+    "nameUrdu": "سورۂ النحل",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۱۶ رکوع",
+    "rukuCount": 16,
+    "isAvailable": true
   }
 ]
