@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
+import '../auth/auth_provider.dart';
 import '../models/tafseer_models.dart';
 import '../services/tafseer_bundled_service.dart';
 import '../theme/app_layout.dart';
@@ -8,10 +11,12 @@ import '../theme/app_theme_colors.dart';
 import '../theme/color_utils.dart';
 import '../theme/tafseer_theme.dart';
 import '../utils/responsive_layout.dart';
+import '../utils/tafseer_plain_text.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/branded_state_view.dart';
 import '../widgets/islamic_ui.dart';
 import '../widgets/standard_shell_header.dart';
+import '../widgets/tafseer_copy_button.dart';
 import '../widgets/tafseer_html.dart';
 
 /// One ruku of tafseer: marker, title, ayah block, prose body and لغات panel.
@@ -78,6 +83,30 @@ class _TafseerRukuScreenState extends State<TafseerRukuScreen> {
     if (_scroll.hasClients) _scroll.jumpTo(0);
   }
 
+  Future<void> _copyRuku() async {
+    final surah = _surah;
+    final ruku = surah?.rukuByNumber(widget.rukuNumber);
+    final body = _bodyHtml;
+    if (surah == null || ruku == null || body == null) return;
+
+    await Clipboard.setData(
+      ClipboardData(
+        text: tafseerRukuPlainText(
+          surah: surah,
+          ruku: ruku,
+          bodyHtml: body,
+        ),
+      ),
+    );
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Ruku ${ruku.number} copied to clipboard'),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
   void _goRelative(int delta) {
     final next = widget.rukuNumber + delta;
     final surah = _surah;
@@ -108,6 +137,13 @@ class _TafseerRukuScreenState extends State<TafseerRukuScreen> {
                 StandardShellHeader(
                   title: surah?.nameUrdu ?? 'Tafseer',
                   onBack: () => context.go('/tafseer/${widget.surahId}'),
+                  trailing: (ruku != null && _bodyHtml != null)
+                      ? TafseerCopyButton(
+                          isSuperAdmin:
+                              context.watch<AuthProvider>().isSuperAdmin,
+                          onCopy: _copyRuku,
+                        )
+                      : null,
                 ),
                 Expanded(
                   child: _loading

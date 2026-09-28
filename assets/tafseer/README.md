@@ -18,6 +18,7 @@ Currently bundled, in surah order:
 | 14 | `ibrahim` | سورۂ ابراہیم | 7 |
 | 15 | `hijr` | سورۂ الحجر | 6 |
 | 16 | `nahl` | سورۂ النحل | 16 |
+| 17 | `bani-israel` | سورۂ بنی اسرائیل | 12 |
 
 ## Adding a surah
 
@@ -36,6 +37,13 @@ Currently bundled, in surah order:
    (id, surah number, Urdu name, ruku count, first and last ruku titles) so a
    malformed source page fails the build instead of shipping empty rukus.
 5. Push to `main` — GitHub Actions redeploys the web build.
+
+Only `prefaceHtml`, `colophonHtml`, the glossary definitions and the ruku body
+files keep their HTML. Every other field — basmala, titles, ayah blocks,
+eyebrows, key and glossary terms — is stripped to plain text by the converter,
+because the reader renders those with a `Text` widget and any surviving tag
+would show up literally on screen. Surah Bani Israel wraps some ayah blocks in
+`<span class="ayah" data-a="N">`, which is what surfaced this.
 
 Body HTML is rendered by `lib/widgets/tafseer_html.dart`. Keep the inline
 `<span class="ayah">` (Quranic fragments, saffron Amiri) and `<span class="hl">`

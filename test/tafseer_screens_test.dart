@@ -2,8 +2,13 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:firebase_auth/firebase_auth.dart' show User;
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:spiritual_learning_app/auth/auth_provider.dart';
+import 'package:spiritual_learning_app/auth/auth_service.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:spiritual_learning_app/screens/tafseer_list_screen.dart';
 import 'package:spiritual_learning_app/screens/tafseer_ruku_screen.dart';
@@ -48,7 +53,32 @@ class _DiskBundle extends AssetBundle {
 
 final _service = TafseerBundledService(bundle: _DiskBundle());
 
-Widget _app(Widget home, {Brightness brightness = Brightness.light}) {
+class _FakeAuthService implements AuthService {
+  @override
+  Stream<User?> get authState => const Stream<User?>.empty();
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => null;
+}
+
+/// AuthProvider with the role forced; the real one needs a live Firebase app.
+class _FakeAuth extends AuthProvider {
+  _FakeAuth({required this.superAdmin}) : super(service: _FakeAuthService());
+
+  final bool superAdmin;
+
+  @override
+  bool get isSuperAdmin => superAdmin;
+
+  @override
+  bool get isAdminOrHigher => superAdmin;
+}
+
+Widget _app(
+  Widget home, {
+  Brightness brightness = Brightness.light,
+  bool superAdmin = false,
+}) {
   final router = GoRouter(
     initialLocation: '/x',
     routes: [GoRoute(path: '/x', builder: (_, _) => home)],
@@ -56,9 +86,12 @@ Widget _app(Widget home, {Brightness brightness = Brightness.light}) {
   final base = brightness == Brightness.dark
       ? ThemeData.dark()
       : ThemeData.light();
-  return MaterialApp.router(
-    routerConfig: router,
-    theme: base.copyWith(extensions: const [_colors]),
+  return ChangeNotifierProvider<AuthProvider>.value(
+    value: _FakeAuth(superAdmin: superAdmin),
+    child: MaterialApp.router(
+      routerConfig: router,
+      theme: base.copyWith(extensions: const [_colors]),
+    ),
   );
 }
 
@@ -68,8 +101,11 @@ Future<void> _pump(
   WidgetTester tester,
   Widget home, {
   Brightness brightness = Brightness.light,
+  bool superAdmin = false,
 }) async {
-  await tester.pumpWidget(_app(home, brightness: brightness));
+  await tester.pumpWidget(
+    _app(home, brightness: brightness, superAdmin: superAdmin),
+  );
   for (var i = 0; i < 6; i++) {
     await tester.pump(const Duration(milliseconds: 100));
   }
@@ -95,12 +131,13 @@ void main() {
       ('سورۂ ابراہیم', '۱۴'),
       ('سورۂ الحجر', '۱۵'),
       ('سورۂ النحل', '۱۶'),
+      ('سورۂ بنی اسرائیل', '۱۷'),
     ]) {
       expect(find.text(name), findsOneWidget, reason: name);
       expect(find.text(badge), findsOneWidget, reason: badge);
     }
 
-    expect(find.text('12 rukus · Urdu'), findsOneWidget);
+    expect(find.text('12 rukus · Urdu'), findsNWidgets(2)); // Yusuf, Bani Israel
     expect(find.text('16 rukus · Urdu'), findsOneWidget);
     expect(find.text('7 rukus · Urdu'), findsOneWidget);
     // Ar-Ra'd and Al-Hijr both have six.
@@ -117,6 +154,13 @@ void main() {
       ('ibrahim', 'ظلمات سے نور تک', 'تبدیلِ ارض اور بلاغ', '۷', '۸'),
       ('hijr', 'ذکرِ محفوظ اور مسحور نگاہ', 'یقین کی آمد تک', '۶', '۷'),
       ('nahl', 'امر کی آمد اور سیدھی راہ', 'ایک فرد، پوری امت', '۱۶', '۱۷'),
+      (
+        'bani-israel',
+        'شبِ اسرا اور مقامِ عبدیت',
+        'سبحان سے تکبیر تک',
+        '۱۲',
+        '۱۳',
+      ),
     ]) {
       await _pump(tester, TafseerSurahScreen(surahId: id, service: _service));
 
@@ -354,6 +398,99 @@ void main() {
 
     // The two are rendered in different families.
     expect(ayah.style?.fontFamily, isNot(prose.style?.fontFamily));
+  });
+
+  testWidgets('.ayah still matches spans that carry extra attributes', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(900, 4000);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
+    // Bani Israel writes <span class="ayah" data-a="N">; the earlier surahs
+    // write a bare class. The class selector must match either way.
+    await _pump(
+      tester,
+      TafseerRukuScreen(
+        surahId: 'bani-israel',
+        rukuNumber: 1,
+        service: _service,
+      ),
+    );
+
+    final spans = <TextSpan>[];
+    for (final rt in tester.widgetList<RichText>(find.byType(RichText))) {
+      rt.text.visitChildren((span) {
+        if (span is TextSpan && (span.text ?? '').isNotEmpty) spans.add(span);
+        return true;
+      });
+    }
+    final ayah = spans.firstWhere(
+      (s) => (s.text ?? '').contains('اَسْرٰى بِعَبْدِهٖ'),
+      orElse: () => throw StateError('no ayah span found'),
+    );
+    expect(ayah.style?.color, kTafseerLightColors.accentGold);
+    expect(ayah.style?.fontWeight, FontWeight.w700);
+  });
+
+  testWidgets('copy action is hidden from a regular member', (tester) async {
+    tester.view.physicalSize = const Size(900, 4000);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
+    await _pump(
+      tester,
+      TafseerRukuScreen(surahId: 'yusuf', rukuNumber: 1, service: _service),
+    );
+    expect(find.byIcon(Icons.copy_all_outlined), findsNothing);
+  });
+
+  testWidgets('super admin can copy the ruku text to the clipboard', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(900, 4000);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
+    String? copied;
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      SystemChannels.platform,
+      (call) async {
+        if (call.method == 'Clipboard.setData') {
+          copied = (call.arguments as Map)['text'] as String?;
+        }
+        return null;
+      },
+    );
+    addTearDown(
+      () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.platform,
+        null,
+      ),
+    );
+
+    await _pump(
+      tester,
+      TafseerRukuScreen(
+        surahId: 'bani-israel',
+        rukuNumber: 5,
+        service: _service,
+      ),
+      superAdmin: true,
+    );
+
+    expect(find.byIcon(Icons.copy_all_outlined), findsOneWidget);
+    await tester.tap(find.byIcon(Icons.copy_all_outlined));
+    await tester.pump();
+    await tester.pump();
+
+    expect(copied, isNotNull);
+    expect(copied, contains('سورۂ بنی اسرائیل'));
+    expect(copied, contains('پانچواں رکوع'));
+    // Ruku 5's ayah block is the one wrapped in <span data-a="44"> upstream.
+    expect(copied, contains('وَاِنْ مِّنْ شَيْءٍ اِلَّا يُسَبِّحُ'));
+    expect(copied, isNot(contains('<')));
+    expect(find.textContaining('copied to clipboard'), findsOneWidget);
   });
 
   testWidgets('out-of-range ruku shows a branded state', (tester) async {

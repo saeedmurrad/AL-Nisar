@@ -22,8 +22,9 @@ void main() {
       'ibrahim',
       'hijr',
       'nahl',
+      'bani-israel',
     ]);
-    expect(index.map((s) => s.surahNumber).toList(), [12, 13, 14, 15, 16]);
+    expect(index.map((s) => s.surahNumber).toList(), [12, 13, 14, 15, 16, 17]);
 
     final yusuf = index.firstWhere((s) => s.id == 'yusuf');
     expect(yusuf.surahNumber, 12);
@@ -68,6 +69,13 @@ void main() {
       rukus: 16,
       first: 'امر کی آمد اور سیدھی راہ',
       last: 'ایک فرد، پوری امت',
+    ),
+    'bani-israel': (
+      number: 17,
+      name: 'سورۂ بنی اسرائیل',
+      rukus: 12,
+      first: 'شبِ اسرا اور مقامِ عبدیت',
+      last: 'سبحان سے تکبیر تک',
     ),
   };
 
@@ -157,6 +165,41 @@ void main() {
 
     final first = await service.loadRukuHtml('yusuf', 1);
     expect(first!.contains('class="ayah"'), isTrue);
+  });
+
+  test('fields rendered as plain Text carry no markup', () async {
+    // Bani Israel wraps some ayah blocks in <span class="ayah" data-a="N">.
+    // Those fields are rendered with Text, so tags would show literally.
+    for (final summary in await service.loadIndex()) {
+      final surah = (await service.loadSurah(summary.id))!;
+      final plain = <String, String>{
+        'basmala': surah.basmala,
+        'titleUrdu': surah.titleUrdu,
+        'subtitleUrdu': surah.subtitleUrdu,
+        'kicker': surah.kicker,
+        'nameUrdu': surah.nameUrdu,
+        for (final k in surah.key) 'key.${k.term}': '${k.term} ${k.meaning}',
+        for (final r in surah.rukus) ...{
+          'ruku${r.number}.title': r.titleUrdu,
+          'ruku${r.number}.ayahBlock': r.ayahBlock,
+          'ruku${r.number}.eyebrow': r.eyebrow,
+          for (final g in r.glossary) 'ruku${r.number}.term': g.term,
+        },
+      };
+      plain.forEach((field, value) {
+        expect(value, isNot(contains('<')), reason: '${summary.id} $field');
+        expect(value, isNot(contains('>')), reason: '${summary.id} $field');
+      });
+    }
+  });
+
+  test('preface, colophon and glossary definitions keep their HTML', () async {
+    final yusuf = (await service.loadSurah('yusuf'))!;
+    expect(yusuf.prefaceHtml.join(), contains('<p>'));
+    final bolded = yusuf.rukus
+        .expand((r) => r.glossary)
+        .where((g) => g.definitionHtml.contains('<b>'));
+    expect(bolded, isNotEmpty);
   });
 
   test('ruku asset paths are zero-padded', () {

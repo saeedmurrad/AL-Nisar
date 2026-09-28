@@ -43,5 +43,14 @@
     "subtitleUrdu": "اشاری تفسیر · ۱۶ رکوع",
     "rukuCount": 16,
     "isAvailable": true
+  },
+  {
+    "id": "bani-israel",
+    "surahNumber": 17,
+    "nameUrdu": "سورۂ بنی اسرائیل",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۱۲ رکوع",
+    "rukuCount": 12,
+    "isAvailable": true
   }
 ]

@@ -34,6 +34,18 @@ def urdu_digits(value):
     return "".join(digits[int(c)] if c.isdigit() else c for c in str(value))
 
 
+def text_of(html):
+    """Plain text for fields the app renders as a Text widget.
+
+    Most sources put bare text in the masthead, titles and ayah blocks, but
+    some wrap the ayah block in <span class="ayah" data-a="N">. That markup
+    must not reach surah.json: the reader renders these fields as plain Text,
+    so tags would show up literally on screen. Only prefaceHtml, colophonHtml,
+    the glossary definitions and the ruku body files stay as HTML.
+    """
+    return re.sub(r"\s{2,}", " ", re.sub(r"<[^>]*>", "", html)).strip()
+
+
 def one(pattern, text, flags=re.S):
     m = re.search(pattern, text, flags)
     return m.group(1).strip() if m else ""
@@ -57,16 +69,16 @@ def main():
 
     # ---- masthead
     masthead = one(r'<header class="masthead">(.*?)</header>', html)
-    basmala = one(r'<p class="basmala">(.*?)</p>', masthead)
-    title = one(r"<h1>(.*?)</h1>", masthead)
-    subtitle = one(r'<p class="sub">(.*?)</p>', masthead)
-    kicker = one(r'<p class="kicker">(.*?)</p>', masthead)
+    basmala = text_of(one(r'<p class="basmala">(.*?)</p>', masthead))
+    title = text_of(one(r"<h1>(.*?)</h1>", masthead))
+    subtitle = text_of(one(r'<p class="sub">(.*?)</p>', masthead))
+    kicker = text_of(one(r'<p class="kicker">(.*?)</p>', masthead))
 
     # ---- preface + symbol key
     preface = one(r'<div class="preface">(.*?)</div>', html)
-    preface_paras = ["<p>%s</p>" % p for p in all_of(r"<p>(.*?)</p>", preface)]
+    preface_paras = ["<p>%s</p>" % p for p in all_of(r"<p>(.*?)</p>", preface)]  # HTML by design
     key = [
-        {"term": t.strip(), "meaning": m.strip()}
+        {"term": text_of(t), "meaning": text_of(m)}
         for t, m in re.findall(r"<li><b>(.*?)</b>(.*?)</li>", preface, re.S)
     ]
 
@@ -76,14 +88,14 @@ def main():
     rukus, bodies = [], {}
     for block in all_of(r'(<section class="ruku".*?</section>)', html):
         number = int(one(r'id="r(\d+)"', block))
-        eyebrow = one(r'<span class="eyebrow">(.*?)</span>', block)
+        eyebrow = text_of(one(r'<span class="eyebrow">(.*?)</span>', block))
         parts = [p.strip() for p in eyebrow.split("·")]
         ordinal = parts[0] if parts else ""
         ayah_range = re.sub(r"^آیات\s*", "", parts[1]) if len(parts) > 1 else ""
 
         aside = one(r'<aside class="lughat">(.*?)</aside>', block)
         glossary = [
-            {"term": t.strip(), "definitionHtml": d.strip()}
+            {"term": text_of(t), "definitionHtml": d.strip()}
             for t, d in re.findall(r"<dt>(.*?)</dt>\s*<dd>(.*?)</dd>", aside, re.S)
         ]
 
@@ -97,8 +109,10 @@ def main():
                 "number": number,
                 "ordinalUrdu": ordinal,
                 "ayahRangeUrdu": ayah_range,
-                "titleUrdu": one(r'<h2 class="ttl">(.*?)</h2>', block),
-                "ayahBlock": one(r'<p class="ayah-block">(.*?)</p>', block),
+                "titleUrdu": text_of(one(r'<h2 class="ttl">(.*?)</h2>', block)),
+                "ayahBlock": text_of(
+                    one(r'<p class="ayah-block">(.*?)</p>', block)
+                ),
                 "glossary": glossary,
             }
         )
