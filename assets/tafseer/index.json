@@ -52,5 +52,14 @@
     "subtitleUrdu": "اشاری تفسیر · ۱۲ رکوع",
     "rukuCount": 12,
     "isAvailable": true
+  },
+  {
+    "id": "kahf",
+    "surahNumber": 18,
+    "nameUrdu": "سورۂ الکہف",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۱۲ رکوع",
+    "rukuCount": 12,
+    "isAvailable": true
   }
 ]

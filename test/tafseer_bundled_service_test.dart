@@ -23,8 +23,10 @@ void main() {
       'hijr',
       'nahl',
       'bani-israel',
+      'kahf',
     ]);
-    expect(index.map((s) => s.surahNumber).toList(), [12, 13, 14, 15, 16, 17]);
+    expect(index.map((s) => s.surahNumber).toList(),
+        [12, 13, 14, 15, 16, 17, 18]);
 
     final yusuf = index.firstWhere((s) => s.id == 'yusuf');
     expect(yusuf.surahNumber, 12);
@@ -76,6 +78,13 @@ void main() {
       rukus: 12,
       first: 'شبِ اسرا اور مقامِ عبدیت',
       last: 'سبحان سے تکبیر تک',
+    ),
+    'kahf': (
+      number: 18,
+      name: 'سورۂ الکہف',
+      rukus: 12,
+      first: 'عبد کی کتاب اور غارِ دل',
+      last: 'کلماتِ رب اور لقاء',
     ),
   };
 

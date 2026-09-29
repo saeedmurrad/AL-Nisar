@@ -11,6 +11,7 @@ import 'package:spiritual_learning_app/auth/auth_provider.dart';
 import 'package:spiritual_learning_app/auth/auth_service.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:spiritual_learning_app/screens/tafseer_list_screen.dart';
+import 'package:spiritual_learning_app/widgets/tafseer_search_result_card.dart';
 import 'package:spiritual_learning_app/screens/tafseer_ruku_screen.dart';
 import 'package:spiritual_learning_app/screens/tafseer_surah_screen.dart';
 import 'package:spiritual_learning_app/services/tafseer_bundled_service.dart';
@@ -132,12 +133,14 @@ void main() {
       ('سورۂ الحجر', '۱۵'),
       ('سورۂ النحل', '۱۶'),
       ('سورۂ بنی اسرائیل', '۱۷'),
+      ('سورۂ الکہف', '۱۸'),
     ]) {
       expect(find.text(name), findsOneWidget, reason: name);
       expect(find.text(badge), findsOneWidget, reason: badge);
     }
 
-    expect(find.text('12 rukus · Urdu'), findsNWidgets(2)); // Yusuf, Bani Israel
+    // Yusuf, Bani Israel and Al-Kahf all have twelve.
+    expect(find.text('12 rukus · Urdu'), findsNWidgets(3));
     expect(find.text('16 rukus · Urdu'), findsOneWidget);
     expect(find.text('7 rukus · Urdu'), findsOneWidget);
     // Ar-Ra'd and Al-Hijr both have six.
@@ -161,6 +164,7 @@ void main() {
         '۱۲',
         '۱۳',
       ),
+      ('kahf', 'عبد کی کتاب اور غارِ دل', 'کلماتِ رب اور لقاء', '۱۲', '۱۳'),
     ]) {
       await _pump(tester, TafseerSurahScreen(surahId: id, service: _service));
 
@@ -398,6 +402,45 @@ void main() {
 
     // The two are rendered in different families.
     expect(ayah.style?.fontFamily, isNot(prose.style?.fontFamily));
+  });
+
+  testWidgets('searching shows results and hides the surah list', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(900, 3000);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
+    await _pump(tester, TafseerListScreen(service: _service));
+    expect(find.text('سورۂ یوسف'), findsOneWidget);
+
+    // Typed without diacritics — the fold is what makes this match.
+    await tester.enterText(find.byType(TextField), 'نحن نقص');
+    await tester.pump(const Duration(milliseconds: 400));
+    for (var i = 0; i < 20; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+
+    expect(find.textContaining('match'), findsWidgets);
+    expect(find.byType(TafseerSearchResultCard), findsWidgets);
+    // The surah picker is replaced while a query is active.
+    expect(find.text('Ishari Commentary'), findsNothing);
+  });
+
+  testWidgets('a query with no matches shows the empty state', (tester) async {
+    tester.view.physicalSize = const Size(900, 2000);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
+    await _pump(tester, TafseerListScreen(service: _service));
+    await tester.enterText(find.byType(TextField), 'zzzqqqxx');
+    await tester.pump(const Duration(milliseconds: 400));
+    for (var i = 0; i < 20; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+
+    expect(find.text('No matches'), findsOneWidget);
+    expect(find.byType(TafseerSearchResultCard), findsNothing);
   });
 
   testWidgets('.ayah still matches spans that carry extra attributes', (

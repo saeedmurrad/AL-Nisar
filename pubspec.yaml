@@ -110,6 +110,8 @@ flutter:
     - assets/tafseer/nahl/rukus/
     - assets/tafseer/bani-israel/surah.json
     - assets/tafseer/bani-israel/rukus/
+    - assets/tafseer/kahf/surah.json
+    - assets/tafseer/kahf/rukus/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

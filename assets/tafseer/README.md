@@ -19,6 +19,7 @@ Currently bundled, in surah order:
 | 15 | `hijr` | سورۂ الحجر | 6 |
 | 16 | `nahl` | سورۂ النحل | 16 |
 | 17 | `bani-israel` | سورۂ بنی اسرائیل | 12 |
+| 18 | `kahf` | سورۂ الکہف | 12 |
 
 ## Adding a surah
 
@@ -48,6 +49,21 @@ would show up literally on screen. Surah Bani Israel wraps some ayah blocks in
 Body HTML is rendered by `lib/widgets/tafseer_html.dart`. Keep the inline
 `<span class="ayah">` (Quranic fragments, saffron Amiri) and `<span class="hl">`
 (highlighted phrases, lapis) markup — those class selectors drive the styling.
+
+## Search
+
+`lib/services/tafseer_search_service.dart` indexes every bundled surah on the
+first query — ayah blocks, inline ayah fragments, prose paragraphs, glossary
+entries and ruku titles — and the Tafseer screen searches across all of them.
+
+Matching runs on folded text (`lib/utils/arabic_search_text.dart`): diacritics
+and tatweel are stripped, alef/yeh/kaf/heh variants are folded together, and
+Urdu and Arabic digits map to Western, so `نحن نقص` finds `نَحْنُ نَقُصُّ`.
+Do-chashmi heh is deliberately *not* folded — doing so would make بھائی match
+بہائی. The fold records an index map back to the original text, which is what
+lets a hit be highlighted in the right place.
+
+Adding a surah needs no search work: the index is built from `index.json`.
 
 ## Print edition
 
