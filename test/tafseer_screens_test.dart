@@ -134,6 +134,8 @@ void main() {
       ('سورۂ النحل', '۱۶'),
       ('سورۂ بنی اسرائیل', '۱۷'),
       ('سورۂ الکہف', '۱۸'),
+      ('سورۂ مریم', '۱۹'),
+      ('سورۂ طٰہٰ', '۲۰'),
     ]) {
       expect(find.text(name), findsOneWidget, reason: name);
       expect(find.text(badge), findsOneWidget, reason: badge);
@@ -143,8 +145,9 @@ void main() {
     expect(find.text('12 rukus · Urdu'), findsNWidgets(3));
     expect(find.text('16 rukus · Urdu'), findsOneWidget);
     expect(find.text('7 rukus · Urdu'), findsOneWidget);
-    // Ar-Ra'd and Al-Hijr both have six.
-    expect(find.text('6 rukus · Urdu'), findsNWidgets(2));
+    expect(find.text('8 rukus · Urdu'), findsOneWidget);
+    // Ar-Ra'd, Al-Hijr and Maryam all have six.
+    expect(find.text('6 rukus · Urdu'), findsNWidgets(3));
   });
 
   testWidgets('each surah screen renders its own contents', (tester) async {
@@ -165,6 +168,8 @@ void main() {
         '۱۳',
       ),
       ('kahf', 'عبد کی کتاب اور غارِ دل', 'کلماتِ رب اور لقاء', '۱۲', '۱۳'),
+      ('maryam', 'ذکرِ رحمت اور بشارتِ یحییٰ', 'عبدیتِ کُل، وُدِّ رحمٰن', '۶', '۷'),
+      ('taha', 'وادیِ طویٰ کی آگ', 'تسبیح، صبر اور رضا', '۸', '۹'),
     ]) {
       await _pump(tester, TafseerSurahScreen(surahId: id, service: _service));
 

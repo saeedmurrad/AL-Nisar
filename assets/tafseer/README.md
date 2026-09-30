@@ -20,6 +20,8 @@ Currently bundled, in surah order:
 | 16 | `nahl` | سورۂ النحل | 16 |
 | 17 | `bani-israel` | سورۂ بنی اسرائیل | 12 |
 | 18 | `kahf` | سورۂ الکہف | 12 |
+| 19 | `maryam` | سورۂ مریم | 6 |
+| 20 | `taha` | سورۂ طٰہٰ | 8 |
 
 ## Adding a surah
 

@@ -61,5 +61,23 @@
     "subtitleUrdu": "اشاری تفسیر · ۱۲ رکوع",
     "rukuCount": 12,
     "isAvailable": true
+  },
+  {
+    "id": "maryam",
+    "surahNumber": 19,
+    "nameUrdu": "سورۂ مریم",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۶ رکوع",
+    "rukuCount": 6,
+    "isAvailable": true
+  },
+  {
+    "id": "taha",
+    "surahNumber": 20,
+    "nameUrdu": "سورۂ طٰہٰ",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۸ رکوع",
+    "rukuCount": 8,
+    "isAvailable": true
   }
 ]
