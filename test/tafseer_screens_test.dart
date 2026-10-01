@@ -138,6 +138,8 @@ void main() {
       ('سورۂ طٰہٰ', '۲۰'),
       ('سورۂ الانبیاء', '۲۱'),
       ('سورۂ الحج', '۲۲'),
+      ('سورۂ المؤمنون', '۲۳'),
+      ('سورۂ النور', '۲۴'),
     ]) {
       expect(find.text(name), findsOneWidget, reason: name);
       expect(find.text(badge), findsOneWidget, reason: badge);
@@ -150,8 +152,9 @@ void main() {
     expect(find.text('7 rukus · Urdu'), findsNWidgets(2));
     expect(find.text('10 rukus · Urdu'), findsOneWidget);
     expect(find.text('8 rukus · Urdu'), findsOneWidget);
-    // Ar-Ra'd, Al-Hijr and Maryam all have six.
-    expect(find.text('6 rukus · Urdu'), findsNWidgets(3));
+    expect(find.text('9 rukus · Urdu'), findsOneWidget);
+    // Ar-Ra'd, Al-Hijr, Maryam and Al-Mu'minun all have six.
+    expect(find.text('6 rukus · Urdu'), findsNWidgets(4));
   });
 
   testWidgets('each surah screen renders its own contents', (tester) async {
@@ -176,6 +179,14 @@ void main() {
       ('taha', 'وادیِ طویٰ کی آگ', 'تسبیح، صبر اور رضا', '۸', '۹'),
       ('anbiya', 'تمہارے ذکر والی کتاب', 'تمام جہانوں کے لیے رحمت', '۷', '۸'),
       ('hajj', 'زلزلۂ ساعت اور خلقِ جدید', 'مکھی کی مثال اور حقِ جہاد', '۱۰', '۱۱'),
+      (
+        'muminun',
+        'فلاح کی منزلیں اور خلقِ آخر',
+        'برزخ سے خیر الراحمین تک',
+        '۶',
+        '۷',
+      ),
+      ('nur', 'نور کی چار دیواری', 'ادبِ رسالت اور علمِ محیط', '۹', '۱۰'),
     ]) {
       await _pump(tester, TafseerSurahScreen(surahId: id, service: _service));
 

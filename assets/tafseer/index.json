@@ -97,5 +97,23 @@
     "subtitleUrdu": "اشاری تفسیر · ۱۰ رکوع",
     "rukuCount": 10,
     "isAvailable": true
+  },
+  {
+    "id": "muminun",
+    "surahNumber": 23,
+    "nameUrdu": "سورۂ المؤمنون",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۶ رکوع",
+    "rukuCount": 6,
+    "isAvailable": true
+  },
+  {
+    "id": "nur",
+    "surahNumber": 24,
+    "nameUrdu": "سورۂ النور",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۹ رکوع",
+    "rukuCount": 9,
+    "isAvailable": true
   }
 ]

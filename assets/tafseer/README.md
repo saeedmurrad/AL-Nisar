@@ -24,6 +24,8 @@ Currently bundled, in surah order:
 | 20 | `taha` | سورۂ طٰہٰ | 8 |
 | 21 | `anbiya` | سورۂ الانبیاء | 7 |
 | 22 | `hajj` | سورۂ الحج | 10 |
+| 23 | `muminun` | سورۂ المؤمنون | 6 |
+| 24 | `nur` | سورۂ النور | 9 |
 
 ## Adding a surah
 
