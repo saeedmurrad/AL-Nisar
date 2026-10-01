@@ -22,6 +22,8 @@ Currently bundled, in surah order:
 | 18 | `kahf` | سورۂ الکہف | 12 |
 | 19 | `maryam` | سورۂ مریم | 6 |
 | 20 | `taha` | سورۂ طٰہٰ | 8 |
+| 21 | `anbiya` | سورۂ الانبیاء | 7 |
+| 22 | `hajj` | سورۂ الحج | 10 |
 
 ## Adding a surah
 

@@ -26,9 +26,11 @@ void main() {
       'kahf',
       'maryam',
       'taha',
+      'anbiya',
+      'hajj',
     ]);
     expect(index.map((s) => s.surahNumber).toList(),
-        [12, 13, 14, 15, 16, 17, 18, 19, 20]);
+        [12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22]);
 
     final yusuf = index.firstWhere((s) => s.id == 'yusuf');
     expect(yusuf.surahNumber, 12);
@@ -101,6 +103,20 @@ void main() {
       rukus: 8,
       first: 'وادیِ طویٰ کی آگ',
       last: 'تسبیح، صبر اور رضا',
+    ),
+    'anbiya': (
+      number: 21,
+      name: 'سورۂ الانبیاء',
+      rukus: 7,
+      first: 'تمہارے ذکر والی کتاب',
+      last: 'تمام جہانوں کے لیے رحمت',
+    ),
+    'hajj': (
+      number: 22,
+      name: 'سورۂ الحج',
+      rukus: 10,
+      first: 'زلزلۂ ساعت اور خلقِ جدید',
+      last: 'مکھی کی مثال اور حقِ جہاد',
     ),
   };
 

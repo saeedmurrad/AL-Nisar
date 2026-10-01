@@ -79,5 +79,23 @@
     "subtitleUrdu": "اشاری تفسیر · ۸ رکوع",
     "rukuCount": 8,
     "isAvailable": true
+  },
+  {
+    "id": "anbiya",
+    "surahNumber": 21,
+    "nameUrdu": "سورۂ الانبیاء",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۷ رکوع",
+    "rukuCount": 7,
+    "isAvailable": true
+  },
+  {
+    "id": "hajj",
+    "surahNumber": 22,
+    "nameUrdu": "سورۂ الحج",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۱۰ رکوع",
+    "rukuCount": 10,
+    "isAvailable": true
   }
 ]

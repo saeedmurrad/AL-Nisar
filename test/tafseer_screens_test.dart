@@ -136,6 +136,8 @@ void main() {
       ('سورۂ الکہف', '۱۸'),
       ('سورۂ مریم', '۱۹'),
       ('سورۂ طٰہٰ', '۲۰'),
+      ('سورۂ الانبیاء', '۲۱'),
+      ('سورۂ الحج', '۲۲'),
     ]) {
       expect(find.text(name), findsOneWidget, reason: name);
       expect(find.text(badge), findsOneWidget, reason: badge);
@@ -144,7 +146,9 @@ void main() {
     // Yusuf, Bani Israel and Al-Kahf all have twelve.
     expect(find.text('12 rukus · Urdu'), findsNWidgets(3));
     expect(find.text('16 rukus · Urdu'), findsOneWidget);
-    expect(find.text('7 rukus · Urdu'), findsOneWidget);
+    // Ibrahim and Al-Anbiya both have seven.
+    expect(find.text('7 rukus · Urdu'), findsNWidgets(2));
+    expect(find.text('10 rukus · Urdu'), findsOneWidget);
     expect(find.text('8 rukus · Urdu'), findsOneWidget);
     // Ar-Ra'd, Al-Hijr and Maryam all have six.
     expect(find.text('6 rukus · Urdu'), findsNWidgets(3));
@@ -170,6 +174,8 @@ void main() {
       ('kahf', 'عبد کی کتاب اور غارِ دل', 'کلماتِ رب اور لقاء', '۱۲', '۱۳'),
       ('maryam', 'ذکرِ رحمت اور بشارتِ یحییٰ', 'عبدیتِ کُل، وُدِّ رحمٰن', '۶', '۷'),
       ('taha', 'وادیِ طویٰ کی آگ', 'تسبیح، صبر اور رضا', '۸', '۹'),
+      ('anbiya', 'تمہارے ذکر والی کتاب', 'تمام جہانوں کے لیے رحمت', '۷', '۸'),
+      ('hajj', 'زلزلۂ ساعت اور خلقِ جدید', 'مکھی کی مثال اور حقِ جہاد', '۱۰', '۱۱'),
     ]) {
       await _pump(tester, TafseerSurahScreen(surahId: id, service: _service));
 
