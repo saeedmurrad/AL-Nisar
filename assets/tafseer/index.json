@@ -241,5 +241,95 @@
     "subtitleUrdu": "اشاری تفسیر · ۵ رکوع",
     "rukuCount": 5,
     "isAvailable": true
+  },
+  {
+    "id": "zumar",
+    "surahNumber": 39,
+    "nameUrdu": "سورۂ الزمر",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۸ رکوع",
+    "rukuCount": 8,
+    "isAvailable": true
+  },
+  {
+    "id": "ghafir",
+    "surahNumber": 40,
+    "nameUrdu": "سورۂ غافر (المؤمن)",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۹ رکوع",
+    "rukuCount": 9,
+    "isAvailable": true
+  },
+  {
+    "id": "fussilat",
+    "surahNumber": 41,
+    "nameUrdu": "سورۂ حٰمٓ السجدہ (فصلت)",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۶ رکوع",
+    "rukuCount": 6,
+    "isAvailable": true
+  },
+  {
+    "id": "shura",
+    "surahNumber": 42,
+    "nameUrdu": "سورۂ الشوریٰ",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۵ رکوع",
+    "rukuCount": 5,
+    "isAvailable": true
+  },
+  {
+    "id": "zukhruf",
+    "surahNumber": 43,
+    "nameUrdu": "سورۂ الزخرف",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۷ رکوع",
+    "rukuCount": 7,
+    "isAvailable": true
+  },
+  {
+    "id": "dukhan",
+    "surahNumber": 44,
+    "nameUrdu": "سورۂ الدخان",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۳ رکوع",
+    "rukuCount": 3,
+    "isAvailable": true
+  },
+  {
+    "id": "jathiya",
+    "surahNumber": 45,
+    "nameUrdu": "سورۂ الجاثیہ",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۴ رکوع",
+    "rukuCount": 4,
+    "isAvailable": true
+  },
+  {
+    "id": "ahqaf",
+    "surahNumber": 46,
+    "nameUrdu": "سورۂ الاحقاف",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۴ رکوع",
+    "rukuCount": 4,
+    "isAvailable": true
+  },
+  {
+    "id": "muhammad",
+    "surahNumber": 47,
+    "nameUrdu": "سورۂ محمد",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۴ رکوع",
+    "rukuCount": 4,
+    "isAvailable": true
+  },
+  {
+    "id": "fath",
+    "surahNumber": 48,
+    "nameUrdu": "سورۂ الفتح",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۴ رکوع",
+    "rukuCount": 4,
+    "isAvailable": true
   }
 ]

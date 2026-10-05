@@ -117,7 +117,7 @@ void main() {
   setUpAll(() => GoogleFonts.config.allowRuntimeFetching = false);
 
   testWidgets('index screen lists every bundled surah', (tester) async {
-    tester.view.physicalSize = const Size(900, 7200);
+    tester.view.physicalSize = const Size(900, 9800);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
 
@@ -154,27 +154,41 @@ void main() {
       ('سورۂ یٰسٓ', '۳۶'),
       ('سورۂ الصّٰفّٰت', '۳۷'),
       ('سورۂ صٓ', '۳۸'),
+      ('سورۂ الزمر', '۳۹'),
+      ('سورۂ غافر (المؤمن)', '۴۰'),
+      ('سورۂ حٰمٓ السجدہ (فصلت)', '۴۱'),
+      ('سورۂ الشوریٰ', '۴۲'),
+      ('سورۂ الزخرف', '۴۳'),
+      ('سورۂ الدخان', '۴۴'),
+      ('سورۂ الجاثیہ', '۴۵'),
+      ('سورۂ الاحقاف', '۴۶'),
+      ('سورۂ محمد', '۴۷'),
+      ('سورۂ الفتح', '۴۸'),
     ]) {
       expect(find.text(name), findsOneWidget, reason: name);
       expect(find.text(badge), findsOneWidget, reason: badge);
     }
 
+    expect(find.text('16 rukus · Urdu'), findsOneWidget);
     // Yusuf, Bani Israel and Al-Kahf all have twelve.
     expect(find.text('12 rukus · Urdu'), findsNWidgets(3));
-    expect(find.text('16 rukus · Urdu'), findsOneWidget);
-    // Ibrahim, Al-Anbiya, An-Naml and Al-Ankabut all have seven.
-    expect(find.text('7 rukus · Urdu'), findsNWidgets(4));
-    expect(find.text('10 rukus · Urdu'), findsOneWidget);
     expect(find.text('11 rukus · Urdu'), findsOneWidget);
-    expect(find.text('8 rukus · Urdu'), findsOneWidget);
-    expect(find.text('4 rukus · Urdu'), findsOneWidget);
-    expect(find.text('3 rukus · Urdu'), findsOneWidget);
-    // An-Nur, Al-Qasas and Al-Ahzab all have nine.
-    expect(find.text('9 rukus · Urdu'), findsNWidgets(3));
-    // Fatir, Ya-Sin, As-Saffat and Sad all have five.
-    expect(find.text('5 rukus · Urdu'), findsNWidgets(4));
-    // Ar-Ra'd, Al-Hijr, Maryam, Al-Mu'minun, Al-Furqan, Ar-Rum and Saba.
-    expect(find.text('6 rukus · Urdu'), findsNWidgets(7));
+    expect(find.text('10 rukus · Urdu'), findsOneWidget);
+    // An-Nur, Al-Qasas, Al-Ahzab and Ghafir all have nine.
+    expect(find.text('9 rukus · Urdu'), findsNWidgets(4));
+    // Ta-Ha and Az-Zumar.
+    expect(find.text('8 rukus · Urdu'), findsNWidgets(2));
+    // Ibrahim, Al-Anbiya, An-Naml, Al-Ankabut and Az-Zukhruf.
+    expect(find.text('7 rukus · Urdu'), findsNWidgets(5));
+    // Ar-Ra'd, Al-Hijr, Maryam, Al-Mu'minun, Al-Furqan, Ar-Rum, Saba and
+    // Fussilat.
+    expect(find.text('6 rukus · Urdu'), findsNWidgets(8));
+    // Fatir, Ya-Sin, As-Saffat, Sad and Ash-Shura.
+    expect(find.text('5 rukus · Urdu'), findsNWidgets(5));
+    // Luqman, Al-Jathiya, Al-Ahqaf, Muhammad and Al-Fath.
+    expect(find.text('4 rukus · Urdu'), findsNWidgets(5));
+    // As-Sajdah and Ad-Dukhan.
+    expect(find.text('3 rukus · Urdu'), findsNWidgets(2));
   });
 
   testWidgets('each surah screen renders its own contents', (tester) async {
@@ -239,6 +253,28 @@ void main() {
       ('yasin', 'قرآنِ حکیم اور امامِ مبین', 'عدم میں کُن کی سماعت', '۵', '۶'),
       ('saffat', 'صفیں اور معبودِ واحد', 'ہر ایک کا مقامِ معلوم', '۵', '۶'),
       ('sad', 'یاد دہانی والا قرآن', 'دونوں ہاتھوں کی تخلیق', '۵', '۶'),
+      ('zumar', 'خالص دین اللہ کا ہے', 'کھلے دروازے اور آخری حمد', '۸', '۹'),
+      ('ghafir', 'رحمت اور علم کی وسعت', 'اپنے علم کا پردہ', '۹', '۱۰'),
+      (
+        'fussilat',
+        'رحمٰن کی کھولی ہوئی کتاب',
+        'آفاق و انفس کی نشانیاں',
+        '۶',
+        '۷',
+      ),
+      ('shura', 'ایک وحی، ایک ولی', 'کلامِ الٰہی کے تین راستے', '۵', '۶'),
+      ('zukhruf', 'امّ الکتاب اور سواری', 'اے میرے بندو سے سلام تک', '۷', '۸'),
+      (
+        'dukhan',
+        'بابرکت رات اور خاموش آسمان',
+        'زقوم اور امن کا مقام',
+        '۳',
+        '۴',
+      ),
+      ('jathiya', 'ایمان، یقین اور عقل', 'گھٹنوں کے بل امتیں', '۴', '۵'),
+      ('ahqaf', 'عبدیتِ کاملہ کا اعلان', 'خاموشی، سماع کا دروازہ', '۴', '۵'),
+      ('muhammad', 'جن کا حال سنوار دیا گیا', 'اللہ غنی، تم فقیر', '۴', '۵'),
+      ('fath', 'فتحِ مبین اور سکینہ', 'سچا خواب اور اصحاب کی تصویر', '۴', '۵'),
     ]) {
       await _pump(tester, TafseerSurahScreen(surahId: id, service: _service));
 
