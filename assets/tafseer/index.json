@@ -151,5 +151,95 @@
     "subtitleUrdu": "اشاری تفسیر · ۹ رکوع",
     "rukuCount": 9,
     "isAvailable": true
+  },
+  {
+    "id": "ankabut",
+    "surahNumber": 29,
+    "nameUrdu": "سورۂ العنکبوت",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۷ رکوع",
+    "rukuCount": 7,
+    "isAvailable": true
+  },
+  {
+    "id": "rum",
+    "surahNumber": 30,
+    "nameUrdu": "سورۂ الروم",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۶ رکوع",
+    "rukuCount": 6,
+    "isAvailable": true
+  },
+  {
+    "id": "luqman",
+    "surahNumber": 31,
+    "nameUrdu": "سورۂ لقمان",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۴ رکوع",
+    "rukuCount": 4,
+    "isAvailable": true
+  },
+  {
+    "id": "sajdah",
+    "surahNumber": 32,
+    "nameUrdu": "سورۂ السجدہ",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۳ رکوع",
+    "rukuCount": 3,
+    "isAvailable": true
+  },
+  {
+    "id": "ahzab",
+    "surahNumber": 33,
+    "nameUrdu": "سورۂ الاحزاب",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۹ رکوع",
+    "rukuCount": 9,
+    "isAvailable": true
+  },
+  {
+    "id": "saba",
+    "surahNumber": 34,
+    "nameUrdu": "سورۂ سبا",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۶ رکوع",
+    "rukuCount": 6,
+    "isAvailable": true
+  },
+  {
+    "id": "fatir",
+    "surahNumber": 35,
+    "nameUrdu": "سورۂ فاطر",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۵ رکوع",
+    "rukuCount": 5,
+    "isAvailable": true
+  },
+  {
+    "id": "yasin",
+    "surahNumber": 36,
+    "nameUrdu": "سورۂ یٰسٓ",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۵ رکوع",
+    "rukuCount": 5,
+    "isAvailable": true
+  },
+  {
+    "id": "saffat",
+    "surahNumber": 37,
+    "nameUrdu": "سورۂ الصّٰفّٰت",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۵ رکوع",
+    "rukuCount": 5,
+    "isAvailable": true
+  },
+  {
+    "id": "sad",
+    "surahNumber": 38,
+    "nameUrdu": "سورۂ صٓ",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۵ رکوع",
+    "rukuCount": 5,
+    "isAvailable": true
   }
 ]

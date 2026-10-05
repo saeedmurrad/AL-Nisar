@@ -117,7 +117,7 @@ void main() {
   setUpAll(() => GoogleFonts.config.allowRuntimeFetching = false);
 
   testWidgets('index screen lists every bundled surah', (tester) async {
-    tester.view.physicalSize = const Size(900, 5000);
+    tester.view.physicalSize = const Size(900, 7200);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
 
@@ -144,6 +144,16 @@ void main() {
       ('سورۂ الشعراء', '۲۶'),
       ('سورۂ النمل', '۲۷'),
       ('سورۂ القصص', '۲۸'),
+      ('سورۂ العنکبوت', '۲۹'),
+      ('سورۂ الروم', '۳۰'),
+      ('سورۂ لقمان', '۳۱'),
+      ('سورۂ السجدہ', '۳۲'),
+      ('سورۂ الاحزاب', '۳۳'),
+      ('سورۂ سبا', '۳۴'),
+      ('سورۂ فاطر', '۳۵'),
+      ('سورۂ یٰسٓ', '۳۶'),
+      ('سورۂ الصّٰفّٰت', '۳۷'),
+      ('سورۂ صٓ', '۳۸'),
     ]) {
       expect(find.text(name), findsOneWidget, reason: name);
       expect(find.text(badge), findsOneWidget, reason: badge);
@@ -152,15 +162,19 @@ void main() {
     // Yusuf, Bani Israel and Al-Kahf all have twelve.
     expect(find.text('12 rukus · Urdu'), findsNWidgets(3));
     expect(find.text('16 rukus · Urdu'), findsOneWidget);
-    // Ibrahim, Al-Anbiya and An-Naml all have seven.
-    expect(find.text('7 rukus · Urdu'), findsNWidgets(3));
+    // Ibrahim, Al-Anbiya, An-Naml and Al-Ankabut all have seven.
+    expect(find.text('7 rukus · Urdu'), findsNWidgets(4));
     expect(find.text('10 rukus · Urdu'), findsOneWidget);
     expect(find.text('11 rukus · Urdu'), findsOneWidget);
     expect(find.text('8 rukus · Urdu'), findsOneWidget);
-    // An-Nur and Al-Qasas both have nine.
-    expect(find.text('9 rukus · Urdu'), findsNWidgets(2));
-    // Ar-Ra'd, Al-Hijr, Maryam, Al-Mu'minun and Al-Furqan all have six.
-    expect(find.text('6 rukus · Urdu'), findsNWidgets(5));
+    expect(find.text('4 rukus · Urdu'), findsOneWidget);
+    expect(find.text('3 rukus · Urdu'), findsOneWidget);
+    // An-Nur, Al-Qasas and Al-Ahzab all have nine.
+    expect(find.text('9 rukus · Urdu'), findsNWidgets(3));
+    // Fatir, Ya-Sin, As-Saffat and Sad all have five.
+    expect(find.text('5 rukus · Urdu'), findsNWidgets(4));
+    // Ar-Ra'd, Al-Hijr, Maryam, Al-Mu'minun, Al-Furqan, Ar-Rum and Saba.
+    expect(find.text('6 rukus · Urdu'), findsNWidgets(7));
   });
 
   testWidgets('each surah screen renders its own contents', (tester) async {
@@ -181,10 +195,22 @@ void main() {
         '۱۳',
       ),
       ('kahf', 'عبد کی کتاب اور غارِ دل', 'کلماتِ رب اور لقاء', '۱۲', '۱۳'),
-      ('maryam', 'ذکرِ رحمت اور بشارتِ یحییٰ', 'عبدیتِ کُل، وُدِّ رحمٰن', '۶', '۷'),
+      (
+        'maryam',
+        'ذکرِ رحمت اور بشارتِ یحییٰ',
+        'عبدیتِ کُل، وُدِّ رحمٰن',
+        '۶',
+        '۷',
+      ),
       ('taha', 'وادیِ طویٰ کی آگ', 'تسبیح، صبر اور رضا', '۸', '۹'),
       ('anbiya', 'تمہارے ذکر والی کتاب', 'تمام جہانوں کے لیے رحمت', '۷', '۸'),
-      ('hajj', 'زلزلۂ ساعت اور خلقِ جدید', 'مکھی کی مثال اور حقِ جہاد', '۱۰', '۱۱'),
+      (
+        'hajj',
+        'زلزلۂ ساعت اور خلقِ جدید',
+        'مکھی کی مثال اور حقِ جہاد',
+        '۱۰',
+        '۱۱',
+      ),
       (
         'muminun',
         'فلاح کی منزلیں اور خلقِ آخر',
@@ -203,6 +229,16 @@ void main() {
       ),
       ('naml', 'آگ کی صورت میں تجلی', 'بادل کی طرح گزرتے پہاڑ', '۷', '۸'),
       ('qasas', 'دریا کی گود میں امان', 'ہر شے فانی، وجہ باقی', '۹', '۱۰'),
+      ('ankabut', 'آزمائش کی بھٹی', 'ہم میں کوشش، ہماری راہیں', '۷', '۸'),
+      ('rum', 'ظاہرِ دنیا اور غفلتِ آخرت', 'ضعف سے ضعف تک', '۶', '۷'),
+      ('luqman', 'کتابِ حکیم اور اہلِ احسان', 'غیب کی پانچ کنجیاں', '۴', '۵'),
+      ('sajdah', 'مٹی، تدبیر اور نفخِ روح', 'صبر، یقین اور فتح', '۳', '۴'),
+      ('ahzab', 'ایک دل، ایک محبوب', 'امانت کا بارِ عظیم', '۹', '۱۰'),
+      ('saba', 'دونوں جہانوں کی حمد', 'مثنیٰ و فرادیٰ کی نصیحت', '۶', '۷'),
+      ('fatir', 'رحمت کی فتح', 'تھاما ہوا وجود', '۵', '۶'),
+      ('yasin', 'قرآنِ حکیم اور امامِ مبین', 'عدم میں کُن کی سماعت', '۵', '۶'),
+      ('saffat', 'صفیں اور معبودِ واحد', 'ہر ایک کا مقامِ معلوم', '۵', '۶'),
+      ('sad', 'یاد دہانی والا قرآن', 'دونوں ہاتھوں کی تخلیق', '۵', '۶'),
     ]) {
       await _pump(tester, TafseerSurahScreen(surahId: id, service: _service));
 
@@ -299,7 +335,9 @@ void main() {
         return true;
       });
     }
-    final ayah = spans.firstWhere((s) => (s.text ?? '').contains('نَحْنُ نَقُصُّ'));
+    final ayah = spans.firstWhere(
+      (s) => (s.text ?? '').contains('نَحْنُ نَقُصُّ'),
+    );
     expect(ayah.style?.color, kTafseerDarkColors.accentGold);
   });
 
@@ -310,7 +348,10 @@ void main() {
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
 
-    await _pump(tester, TafseerSurahScreen(surahId: 'yusuf', service: _service));
+    await _pump(
+      tester,
+      TafseerSurahScreen(surahId: 'yusuf', service: _service),
+    );
 
     expect(find.text('تفسیرِ ابنِ عربی'), findsOneWidget);
     expect(find.textContaining('بِسْمِ'), findsWidgets);
@@ -335,7 +376,10 @@ void main() {
   testWidgets('surah screen shows a branded state for an unknown surah', (
     tester,
   ) async {
-    await _pump(tester, TafseerSurahScreen(surahId: 'baqarah', service: _service));
+    await _pump(
+      tester,
+      TafseerSurahScreen(surahId: 'baqarah', service: _service),
+    );
     expect(find.text('Tafseer not found'), findsOneWidget);
   });
 
