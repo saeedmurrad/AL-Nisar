@@ -26,6 +26,10 @@ Currently bundled, in surah order:
 | 22 | `hajj` | سورۂ الحج | 10 |
 | 23 | `muminun` | سورۂ المؤمنون | 6 |
 | 24 | `nur` | سورۂ النور | 9 |
+| 25 | `furqan` | سورۂ الفرقان | 6 |
+| 26 | `shuara` | سورۂ الشعراء | 11 |
+| 27 | `naml` | سورۂ النمل | 7 |
+| 28 | `qasas` | سورۂ القصص | 9 |
 
 ## Adding a surah
 

@@ -30,9 +30,13 @@ void main() {
       'hajj',
       'muminun',
       'nur',
+      'furqan',
+      'shuara',
+      'naml',
+      'qasas',
     ]);
     expect(index.map((s) => s.surahNumber).toList(),
-        [12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]);
+        [12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28]);
 
     final yusuf = index.firstWhere((s) => s.id == 'yusuf');
     expect(yusuf.surahNumber, 12);
@@ -133,6 +137,34 @@ void main() {
       rukus: 9,
       first: 'نور کی چار دیواری',
       last: 'ادبِ رسالت اور علمِ محیط',
+    ),
+    'furqan': (
+      number: 25,
+      name: 'سورۂ الفرقان',
+      rukus: 6,
+      first: 'بندے پر اترا فرقان',
+      last: 'رحمٰن کے بندوں کا سراپا',
+    ),
+    'shuara': (
+      number: 26,
+      name: 'سورۂ الشعراء',
+      rukus: 11,
+      first: 'نشانی اور اختیار کی عزت',
+      last: 'قلب پر نزول اور اہلِ ذکر',
+    ),
+    'naml': (
+      number: 27,
+      name: 'سورۂ النمل',
+      rukus: 7,
+      first: 'آگ کی صورت میں تجلی',
+      last: 'بادل کی طرح گزرتے پہاڑ',
+    ),
+    'qasas': (
+      number: 28,
+      name: 'سورۂ القصص',
+      rukus: 9,
+      first: 'دریا کی گود میں امان',
+      last: 'ہر شے فانی، وجہ باقی',
     ),
   };
 

@@ -117,7 +117,7 @@ void main() {
   setUpAll(() => GoogleFonts.config.allowRuntimeFetching = false);
 
   testWidgets('index screen lists every bundled surah', (tester) async {
-    tester.view.physicalSize = const Size(900, 3800);
+    tester.view.physicalSize = const Size(900, 5000);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
 
@@ -140,6 +140,10 @@ void main() {
       ('سورۂ الحج', '۲۲'),
       ('سورۂ المؤمنون', '۲۳'),
       ('سورۂ النور', '۲۴'),
+      ('سورۂ الفرقان', '۲۵'),
+      ('سورۂ الشعراء', '۲۶'),
+      ('سورۂ النمل', '۲۷'),
+      ('سورۂ القصص', '۲۸'),
     ]) {
       expect(find.text(name), findsOneWidget, reason: name);
       expect(find.text(badge), findsOneWidget, reason: badge);
@@ -148,13 +152,15 @@ void main() {
     // Yusuf, Bani Israel and Al-Kahf all have twelve.
     expect(find.text('12 rukus · Urdu'), findsNWidgets(3));
     expect(find.text('16 rukus · Urdu'), findsOneWidget);
-    // Ibrahim and Al-Anbiya both have seven.
-    expect(find.text('7 rukus · Urdu'), findsNWidgets(2));
+    // Ibrahim, Al-Anbiya and An-Naml all have seven.
+    expect(find.text('7 rukus · Urdu'), findsNWidgets(3));
     expect(find.text('10 rukus · Urdu'), findsOneWidget);
+    expect(find.text('11 rukus · Urdu'), findsOneWidget);
     expect(find.text('8 rukus · Urdu'), findsOneWidget);
-    expect(find.text('9 rukus · Urdu'), findsOneWidget);
-    // Ar-Ra'd, Al-Hijr, Maryam and Al-Mu'minun all have six.
-    expect(find.text('6 rukus · Urdu'), findsNWidgets(4));
+    // An-Nur and Al-Qasas both have nine.
+    expect(find.text('9 rukus · Urdu'), findsNWidgets(2));
+    // Ar-Ra'd, Al-Hijr, Maryam, Al-Mu'minun and Al-Furqan all have six.
+    expect(find.text('6 rukus · Urdu'), findsNWidgets(5));
   });
 
   testWidgets('each surah screen renders its own contents', (tester) async {
@@ -187,6 +193,16 @@ void main() {
         '۷',
       ),
       ('nur', 'نور کی چار دیواری', 'ادبِ رسالت اور علمِ محیط', '۹', '۱۰'),
+      ('furqan', 'بندے پر اترا فرقان', 'رحمٰن کے بندوں کا سراپا', '۶', '۷'),
+      (
+        'shuara',
+        'نشانی اور اختیار کی عزت',
+        'قلب پر نزول اور اہلِ ذکر',
+        '۱۱',
+        '۱۲',
+      ),
+      ('naml', 'آگ کی صورت میں تجلی', 'بادل کی طرح گزرتے پہاڑ', '۷', '۸'),
+      ('qasas', 'دریا کی گود میں امان', 'ہر شے فانی، وجہ باقی', '۹', '۱۰'),
     ]) {
       await _pump(tester, TafseerSurahScreen(surahId: id, service: _service));
 

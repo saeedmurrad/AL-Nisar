@@ -115,5 +115,41 @@
     "subtitleUrdu": "اشاری تفسیر · ۹ رکوع",
     "rukuCount": 9,
     "isAvailable": true
+  },
+  {
+    "id": "furqan",
+    "surahNumber": 25,
+    "nameUrdu": "سورۂ الفرقان",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۶ رکوع",
+    "rukuCount": 6,
+    "isAvailable": true
+  },
+  {
+    "id": "shuara",
+    "surahNumber": 26,
+    "nameUrdu": "سورۂ الشعراء",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۱۱ رکوع",
+    "rukuCount": 11,
+    "isAvailable": true
+  },
+  {
+    "id": "naml",
+    "surahNumber": 27,
+    "nameUrdu": "سورۂ النمل",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۷ رکوع",
+    "rukuCount": 7,
+    "isAvailable": true
+  },
+  {
+    "id": "qasas",
+    "surahNumber": 28,
+    "nameUrdu": "سورۂ القصص",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۹ رکوع",
+    "rukuCount": 9,
+    "isAvailable": true
   }
 ]
