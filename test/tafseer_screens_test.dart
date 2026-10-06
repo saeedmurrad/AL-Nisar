@@ -15,6 +15,7 @@ import 'package:spiritual_learning_app/widgets/tafseer_search_result_card.dart';
 import 'package:spiritual_learning_app/screens/tafseer_ruku_screen.dart';
 import 'package:spiritual_learning_app/screens/tafseer_surah_screen.dart';
 import 'package:spiritual_learning_app/services/tafseer_bundled_service.dart';
+import 'package:spiritual_learning_app/widgets/tafseer_print_button.dart';
 import 'package:spiritual_learning_app/theme/app_theme_colors.dart';
 import 'package:spiritual_learning_app/theme/tafseer_theme.dart';
 
@@ -660,5 +661,76 @@ void main() {
       TafseerRukuScreen(surahId: 'yusuf', rukuNumber: 99, service: _service),
     );
     expect(find.text('Ruku not found'), findsOneWidget);
+  });
+
+  testWidgets('every member gets the print button, not just super admins', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(900, 4000);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
+    await _pump(
+      tester,
+      TafseerSurahScreen(
+        surahId: 'dukhan',
+        service: _service,
+        canPrint: true,
+        printDocument: (_) async {},
+      ),
+      // A plain member: the copy action is super-admin only, printing is not.
+      superAdmin: false,
+    );
+
+    expect(find.byType(TafseerPrintButton), findsOneWidget);
+    expect(find.byIcon(Icons.print_outlined), findsOneWidget);
+  });
+
+  testWidgets('the print button is hidden where printing is unsupported', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(900, 4000);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
+    await _pump(
+      tester,
+      TafseerSurahScreen(surahId: 'dukhan', service: _service, canPrint: false),
+    );
+
+    expect(find.byType(TafseerPrintButton), findsNothing);
+  });
+
+  testWidgets('printing hands over the whole surah, every ruku included', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(900, 4000);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
+    String? printed;
+    await _pump(
+      tester,
+      TafseerSurahScreen(
+        surahId: 'dukhan',
+        service: _service,
+        canPrint: true,
+        printDocument: (html) async => printed = html,
+      ),
+    );
+
+    await tester.tap(find.byIcon(Icons.print_outlined));
+    for (var i = 0; i < 6; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+
+    expect(printed, isNotNull);
+    // All three rukus, each with its title and its body prose.
+    expect('<section class="ruku">'.allMatches(printed!).length, 3);
+    expect(printed, contains('بابرکت رات اور خاموش آسمان'));
+    expect(printed, contains('زقوم اور امن کا مقام'));
+    expect(printed, contains('class="ayah"'));
+    // Black ink: the reading theme's saffron must not reach the page.
+    expect(printed!.toUpperCase(), isNot(contains('#B07A12')));
   });
 }

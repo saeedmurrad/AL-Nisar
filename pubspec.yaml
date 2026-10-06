@@ -59,6 +59,8 @@ dependencies:
   photo_view: ^0.15.0
   pdfx: ^2.9.2
   url_launcher: ^6.3.1
+  # Used directly by lib/services/tafseer_printer_web.dart.
+  web: ^1.1.0
 
 dev_dependencies:
   flutter_test:

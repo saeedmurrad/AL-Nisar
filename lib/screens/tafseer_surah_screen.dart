@@ -3,25 +3,42 @@ import 'package:go_router/go_router.dart';
 
 import '../models/tafseer_models.dart';
 import '../services/tafseer_bundled_service.dart';
+import '../services/tafseer_printer.dart';
 import '../theme/app_layout.dart';
 import '../theme/app_theme_colors.dart';
 import '../theme/tafseer_theme.dart';
 import '../utils/responsive_layout.dart';
+import '../utils/tafseer_print_html.dart';
 import '../utils/urdu_digits.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/branded_state_view.dart';
 import '../widgets/islamic_ui.dart';
 import '../widgets/standard_shell_header.dart';
 import '../widgets/tafseer_html.dart';
+import '../widgets/tafseer_print_button.dart';
 
 /// A surah's front matter: masthead, preface, symbol key and ruku index.
 class TafseerSurahScreen extends StatefulWidget {
-  const TafseerSurahScreen({super.key, required this.surahId, this.service});
+  const TafseerSurahScreen({
+    super.key,
+    required this.surahId,
+    this.service,
+    this.canPrint,
+    this.printDocument,
+  });
 
   final String surahId;
 
   /// Injectable for tests; defaults to the bundled assets.
   final TafseerBundledService? service;
+
+  /// Whether to offer the Print button. Defaults to [canPrintTafseer], which
+  /// is false off the web build — and false under `flutter test`, which runs
+  /// on the VM, so tests must pass this explicitly to see the button.
+  final bool? canPrint;
+
+  /// Injectable for tests; defaults to the real print dialog.
+  final Future<void> Function(String html)? printDocument;
 
   @override
   State<TafseerSurahScreen> createState() => _TafseerSurahScreenState();
@@ -30,6 +47,9 @@ class TafseerSurahScreen extends StatefulWidget {
 class _TafseerSurahScreenState extends State<TafseerSurahScreen> {
   late final _service = widget.service ?? TafseerBundledService();
   late Future<TafseerSurah?> _future;
+  late final _canPrint = widget.canPrint ?? canPrintTafseer;
+  late final _print = widget.printDocument ?? printTafseerDocument;
+  bool _printing = false;
 
   @override
   void initState() {
@@ -42,6 +62,34 @@ class _TafseerSurahScreenState extends State<TafseerSurahScreen> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.surahId != widget.surahId) {
       _future = _service.loadSurah(widget.surahId);
+    }
+  }
+
+  /// Gathers every ruku of [surah] and hands the assembled document to the
+  /// browser's print dialog.
+  ///
+  /// The surah screen itself only loads `surah.json`, so the bodies are read
+  /// here rather than up front: a reader who never prints never pays for them.
+  Future<void> _printSurah(TafseerSurah surah) async {
+    if (_printing) return;
+    setState(() => _printing = true);
+    try {
+      final bodies = <int, String>{};
+      for (final ruku in surah.rukus) {
+        final html = await _service.loadRukuHtml(surah.id, ruku.number);
+        if (html != null) bodies[ruku.number] = html;
+      }
+      await _print(tafseerPrintHtml(surah: surah, rukuBodies: bodies));
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Could not open the print dialog.'),
+          duration: Duration(seconds: 3),
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _printing = false);
     }
   }
 
@@ -71,6 +119,12 @@ class _TafseerSurahScreenState extends State<TafseerSurahScreen> {
                     StandardShellHeader(
                       title: surah?.nameUrdu ?? 'Tafseer',
                       onBack: () => context.go('/tafseer'),
+                      trailing: (surah != null && _canPrint)
+                          ? TafseerPrintButton(
+                              busy: _printing,
+                              onPrint: () => _printSurah(surah),
+                            )
+                          : null,
                     ),
                     Expanded(
                       child: loading
@@ -273,7 +327,10 @@ class _KeyList extends StatelessWidget {
     ];
 
     if (!twoUp) {
-      return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: rows);
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: rows,
+      );
     }
 
     final mid = (rows.length + 1) ~/ 2;
@@ -412,10 +469,9 @@ class _Colophon extends StatelessWidget {
         border: Border(top: BorderSide(color: c.borderDefault)),
       ),
       child: Text(
-        html.replaceAll(RegExp(r'<br\s*/?>'), '\n').replaceAll(
-          RegExp(r'<[^>]+>'),
-          '',
-        ),
+        html
+            .replaceAll(RegExp(r'<br\s*/?>'), '\n')
+            .replaceAll(RegExp(r'<[^>]+>'), ''),
         textAlign: TextAlign.center,
         style: TextStyle(
           fontFamily: tafseerUrduFamily,
