@@ -118,7 +118,7 @@ void main() {
   setUpAll(() => GoogleFonts.config.allowRuntimeFetching = false);
 
   testWidgets('index screen lists every bundled surah', (tester) async {
-    tester.view.physicalSize = const Size(900, 12400);
+    tester.view.physicalSize = const Size(900, 15000);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
 
@@ -175,6 +175,16 @@ void main() {
       ('سورۂ الواقعہ', '۵۶'),
       ('سورۂ الحدید', '۵۷'),
       ('سورۂ المجادلہ', '۵۸'),
+      ('سورۂ الحشر', '۵۹'),
+      ('سورۂ الممتحنہ', '۶۰'),
+      ('سورۂ الصف', '۶۱'),
+      ('سورۂ الجمعہ', '۶۲'),
+      ('سورۂ المنافقون', '۶۳'),
+      ('سورۂ التغابن', '۶۴'),
+      ('سورۂ الطلاق', '۶۵'),
+      ('سورۂ التحریم', '۶۶'),
+      ('سورۂ الملک', '۶۷'),
+      ('سورۂ القلم', '۶۸'),
     ]) {
       expect(find.text(name), findsOneWidget, reason: name);
       expect(find.text(badge), findsOneWidget, reason: badge);
@@ -199,10 +209,11 @@ void main() {
     // Luqman, Al-Jathiya, Al-Ahqaf, Muhammad, Al-Fath and Al-Hadid.
     expect(find.text('4 rukus · Urdu'), findsNWidgets(6));
     // As-Sajdah, Ad-Dukhan, Qaf, Adh-Dhariyat, An-Najm, Al-Qamar,
-    // Ar-Rahman, Al-Waqi'ah and Al-Mujadilah.
-    expect(find.text('3 rukus · Urdu'), findsNWidgets(9));
-    // Al-Hujurat and At-Tur.
-    expect(find.text('2 rukus · Urdu'), findsNWidgets(2));
+    // Ar-Rahman, Al-Waqi'ah, Al-Mujadilah and Al-Hashr.
+    expect(find.text('3 rukus · Urdu'), findsNWidgets(10));
+    // Al-Hujurat, At-Tur and the nine short surahs from Al-Mumtahanah
+    // through Al-Qalam.
+    expect(find.text('2 rukus · Urdu'), findsNWidgets(11));
   });
 
   testWidgets('each surah screen renders its own contents', (tester) async {
@@ -311,6 +322,52 @@ void main() {
       ),
       ('hadid', 'اول و آخر، ظاہر و باطن', 'رہبانیت اور چلنے کا نور', '۴', '۵'),
       ('mujadilah', 'فریاد جو سنی گئی', 'فراموشیِ ذکر اور حزب اللہ', '۳', '۴'),
+      (
+        'hashr',
+        'ایثار اور بے کینہ دل',
+        'نسیانِ نفس اور اسماءِ حسنیٰ',
+        '۳',
+        '۴',
+      ),
+      (
+        'mumtahanah',
+        'اسوۂ ابراہیم اور دعائے توکل',
+        'نیکی، انصاف اور بیعتِ مومنات',
+        '۲',
+        '۳',
+      ),
+      (
+        'saff',
+        'صدقِ قول اور بشارتِ احمد',
+        'تجارتِ نجات اور انصارِ الٰہی',
+        '۲',
+        '۳',
+      ),
+      ('jumuah', 'تلاوت، تزکیہ اور حکمت', 'ندائے جمعہ اور ذکرِ کثیر', '۲', '۳'),
+      ('munafiqun', 'سچا کلمہ، جھوٹی گواہی', 'ذکر، انفاق اور مہلت', '۲', '۳'),
+      ('taghabun', 'ایک خلق، دو رخ', 'ایمان اور ہدایتِ قلب', '۲', '۳'),
+      ('talaq', 'تقویٰ اور کشادگی کی راہ', 'طبقات میں اترتا امر', '۲', '۳'),
+      (
+        'tahrim',
+        'خانۂ نبوت اور دعوتِ توبہ',
+        'توبۂ نصوح اور چار مثالیں',
+        '۲',
+        '۳',
+      ),
+      (
+        'mulk',
+        'بادشاہی اسی کے ہاتھ میں',
+        'رحمٰن کے تھامے ہوئے پرندے',
+        '۲',
+        '۳',
+      ),
+      (
+        'qalam',
+        'قلم، خلقِ عظیم اور باغ والے',
+        'سجدے کی پکار اور صاحبِ حوت',
+        '۲',
+        '۳',
+      ),
     ]) {
       await _pump(tester, TafseerSurahScreen(surahId: id, service: _service));
 

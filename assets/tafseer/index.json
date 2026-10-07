@@ -421,5 +421,95 @@
     "subtitleUrdu": "اشاری تفسیر · ۳ رکوع",
     "rukuCount": 3,
     "isAvailable": true
+  },
+  {
+    "id": "hashr",
+    "surahNumber": 59,
+    "nameUrdu": "سورۂ الحشر",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۳ رکوع",
+    "rukuCount": 3,
+    "isAvailable": true
+  },
+  {
+    "id": "mumtahanah",
+    "surahNumber": 60,
+    "nameUrdu": "سورۂ الممتحنہ",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۲ رکوع",
+    "rukuCount": 2,
+    "isAvailable": true
+  },
+  {
+    "id": "saff",
+    "surahNumber": 61,
+    "nameUrdu": "سورۂ الصف",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۲ رکوع",
+    "rukuCount": 2,
+    "isAvailable": true
+  },
+  {
+    "id": "jumuah",
+    "surahNumber": 62,
+    "nameUrdu": "سورۂ الجمعہ",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۲ رکوع",
+    "rukuCount": 2,
+    "isAvailable": true
+  },
+  {
+    "id": "munafiqun",
+    "surahNumber": 63,
+    "nameUrdu": "سورۂ المنافقون",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۲ رکوع",
+    "rukuCount": 2,
+    "isAvailable": true
+  },
+  {
+    "id": "taghabun",
+    "surahNumber": 64,
+    "nameUrdu": "سورۂ التغابن",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۲ رکوع",
+    "rukuCount": 2,
+    "isAvailable": true
+  },
+  {
+    "id": "talaq",
+    "surahNumber": 65,
+    "nameUrdu": "سورۂ الطلاق",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۲ رکوع",
+    "rukuCount": 2,
+    "isAvailable": true
+  },
+  {
+    "id": "tahrim",
+    "surahNumber": 66,
+    "nameUrdu": "سورۂ التحریم",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۲ رکوع",
+    "rukuCount": 2,
+    "isAvailable": true
+  },
+  {
+    "id": "mulk",
+    "surahNumber": 67,
+    "nameUrdu": "سورۂ الملک",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۲ رکوع",
+    "rukuCount": 2,
+    "isAvailable": true
+  },
+  {
+    "id": "qalam",
+    "surahNumber": 68,
+    "nameUrdu": "سورۂ القلم",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۲ رکوع",
+    "rukuCount": 2,
+    "isAvailable": true
   }
 ]
