@@ -331,5 +331,95 @@
     "subtitleUrdu": "اشاری تفسیر · ۴ رکوع",
     "rukuCount": 4,
     "isAvailable": true
+  },
+  {
+    "id": "hujurat",
+    "surahNumber": 49,
+    "nameUrdu": "سورۂ الحجرات",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۲ رکوع",
+    "rukuCount": 2,
+    "isAvailable": true
+  },
+  {
+    "id": "qaf",
+    "surahNumber": 50,
+    "nameUrdu": "سورۂ قٓ",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۳ رکوع",
+    "rukuCount": 3,
+    "isAvailable": true
+  },
+  {
+    "id": "dhariyat",
+    "surahNumber": 51,
+    "nameUrdu": "سورۂ الذاریات",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۳ رکوع",
+    "rukuCount": 3,
+    "isAvailable": true
+  },
+  {
+    "id": "tur",
+    "surahNumber": 52,
+    "nameUrdu": "سورۂ الطور",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۲ رکوع",
+    "rukuCount": 2,
+    "isAvailable": true
+  },
+  {
+    "id": "najm",
+    "surahNumber": 53,
+    "nameUrdu": "سورۂ النجم",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۳ رکوع",
+    "rukuCount": 3,
+    "isAvailable": true
+  },
+  {
+    "id": "qamar",
+    "surahNumber": 54,
+    "nameUrdu": "سورۂ القمر",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۳ رکوع",
+    "rukuCount": 3,
+    "isAvailable": true
+  },
+  {
+    "id": "rahman",
+    "surahNumber": 55,
+    "nameUrdu": "سورۂ الرحمٰن",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۳ رکوع",
+    "rukuCount": 3,
+    "isAvailable": true
+  },
+  {
+    "id": "waqiah",
+    "surahNumber": 56,
+    "nameUrdu": "سورۂ الواقعہ",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۳ رکوع",
+    "rukuCount": 3,
+    "isAvailable": true
+  },
+  {
+    "id": "hadid",
+    "surahNumber": 57,
+    "nameUrdu": "سورۂ الحدید",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۴ رکوع",
+    "rukuCount": 4,
+    "isAvailable": true
+  },
+  {
+    "id": "mujadilah",
+    "surahNumber": 58,
+    "nameUrdu": "سورۂ المجادلہ",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۳ رکوع",
+    "rukuCount": 3,
+    "isAvailable": true
   }
 ]
