@@ -30,6 +30,20 @@ void main() {
     expect(rukus.last.eyebrow, isNot(contains('آیات آیت')));
   });
 
+  // The bundle now runs unbroken from Surah Yusuf to the end of the Quran.
+  // A missing or duplicated surah would otherwise only show as a shifted
+  // count somewhere far away in the fixtures.
+  test('index covers surahs 12 through 114 with no gaps', () async {
+    final index = await service.loadIndex();
+    final numbers = index.map((s) => s.surahNumber).toList();
+
+    expect(numbers.first, 12);
+    expect(numbers.last, 114);
+    expect(numbers, List<int>.generate(114 - 12 + 1, (i) => 12 + i));
+    expect(numbers.toSet(), hasLength(numbers.length));
+    expect(index.map((s) => s.id).toSet(), hasLength(index.length));
+  });
+
   test('index lists the bundled surahs in surah order', () async {
     final index = await service.loadIndex();
     expect(index.map((s) => s.id).toList(), [
@@ -110,6 +124,32 @@ void main() {
       'tariq',
       'ala',
       'ghashiyah',
+      'fajr',
+      'balad',
+      'shams',
+      'layl',
+      'duha',
+      'inshirah',
+      'tin',
+      'alaq',
+      'qadr',
+      'bayyinah',
+      'zalzalah',
+      'adiyat',
+      'qariah',
+      'takathur',
+      'asr',
+      'humazah',
+      'fil',
+      'quraish',
+      'maun',
+      'kawthar',
+      'kafirun',
+      'nasr',
+      'lahab',
+      'ikhlas',
+      'falaq',
+      'nas',
     ]);
     expect(index.map((s) => s.surahNumber).toList(), [
       12,
@@ -189,6 +229,32 @@ void main() {
       86,
       87,
       88,
+      89,
+      90,
+      91,
+      92,
+      93,
+      94,
+      95,
+      96,
+      97,
+      98,
+      99,
+      100,
+      101,
+      102,
+      103,
+      104,
+      105,
+      106,
+      107,
+      108,
+      109,
+      110,
+      111,
+      112,
+      113,
+      114,
     ]);
 
     final yusuf = index.firstWhere((s) => s.id == 'yusuf');
@@ -742,6 +808,188 @@ void main() {
           rukus: 1,
           first: 'یاد دلانے والا، داروغہ نہیں',
           last: 'یاد دلانے والا، داروغہ نہیں',
+        ),
+        'fajr': (
+          number: 89,
+          name: 'سورۂ الفجر',
+          rukus: 1,
+          first: 'نفسِ مطمئنہ کی واپسی',
+          last: 'نفسِ مطمئنہ کی واپسی',
+        ),
+        'balad': (
+          number: 90,
+          name: 'سورۂ البلد',
+          rukus: 1,
+          first: 'دو راہیں اور دشوار گھاٹی',
+          last: 'دو راہیں اور دشوار گھاٹی',
+        ),
+        'shams': (
+          number: 91,
+          name: 'سورۂ الشمس',
+          rukus: 1,
+          first: 'نفس کا تزکیہ اور تدسیہ',
+          last: 'نفس کا تزکیہ اور تدسیہ',
+        ),
+        'layl': (
+          number: 92,
+          name: 'سورۂ اللیل',
+          rukus: 1,
+          first: 'عطا کی راہ، رضا کی منزل',
+          last: 'عطا کی راہ، رضا کی منزل',
+        ),
+        'duha': (
+          number: 93,
+          name: 'سورۂ الضحیٰ',
+          rukus: 1,
+          first: 'تیرے رب نے نہیں چھوڑا',
+          last: 'تیرے رب نے نہیں چھوڑا',
+        ),
+        'inshirah': (
+          number: 94,
+          name: 'سورۂ الانشراح',
+          rukus: 1,
+          first: 'سینے کی کشادگی',
+          last: 'سینے کی کشادگی',
+        ),
+        'tin': (
+          number: 95,
+          name: 'سورۂ التین',
+          rukus: 1,
+          first: 'احسنِ تقویم کی امانت',
+          last: 'احسنِ تقویم کی امانت',
+        ),
+        'alaq': (
+          number: 96,
+          name: 'سورۂ العلق',
+          rukus: 1,
+          first: 'نام، قلم اور سجدہ',
+          last: 'نام، قلم اور سجدہ',
+        ),
+        'qadr': (
+          number: 97,
+          name: 'سورۂ القدر',
+          rukus: 1,
+          first: 'شبِ قدر اور دل کی رات',
+          last: 'شبِ قدر اور دل کی رات',
+        ),
+        'bayyinah': (
+          number: 98,
+          name: 'سورۂ البینہ',
+          rukus: 1,
+          first: 'بیّنہ سے رضا تک',
+          last: 'بیّنہ سے رضا تک',
+        ),
+        'zalzalah': (
+          number: 99,
+          name: 'سورۂ الزلزال',
+          rukus: 1,
+          first: 'زمین کی گواہی',
+          last: 'زمین کی گواہی',
+        ),
+        'adiyat': (
+          number: 100,
+          name: 'سورۂ العادیات',
+          rukus: 1,
+          first: 'ہانپتے گھوڑے اور ناشکرا دل',
+          last: 'ہانپتے گھوڑے اور ناشکرا دل',
+        ),
+        'qariah': (
+          number: 101,
+          name: 'سورۂ القارعہ',
+          rukus: 1,
+          first: 'دستک، پروانے اور ترازو',
+          last: 'دستک، پروانے اور ترازو',
+        ),
+        'takathur': (
+          number: 102,
+          name: 'سورۂ التکاثر',
+          rukus: 1,
+          first: 'گنتی کی غفلت، یقین کی آنکھ',
+          last: 'گنتی کی غفلت، یقین کی آنکھ',
+        ),
+        'asr': (
+          number: 103,
+          name: 'سورۂ العصر',
+          rukus: 1,
+          first: 'وقت، خسارہ اور چار شرطیں',
+          last: 'وقت، خسارہ اور چار شرطیں',
+        ),
+        'humazah': (
+          number: 104,
+          name: 'سورۂ الہمزہ',
+          rukus: 1,
+          first: 'طعنہ، مال اور حطمہ',
+          last: 'طعنہ، مال اور حطمہ',
+        ),
+        'fil': (
+          number: 105,
+          name: 'سورۂ الفیل',
+          rukus: 1,
+          first: 'ہاتھی والے اور گھر کا رب',
+          last: 'ہاتھی والے اور گھر کا رب',
+        ),
+        'quraish': (
+          number: 106,
+          name: 'سورۂ قریش',
+          rukus: 1,
+          first: 'ایلاف، نعمت اور بندگی',
+          last: 'ایلاف، نعمت اور بندگی',
+        ),
+        'maun': (
+          number: 107,
+          name: 'سورۂ الماعون',
+          rukus: 1,
+          first: 'انکارِ جزا کی نشانیاں',
+          last: 'انکارِ جزا کی نشانیاں',
+        ),
+        'kawthar': (
+          number: 108,
+          name: 'سورۂ الکوثر',
+          rukus: 1,
+          first: 'عطا، شکر اور بقا',
+          last: 'عطا، شکر اور بقا',
+        ),
+        'kafirun': (
+          number: 109,
+          name: 'سورۂ الکافرون',
+          rukus: 1,
+          first: 'عبادت میں دو ٹوک جدائی',
+          last: 'عبادت میں دو ٹوک جدائی',
+        ),
+        'nasr': (
+          number: 110,
+          name: 'سورۂ النصر',
+          rukus: 1,
+          first: 'فتح پر عاجزی کا سجدہ',
+          last: 'فتح پر عاجزی کا سجدہ',
+        ),
+        'lahab': (
+          number: 111,
+          name: 'سورۂ اللہب',
+          rukus: 1,
+          first: 'ہاتھوں کی کمائی کا انجام',
+          last: 'ہاتھوں کی کمائی کا انجام',
+        ),
+        'ikhlas': (
+          number: 112,
+          name: 'سورۂ الاخلاص',
+          rukus: 1,
+          first: 'احدِ بے ہمتا کی تنزیہ',
+          last: 'احدِ بے ہمتا کی تنزیہ',
+        ),
+        'falaq': (
+          number: 113,
+          name: 'سورۂ الفلق',
+          rukus: 1,
+          first: 'سپیدۂ سحر کی پناہ',
+          last: 'سپیدۂ سحر کی پناہ',
+        ),
+        'nas': (
+          number: 114,
+          name: 'سورۂ الناس',
+          rukus: 1,
+          first: 'انسانوں کے رب کی پناہ',
+          last: 'انسانوں کے رب کی پناہ',
         ),
       };
 

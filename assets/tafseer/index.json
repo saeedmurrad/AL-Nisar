@@ -691,5 +691,239 @@
     "subtitleUrdu": "اشاری تفسیر · ۱ رکوع",
     "rukuCount": 1,
     "isAvailable": true
+  },
+  {
+    "id": "fajr",
+    "surahNumber": 89,
+    "nameUrdu": "سورۂ الفجر",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۱ رکوع",
+    "rukuCount": 1,
+    "isAvailable": true
+  },
+  {
+    "id": "balad",
+    "surahNumber": 90,
+    "nameUrdu": "سورۂ البلد",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۱ رکوع",
+    "rukuCount": 1,
+    "isAvailable": true
+  },
+  {
+    "id": "shams",
+    "surahNumber": 91,
+    "nameUrdu": "سورۂ الشمس",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۱ رکوع",
+    "rukuCount": 1,
+    "isAvailable": true
+  },
+  {
+    "id": "layl",
+    "surahNumber": 92,
+    "nameUrdu": "سورۂ اللیل",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۱ رکوع",
+    "rukuCount": 1,
+    "isAvailable": true
+  },
+  {
+    "id": "duha",
+    "surahNumber": 93,
+    "nameUrdu": "سورۂ الضحیٰ",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۱ رکوع",
+    "rukuCount": 1,
+    "isAvailable": true
+  },
+  {
+    "id": "inshirah",
+    "surahNumber": 94,
+    "nameUrdu": "سورۂ الانشراح",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۱ رکوع",
+    "rukuCount": 1,
+    "isAvailable": true
+  },
+  {
+    "id": "tin",
+    "surahNumber": 95,
+    "nameUrdu": "سورۂ التین",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۱ رکوع",
+    "rukuCount": 1,
+    "isAvailable": true
+  },
+  {
+    "id": "alaq",
+    "surahNumber": 96,
+    "nameUrdu": "سورۂ العلق",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۱ رکوع",
+    "rukuCount": 1,
+    "isAvailable": true
+  },
+  {
+    "id": "qadr",
+    "surahNumber": 97,
+    "nameUrdu": "سورۂ القدر",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۱ رکوع",
+    "rukuCount": 1,
+    "isAvailable": true
+  },
+  {
+    "id": "bayyinah",
+    "surahNumber": 98,
+    "nameUrdu": "سورۂ البینہ",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۱ رکوع",
+    "rukuCount": 1,
+    "isAvailable": true
+  },
+  {
+    "id": "zalzalah",
+    "surahNumber": 99,
+    "nameUrdu": "سورۂ الزلزال",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۱ رکوع",
+    "rukuCount": 1,
+    "isAvailable": true
+  },
+  {
+    "id": "adiyat",
+    "surahNumber": 100,
+    "nameUrdu": "سورۂ العادیات",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۱ رکوع",
+    "rukuCount": 1,
+    "isAvailable": true
+  },
+  {
+    "id": "qariah",
+    "surahNumber": 101,
+    "nameUrdu": "سورۂ القارعہ",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۱ رکوع",
+    "rukuCount": 1,
+    "isAvailable": true
+  },
+  {
+    "id": "takathur",
+    "surahNumber": 102,
+    "nameUrdu": "سورۂ التکاثر",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۱ رکوع",
+    "rukuCount": 1,
+    "isAvailable": true
+  },
+  {
+    "id": "asr",
+    "surahNumber": 103,
+    "nameUrdu": "سورۂ العصر",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۱ رکوع",
+    "rukuCount": 1,
+    "isAvailable": true
+  },
+  {
+    "id": "humazah",
+    "surahNumber": 104,
+    "nameUrdu": "سورۂ الہمزہ",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۱ رکوع",
+    "rukuCount": 1,
+    "isAvailable": true
+  },
+  {
+    "id": "fil",
+    "surahNumber": 105,
+    "nameUrdu": "سورۂ الفیل",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۱ رکوع",
+    "rukuCount": 1,
+    "isAvailable": true
+  },
+  {
+    "id": "quraish",
+    "surahNumber": 106,
+    "nameUrdu": "سورۂ قریش",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۱ رکوع",
+    "rukuCount": 1,
+    "isAvailable": true
+  },
+  {
+    "id": "maun",
+    "surahNumber": 107,
+    "nameUrdu": "سورۂ الماعون",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۱ رکوع",
+    "rukuCount": 1,
+    "isAvailable": true
+  },
+  {
+    "id": "kawthar",
+    "surahNumber": 108,
+    "nameUrdu": "سورۂ الکوثر",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۱ رکوع",
+    "rukuCount": 1,
+    "isAvailable": true
+  },
+  {
+    "id": "kafirun",
+    "surahNumber": 109,
+    "nameUrdu": "سورۂ الکافرون",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۱ رکوع",
+    "rukuCount": 1,
+    "isAvailable": true
+  },
+  {
+    "id": "nasr",
+    "surahNumber": 110,
+    "nameUrdu": "سورۂ النصر",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۱ رکوع",
+    "rukuCount": 1,
+    "isAvailable": true
+  },
+  {
+    "id": "lahab",
+    "surahNumber": 111,
+    "nameUrdu": "سورۂ اللہب",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۱ رکوع",
+    "rukuCount": 1,
+    "isAvailable": true
+  },
+  {
+    "id": "ikhlas",
+    "surahNumber": 112,
+    "nameUrdu": "سورۂ الاخلاص",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۱ رکوع",
+    "rukuCount": 1,
+    "isAvailable": true
+  },
+  {
+    "id": "falaq",
+    "surahNumber": 113,
+    "nameUrdu": "سورۂ الفلق",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۱ رکوع",
+    "rukuCount": 1,
+    "isAvailable": true
+  },
+  {
+    "id": "nas",
+    "surahNumber": 114,
+    "nameUrdu": "سورۂ الناس",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۱ رکوع",
+    "rukuCount": 1,
+    "isAvailable": true
   }
 ]
