@@ -118,7 +118,7 @@ void main() {
   setUpAll(() => GoogleFonts.config.allowRuntimeFetching = false);
 
   testWidgets('index screen lists every bundled surah', (tester) async {
-    tester.view.physicalSize = const Size(900, 17600);
+    tester.view.physicalSize = const Size(900, 20200);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
 
@@ -195,6 +195,16 @@ void main() {
       ('سورۂ الدہر', '۷۶'),
       ('سورۂ المرسلات', '۷۷'),
       ('سورۂ النبا', '۷۸'),
+      ('سورۂ النازعات', '۷۹'),
+      ('سورۂ عبس', '۸۰'),
+      ('سورۂ التکویر', '۸۱'),
+      ('سورۂ الانفطار', '۸۲'),
+      ('سورۂ المطففین', '۸۳'),
+      ('سورۂ الانشقاق', '۸۴'),
+      ('سورۂ البروج', '۸۵'),
+      ('سورۂ الطارق', '۸۶'),
+      ('سورۂ الاعلیٰ', '۸۷'),
+      ('سورۂ الغاشیہ', '۸۸'),
     ]) {
       expect(find.text(name), findsOneWidget, reason: name);
       expect(find.text(badge), findsOneWidget, reason: badge);
@@ -221,9 +231,13 @@ void main() {
     // As-Sajdah, Ad-Dukhan, Qaf, Adh-Dhariyat, An-Najm, Al-Qamar,
     // Ar-Rahman, Al-Waqi'ah, Al-Mujadilah and Al-Hashr.
     expect(find.text('3 rukus · Urdu'), findsNWidgets(10));
-    // Al-Hujurat, At-Tur and the nineteen short surahs from
-    // Al-Mumtahanah through An-Naba.
-    expect(find.text('2 rukus · Urdu'), findsNWidgets(21));
+    // Al-Hujurat, At-Tur, the nineteen short surahs from Al-Mumtahanah
+    // through An-Naba, and An-Nazi'at.
+    expect(find.text('2 rukus · Urdu'), findsNWidgets(22));
+    // 'Abasa through Al-Ghashiyah are a single ruku each, so the noun is
+    // singular — "1 rukus" would be wrong.
+    expect(find.text('1 ruku · Urdu'), findsNWidgets(9));
+    expect(find.text('1 rukus · Urdu'), findsNothing);
   });
 
   testWidgets('each surah screen renders its own contents', (tester) async {
@@ -412,6 +426,46 @@ void main() {
         '۳',
       ),
       ('naba', 'بڑی خبر اور سراب پہاڑ', 'رب کی طرف ٹھکانا', '۲', '۳'),
+      ('naziat', 'کیا تو پاک ہونا چاہتا ہے؟', 'دو راستے، دو ٹھکانے', '۲', '۳'),
+      ('abasa', 'طالب کی قدر و منزلت', 'طالب کی قدر و منزلت', '۱', '۲'),
+      (
+        'takwir',
+        'جان کی حاضری، صبح کی سانس',
+        'جان کی حاضری، صبح کی سانس',
+        '۱',
+        '۲',
+      ),
+      (
+        'infitar',
+        'ربِّ کریم کا پیار بھرا عتاب',
+        'ربِّ کریم کا پیار بھرا عتاب',
+        '۱',
+        '۲',
+      ),
+      (
+        'mutaffifin',
+        'ناپ تول، زنگ اور تسنیم',
+        'ناپ تول، زنگ اور تسنیم',
+        '۱',
+        '۲',
+      ),
+      ('inshiqaq', 'رب کی طرف کدح', 'رب کی طرف کدح', '۱', '۲'),
+      ('buruj', 'خندق کی آگ اور ودود رب', 'خندق کی آگ اور ودود رب', '۱', '۲'),
+      (
+        'tariq',
+        'رات کا دستک دینے والا تارا',
+        'رات کا دستک دینے والا تارا',
+        '۱',
+        '۲',
+      ),
+      ('ala', 'ربِّ اعلیٰ کی تسبیح', 'ربِّ اعلیٰ کی تسبیح', '۱', '۲'),
+      (
+        'ghashiyah',
+        'یاد دلانے والا، داروغہ نہیں',
+        'یاد دلانے والا، داروغہ نہیں',
+        '۱',
+        '۲',
+      ),
     ]) {
       await _pump(tester, TafseerSurahScreen(surahId: id, service: _service));
 
@@ -617,6 +671,31 @@ void main() {
       ),
     );
     expect(next.onPressed, isNull);
+  });
+
+  testWidgets('a single-ruku surah disables both Prev and Next', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(900, 4000);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
+    // Al-Ghashiyah is one ruku, so it is both the first and the last.
+    await _pump(
+      tester,
+      TafseerRukuScreen(surahId: 'ghashiyah', rukuNumber: 1, service: _service),
+    );
+
+    expect(find.text('یاد دلانے والا، داروغہ نہیں'), findsOneWidget);
+    for (final label in const ['← پچھلا رکوع', 'اگلا رکوع →']) {
+      final b = tester.widget<OutlinedButton>(
+        find.ancestor(
+          of: find.text(label),
+          matching: find.byType(OutlinedButton),
+        ),
+      );
+      expect(b.onPressed, isNull, reason: label);
+    }
   });
 
   testWidgets('inline .ayah spans are restyled saffron, body prose is not', (

@@ -195,7 +195,12 @@ class _TafseerListScreenState extends State<TafseerListScreen> {
       );
     }
     return ListView(
-      padding: const EdgeInsets.fromLTRB(AppLayout.md, AppLayout.md, AppLayout.md, 24),
+      padding: const EdgeInsets.fromLTRB(
+        AppLayout.md,
+        AppLayout.md,
+        AppLayout.md,
+        24,
+      ),
       children: [
         ContentColumn(
           maxWidth: 720,
@@ -233,9 +238,7 @@ class _TafseerListScreenState extends State<TafseerListScreen> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 10, left: 2),
                   child: Text(
-                    _hits.length == 1
-                        ? '1 match'
-                        : '${_hits.length} matches',
+                    _hits.length == 1 ? '1 match' : '${_hits.length} matches',
                     style: AppTheme.lato(
                       fontSize: 12,
                       color: context.c.textMuted,
@@ -408,7 +411,11 @@ class _SurahCard extends StatelessWidget {
                       const SizedBox(height: 6),
                       Text(
                         enabled
-                            ? '${summary.rukuCount} rukus · Urdu'
+                            // The short surahs near the end of the Quran have
+                            // a single ruku, so the noun has to agree.
+                            ? '${summary.rukuCount} '
+                                  '${summary.rukuCount == 1 ? 'ruku' : 'rukus'}'
+                                  ' · Urdu'
                             : 'Coming soon',
                         style: AppTheme.lato(fontSize: 12, color: c.textMuted),
                       ),

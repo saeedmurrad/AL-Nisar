@@ -601,5 +601,95 @@
     "subtitleUrdu": "اشاری تفسیر · ۲ رکوع",
     "rukuCount": 2,
     "isAvailable": true
+  },
+  {
+    "id": "naziat",
+    "surahNumber": 79,
+    "nameUrdu": "سورۂ النازعات",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۲ رکوع",
+    "rukuCount": 2,
+    "isAvailable": true
+  },
+  {
+    "id": "abasa",
+    "surahNumber": 80,
+    "nameUrdu": "سورۂ عبس",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۱ رکوع",
+    "rukuCount": 1,
+    "isAvailable": true
+  },
+  {
+    "id": "takwir",
+    "surahNumber": 81,
+    "nameUrdu": "سورۂ التکویر",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۱ رکوع",
+    "rukuCount": 1,
+    "isAvailable": true
+  },
+  {
+    "id": "infitar",
+    "surahNumber": 82,
+    "nameUrdu": "سورۂ الانفطار",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۱ رکوع",
+    "rukuCount": 1,
+    "isAvailable": true
+  },
+  {
+    "id": "mutaffifin",
+    "surahNumber": 83,
+    "nameUrdu": "سورۂ المطففین",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۱ رکوع",
+    "rukuCount": 1,
+    "isAvailable": true
+  },
+  {
+    "id": "inshiqaq",
+    "surahNumber": 84,
+    "nameUrdu": "سورۂ الانشقاق",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۱ رکوع",
+    "rukuCount": 1,
+    "isAvailable": true
+  },
+  {
+    "id": "buruj",
+    "surahNumber": 85,
+    "nameUrdu": "سورۂ البروج",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۱ رکوع",
+    "rukuCount": 1,
+    "isAvailable": true
+  },
+  {
+    "id": "tariq",
+    "surahNumber": 86,
+    "nameUrdu": "سورۂ الطارق",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۱ رکوع",
+    "rukuCount": 1,
+    "isAvailable": true
+  },
+  {
+    "id": "ala",
+    "surahNumber": 87,
+    "nameUrdu": "سورۂ الاعلیٰ",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۱ رکوع",
+    "rukuCount": 1,
+    "isAvailable": true
+  },
+  {
+    "id": "ghashiyah",
+    "surahNumber": 88,
+    "nameUrdu": "سورۂ الغاشیہ",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۱ رکوع",
+    "rukuCount": 1,
+    "isAvailable": true
   }
 ]
