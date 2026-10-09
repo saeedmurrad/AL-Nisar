@@ -84,10 +84,17 @@ class TafseerRuku {
   final String ayahBlock;
   final List<TafseerGlossaryEntry> glossary;
 
-  /// e.g. `پہلا رکوع · آیات ۱ تا ۶`
-  String get eyebrow => ayahRangeUrdu.isEmpty
-      ? ordinalUrdu
-      : '$ordinalUrdu · آیات $ayahRangeUrdu';
+  /// e.g. `پہلا رکوع · آیات ۱ تا ۶`.
+  ///
+  /// A ruku that is one single long ayah arrives already carrying its own
+  /// singular label (`آیت ۲۰`), so the plural `آیات` is not prepended to it —
+  /// that would read "ayahs ayah 20". Al-Muzzammil's second ruku is the one
+  /// such case in the bundle.
+  String get eyebrow {
+    if (ayahRangeUrdu.isEmpty) return ordinalUrdu;
+    if (ayahRangeUrdu.startsWith('آیت')) return '$ordinalUrdu · $ayahRangeUrdu';
+    return '$ordinalUrdu · آیات $ayahRangeUrdu';
+  }
 
   factory TafseerRuku.fromJson(Map<String, dynamic> json) => TafseerRuku(
     number: (json['number'] as num?)?.toInt() ?? 0,

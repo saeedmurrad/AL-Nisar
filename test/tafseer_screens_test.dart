@@ -118,7 +118,7 @@ void main() {
   setUpAll(() => GoogleFonts.config.allowRuntimeFetching = false);
 
   testWidgets('index screen lists every bundled surah', (tester) async {
-    tester.view.physicalSize = const Size(900, 15000);
+    tester.view.physicalSize = const Size(900, 17600);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
 
@@ -185,6 +185,16 @@ void main() {
       ('سورۂ التحریم', '۶۶'),
       ('سورۂ الملک', '۶۷'),
       ('سورۂ القلم', '۶۸'),
+      ('سورۂ الحاقہ', '۶۹'),
+      ('سورۂ المعارج', '۷۰'),
+      ('سورۂ نوح', '۷۱'),
+      ('سورۂ الجن', '۷۲'),
+      ('سورۂ المزمل', '۷۳'),
+      ('سورۂ المدثر', '۷۴'),
+      ('سورۂ القیامہ', '۷۵'),
+      ('سورۂ الدہر', '۷۶'),
+      ('سورۂ المرسلات', '۷۷'),
+      ('سورۂ النبا', '۷۸'),
     ]) {
       expect(find.text(name), findsOneWidget, reason: name);
       expect(find.text(badge), findsOneWidget, reason: badge);
@@ -211,9 +221,9 @@ void main() {
     // As-Sajdah, Ad-Dukhan, Qaf, Adh-Dhariyat, An-Najm, Al-Qamar,
     // Ar-Rahman, Al-Waqi'ah, Al-Mujadilah and Al-Hashr.
     expect(find.text('3 rukus · Urdu'), findsNWidgets(10));
-    // Al-Hujurat, At-Tur and the nine short surahs from Al-Mumtahanah
-    // through Al-Qalam.
-    expect(find.text('2 rukus · Urdu'), findsNWidgets(11));
+    // Al-Hujurat, At-Tur and the nineteen short surahs from
+    // Al-Mumtahanah through An-Naba.
+    expect(find.text('2 rukus · Urdu'), findsNWidgets(21));
   });
 
   testWidgets('each surah screen renders its own contents', (tester) async {
@@ -368,6 +378,40 @@ void main() {
         '۲',
         '۳',
       ),
+      (
+        'haqqah',
+        'الحاقہ، گوشِ واعیہ اور دو نامے',
+        'دیدہ و نادیدہ اور حق الیقین',
+        '۲',
+        '۳',
+      ),
+      (
+        'maarij',
+        'زینوں کا رب اور دائم نمازی',
+        'مشرقوں اور مغربوں کا رب',
+        '۲',
+        '۳',
+      ),
+      ('nuh', 'رات دن کی پکار اور استغفار', 'پانچ نام اور جامع دعا', '۲', '۳'),
+      ('jinn', 'جنوں کا سماع اور عبدیت', 'غیب کا امین رسول', '۲', '۳'),
+      ('muzzammil', 'قیامِ شب، ترتیل اور تبتل', 'تخفیف کی رحمت', '۲', '۳'),
+      (
+        'muddaththir',
+        'قیام، تکبیر اور فتنۂ عدد',
+        'گروی جانیں اور دو مشیتیں',
+        '۲',
+        '۳',
+      ),
+      ('qiyamah', 'نفسِ لوامہ اور دیدارِ رب', 'انسان بے مہار نہیں', '۲', '۳'),
+      ('dahr', 'نامذکور سے شرابِ طہور تک', 'دو مشیتیں، ایک راستہ', '۲', '۳'),
+      (
+        'mursalat',
+        'قسمیں، پیمانہ اور یومِ فصل',
+        'سایے، چشمے اور رکوع کی پکار',
+        '۲',
+        '۳',
+      ),
+      ('naba', 'بڑی خبر اور سراب پہاڑ', 'رب کی طرف ٹھکانا', '۲', '۳'),
     ]) {
       await _pump(tester, TafseerSurahScreen(surahId: id, service: _service));
 

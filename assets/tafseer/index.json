@@ -511,5 +511,95 @@
     "subtitleUrdu": "اشاری تفسیر · ۲ رکوع",
     "rukuCount": 2,
     "isAvailable": true
+  },
+  {
+    "id": "haqqah",
+    "surahNumber": 69,
+    "nameUrdu": "سورۂ الحاقہ",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۲ رکوع",
+    "rukuCount": 2,
+    "isAvailable": true
+  },
+  {
+    "id": "maarij",
+    "surahNumber": 70,
+    "nameUrdu": "سورۂ المعارج",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۲ رکوع",
+    "rukuCount": 2,
+    "isAvailable": true
+  },
+  {
+    "id": "nuh",
+    "surahNumber": 71,
+    "nameUrdu": "سورۂ نوح",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۲ رکوع",
+    "rukuCount": 2,
+    "isAvailable": true
+  },
+  {
+    "id": "jinn",
+    "surahNumber": 72,
+    "nameUrdu": "سورۂ الجن",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۲ رکوع",
+    "rukuCount": 2,
+    "isAvailable": true
+  },
+  {
+    "id": "muzzammil",
+    "surahNumber": 73,
+    "nameUrdu": "سورۂ المزمل",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۲ رکوع",
+    "rukuCount": 2,
+    "isAvailable": true
+  },
+  {
+    "id": "muddaththir",
+    "surahNumber": 74,
+    "nameUrdu": "سورۂ المدثر",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۲ رکوع",
+    "rukuCount": 2,
+    "isAvailable": true
+  },
+  {
+    "id": "qiyamah",
+    "surahNumber": 75,
+    "nameUrdu": "سورۂ القیامہ",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۲ رکوع",
+    "rukuCount": 2,
+    "isAvailable": true
+  },
+  {
+    "id": "dahr",
+    "surahNumber": 76,
+    "nameUrdu": "سورۂ الدہر",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۲ رکوع",
+    "rukuCount": 2,
+    "isAvailable": true
+  },
+  {
+    "id": "mursalat",
+    "surahNumber": 77,
+    "nameUrdu": "سورۂ المرسلات",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۲ رکوع",
+    "rukuCount": 2,
+    "isAvailable": true
+  },
+  {
+    "id": "naba",
+    "surahNumber": 78,
+    "nameUrdu": "سورۂ النبا",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۲ رکوع",
+    "rukuCount": 2,
+    "isAvailable": true
   }
 ]

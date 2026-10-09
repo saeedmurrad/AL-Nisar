@@ -15,6 +15,21 @@ void main() {
 
   final service = TafseerBundledService();
 
+  // Al-Muzzammil's second ruku is the bundle's only single-ayah ruku: its
+  // range arrives already labelled, so the eyebrow must not prepend the
+  // plural and read "ayahs ayah 20".
+  test('a single-ayah ruku keeps its own label in the eyebrow', () async {
+    final surah = await service.loadSurah('muzzammil');
+    final rukus = surah!.rukus;
+
+    expect(rukus.first.ayahRangeUrdu, '۱ تا ۱۹');
+    expect(rukus.first.eyebrow, 'پہلا رکوع · آیات ۱ تا ۱۹');
+
+    expect(rukus.last.ayahRangeUrdu, 'آیت ۲۰');
+    expect(rukus.last.eyebrow, 'دوسرا رکوع · آیت ۲۰');
+    expect(rukus.last.eyebrow, isNot(contains('آیات آیت')));
+  });
+
   test('index lists the bundled surahs in surah order', () async {
     final index = await service.loadIndex();
     expect(index.map((s) => s.id).toList(), [
@@ -75,6 +90,16 @@ void main() {
       'tahrim',
       'mulk',
       'qalam',
+      'haqqah',
+      'maarij',
+      'nuh',
+      'jinn',
+      'muzzammil',
+      'muddaththir',
+      'qiyamah',
+      'dahr',
+      'mursalat',
+      'naba',
     ]);
     expect(index.map((s) => s.surahNumber).toList(), [
       12,
@@ -134,6 +159,16 @@ void main() {
       66,
       67,
       68,
+      69,
+      70,
+      71,
+      72,
+      73,
+      74,
+      75,
+      76,
+      77,
+      78,
     ]);
 
     final yusuf = index.firstWhere((s) => s.id == 'yusuf');
@@ -548,6 +583,76 @@ void main() {
           first: 'قلم، خلقِ عظیم اور باغ والے',
           last: 'سجدے کی پکار اور صاحبِ حوت',
         ),
+        'haqqah': (
+          number: 69,
+          name: 'سورۂ الحاقہ',
+          rukus: 2,
+          first: 'الحاقہ، گوشِ واعیہ اور دو نامے',
+          last: 'دیدہ و نادیدہ اور حق الیقین',
+        ),
+        'maarij': (
+          number: 70,
+          name: 'سورۂ المعارج',
+          rukus: 2,
+          first: 'زینوں کا رب اور دائم نمازی',
+          last: 'مشرقوں اور مغربوں کا رب',
+        ),
+        'nuh': (
+          number: 71,
+          name: 'سورۂ نوح',
+          rukus: 2,
+          first: 'رات دن کی پکار اور استغفار',
+          last: 'پانچ نام اور جامع دعا',
+        ),
+        'jinn': (
+          number: 72,
+          name: 'سورۂ الجن',
+          rukus: 2,
+          first: 'جنوں کا سماع اور عبدیت',
+          last: 'غیب کا امین رسول',
+        ),
+        'muzzammil': (
+          number: 73,
+          name: 'سورۂ المزمل',
+          rukus: 2,
+          first: 'قیامِ شب، ترتیل اور تبتل',
+          last: 'تخفیف کی رحمت',
+        ),
+        'muddaththir': (
+          number: 74,
+          name: 'سورۂ المدثر',
+          rukus: 2,
+          first: 'قیام، تکبیر اور فتنۂ عدد',
+          last: 'گروی جانیں اور دو مشیتیں',
+        ),
+        'qiyamah': (
+          number: 75,
+          name: 'سورۂ القیامہ',
+          rukus: 2,
+          first: 'نفسِ لوامہ اور دیدارِ رب',
+          last: 'انسان بے مہار نہیں',
+        ),
+        'dahr': (
+          number: 76,
+          name: 'سورۂ الدہر',
+          rukus: 2,
+          first: 'نامذکور سے شرابِ طہور تک',
+          last: 'دو مشیتیں، ایک راستہ',
+        ),
+        'mursalat': (
+          number: 77,
+          name: 'سورۂ المرسلات',
+          rukus: 2,
+          first: 'قسمیں، پیمانہ اور یومِ فصل',
+          last: 'سایے، چشمے اور رکوع کی پکار',
+        ),
+        'naba': (
+          number: 78,
+          name: 'سورۂ النبا',
+          rukus: 2,
+          first: 'بڑی خبر اور سراب پہاڑ',
+          last: 'رب کی طرف ٹھکانا',
+        ),
       };
 
   bundled.forEach((id, want) {
@@ -588,9 +693,11 @@ void main() {
             contains('رکوع'),
             reason: '$id ruku ${r.number}',
           );
+          // Normally a range (`۱ تا ۶`); a ruku that is a single ayah
+          // carries its own label instead (`آیت ۲۰`).
           expect(
             r.ayahRangeUrdu,
-            contains('تا'),
+            anyOf(contains('تا'), startsWith('آیت')),
             reason: '$id ruku ${r.number}',
           );
         }

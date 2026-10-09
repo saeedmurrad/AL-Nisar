@@ -214,6 +214,26 @@ flutter:
     - assets/tafseer/mulk/rukus/
     - assets/tafseer/qalam/surah.json
     - assets/tafseer/qalam/rukus/
+    - assets/tafseer/haqqah/surah.json
+    - assets/tafseer/haqqah/rukus/
+    - assets/tafseer/maarij/surah.json
+    - assets/tafseer/maarij/rukus/
+    - assets/tafseer/nuh/surah.json
+    - assets/tafseer/nuh/rukus/
+    - assets/tafseer/jinn/surah.json
+    - assets/tafseer/jinn/rukus/
+    - assets/tafseer/muzzammil/surah.json
+    - assets/tafseer/muzzammil/rukus/
+    - assets/tafseer/muddaththir/surah.json
+    - assets/tafseer/muddaththir/rukus/
+    - assets/tafseer/qiyamah/surah.json
+    - assets/tafseer/qiyamah/rukus/
+    - assets/tafseer/dahr/surah.json
+    - assets/tafseer/dahr/rukus/
+    - assets/tafseer/mursalat/surah.json
+    - assets/tafseer/mursalat/rukus/
+    - assets/tafseer/naba/surah.json
+    - assets/tafseer/naba/rukus/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
