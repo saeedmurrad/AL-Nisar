@@ -135,7 +135,7 @@ class _TafseerRukuScreenState extends State<TafseerRukuScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 StandardShellHeader(
-                  title: surah?.nameUrdu ?? 'Tafseer',
+                  title: surah?.nameUrdu ?? 'Tafseer-e-Quran',
                   onBack: () => context.go('/tafseer/${widget.surahId}'),
                   trailing: (ruku != null && _bodyHtml != null)
                       ? TafseerCopyButton(

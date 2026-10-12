@@ -23,7 +23,7 @@ import '../widgets/standard_shell_header.dart';
 import '../widgets/tafseer_search_field.dart';
 import '../widgets/tafseer_search_result_card.dart';
 
-/// Tafseer index: the surahs with bundled commentary.
+/// Tafseer-e-Quran index: the surahs with bundled tafseer.
 ///
 /// The whole Quran is bundled, so this screen has to make 114 surahs findable
 /// rather than merely list them. Three things do that: the search box doubles
@@ -144,7 +144,7 @@ class _TafseerListScreenState extends State<TafseerListScreen> {
             body: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const StandardShellHeader(title: 'Tafseer'),
+                const StandardShellHeader(title: 'Tafseer-e-Quran'),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(
                     AppLayout.md,
@@ -190,7 +190,7 @@ class _TafseerListScreenState extends State<TafseerListScreen> {
         if (snap.connectionState != ConnectionState.done) {
           return const BrandedStateView(
             icon: Icons.auto_stories_outlined,
-            title: 'Loading tafseer',
+            title: 'Loading Tafseer-e-Quran',
             loading: true,
           );
         }
@@ -199,7 +199,7 @@ class _TafseerListScreenState extends State<TafseerListScreen> {
           return const BrandedStateView(
             icon: Icons.auto_stories_outlined,
             title: 'No tafseer yet',
-            message: 'Commentary will appear here as it is published.',
+            message: 'Tafseer will appear here as it is published.',
           );
         }
 
@@ -441,8 +441,8 @@ class _Masthead extends StatelessWidget {
         children: [
           const SizedBox(height: AppLayout.lg),
           const SectionHeader(
-            caption: 'Tafseer',
-            title: 'Ishari Commentary',
+            caption: 'Tafseer-e-Quran',
+            title: 'Ishari Tafseer',
             urdu: 'اشاری تفسیر',
           ),
           const SizedBox(height: 12),
@@ -456,7 +456,7 @@ class _Masthead extends StatelessWidget {
       children: [
         const SizedBox(height: 14),
         Text(
-          'Ishari Commentary',
+          'Ishari Tafseer',
           textAlign: TextAlign.center,
           style: AppTheme.cormorantGaramond(
             fontSize: 21,

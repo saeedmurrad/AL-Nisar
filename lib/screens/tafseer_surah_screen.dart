@@ -117,7 +117,7 @@ class _TafseerSurahScreenState extends State<TafseerSurahScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     StandardShellHeader(
-                      title: surah?.nameUrdu ?? 'Tafseer',
+                      title: surah?.nameUrdu ?? 'Tafseer-e-Quran',
                       onBack: () => context.go('/tafseer'),
                       trailing: (surah != null && _canPrint)
                           ? TafseerPrintButton(
@@ -130,7 +130,7 @@ class _TafseerSurahScreenState extends State<TafseerSurahScreen> {
                       child: loading
                           ? const BrandedStateView(
                               icon: Icons.auto_stories_outlined,
-                              title: 'Loading tafseer',
+                              title: 'Loading Tafseer-e-Quran',
                               loading: true,
                             )
                           : surah == null
@@ -138,10 +138,10 @@ class _TafseerSurahScreenState extends State<TafseerSurahScreen> {
                               icon: Icons.search_off_rounded,
                               title: 'Tafseer not found',
                               message:
-                                  'No commentary is bundled for "${widget.surahId}".',
+                                  'No tafseer is bundled for "${widget.surahId}".',
                               action: OutlinedButton(
                                 onPressed: () => context.go('/tafseer'),
-                                child: const Text('Back to Tafseer'),
+                                child: const Text('Back to Tafseer-e-Quran'),
                               ),
                             )
                           : _SurahBody(surah: surah),

@@ -268,8 +268,8 @@ class _HomeGrid extends StatelessWidget {
           onTap: onBooks,
         ),
         _HomeGridCard(
-          label: 'Tafseer',
-          sublabel: 'Ishari commentary',
+          label: 'Tafseer-e-Quran',
+          sublabel: 'Ishari tafseer',
           iconKind: HomeGridIconKind.tafseer,
           onTap: onTafseer,
         ),

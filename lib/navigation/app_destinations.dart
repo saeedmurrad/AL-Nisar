@@ -40,7 +40,7 @@ List<AppDestination> _memberDestinationsFor(AuthProvider auth) => [
   ),
   const AppDestination(
     route: '/tafseer',
-    label: 'Tafseer',
+    label: 'Tafseer-e-Quran',
     icon: Icons.menu_book_rounded,
   ),
   const AppDestination(

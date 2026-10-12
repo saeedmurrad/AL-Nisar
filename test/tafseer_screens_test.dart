@@ -124,7 +124,7 @@ void main() {
 
     await _pump(tester, TafseerListScreen(service: _service));
 
-    expect(find.text('Ishari Commentary'), findsOneWidget);
+    expect(find.text('Ishari Tafseer'), findsOneWidget);
 
     // One card per surah, each with its own Urdu name and number badge.
     for (final (name, badge) in const [
@@ -940,8 +940,10 @@ void main() {
 
     expect(find.textContaining('PASSAGES'), findsOneWidget);
     expect(find.byType(TafseerSearchResultCard), findsWidgets);
-    // The surah picker is replaced while a query is active.
-    expect(find.text('Ishari Commentary'), findsNothing);
+    // The surah picker is replaced while a query is active; the section name
+    // in the shell header stays.
+    expect(find.text('Ishari Tafseer'), findsNothing);
+    expect(find.text('Tafseer-e-Quran'), findsOneWidget);
     // No surah is called نحن نقص, so the results are passages alone.
     expect(find.text('SURAHS'), findsNothing);
   });

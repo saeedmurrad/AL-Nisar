@@ -461,7 +461,7 @@ class AppFooter extends StatelessWidget {
     FooterLink('Home', '/home'),
     FooterLink('Sabaq', '/sabaq'),
     FooterLink('Books', '/books'),
-    FooterLink('Tafseer', '/tafseer'),
+    FooterLink('Tafseer-e-Quran', '/tafseer'),
     FooterLink('Irshadat', '/irshadat'),
     FooterLink('News & Events', '/news-events'),
     FooterLink('Shajra Pak', '/shijra'),
