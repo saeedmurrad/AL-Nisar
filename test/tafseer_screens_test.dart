@@ -914,10 +914,95 @@ void main() {
       await tester.pump(const Duration(milliseconds: 100));
     }
 
-    expect(find.textContaining('match'), findsWidgets);
+    expect(find.textContaining('PASSAGES'), findsOneWidget);
     expect(find.byType(TafseerSearchResultCard), findsWidgets);
     // The surah picker is replaced while a query is active.
     expect(find.text('Ishari Commentary'), findsNothing);
+    // No surah is called نحن نقص, so the results are passages alone.
+    expect(find.text('SURAHS'), findsNothing);
+  });
+
+  testWidgets('a query that names a surah offers it above the passages', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(900, 3000);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
+    await _pump(tester, TafseerListScreen(service: _service));
+
+    // Latin, because reaching surah 36 should not require a Urdu keyboard.
+    await tester.enterText(find.byType(TextField), 'yasin');
+    await tester.pump(const Duration(milliseconds: 400));
+    for (var i = 0; i < 20; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+
+    expect(find.text('SURAHS'), findsOneWidget);
+    expect(find.text('سورۂ یٰسٓ'), findsOneWidget);
+    expect(find.text('۳۶'), findsOneWidget);
+  });
+
+  testWidgets('a surah number jumps straight to that surah', (tester) async {
+    tester.view.physicalSize = const Size(900, 3000);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
+    await _pump(tester, TafseerListScreen(service: _service));
+    await tester.enterText(find.byType(TextField), '36');
+    await tester.pump(const Duration(milliseconds: 400));
+    for (var i = 0; i < 20; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+
+    expect(find.text('سورۂ یٰسٓ'), findsOneWidget);
+    // Exactly one: `36` must not also drag in 3, 6 or 136-style prefixes.
+    expect(find.text('سورۂ الفاتحہ'), findsNothing);
+  });
+
+  testWidgets('a range chip narrows the grid to ten surahs', (tester) async {
+    tester.view.physicalSize = const Size(900, 3000);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
+    await _pump(tester, TafseerListScreen(service: _service));
+    expect(find.text('114 surahs  ·  558 rukus'), findsOneWidget);
+
+    await tester.tap(find.text('۳۱–۴۰'));
+    for (var i = 0; i < 6; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+
+    expect(find.text('10 of 114 surahs'), findsOneWidget);
+    expect(find.text('سورۂ یٰسٓ'), findsOneWidget); // 36, inside the range
+    expect(find.text('سورۂ الفاتحہ'), findsNothing); // 1, outside it
+    expect(find.text('سورۂ الناس'), findsNothing); // 114, outside it
+  });
+
+  testWidgets('the grid reflows from one column to three', (tester) async {
+    addTearDown(tester.view.reset);
+    tester.view.devicePixelRatio = 1.0;
+
+    for (final (width, columns) in const [
+      (320.0, 1), // the narrowest phone still in use
+      (380.0, 1), // phone
+      (820.0, 2), // tablet
+      // A 1440px desktop window less the 264px side nav lands here, so the
+      // three-column breakpoint has to sit below it.
+      (1176.0, 3),
+      (1700.0, 4), // large monitor
+    ]) {
+      tester.view.physicalSize = Size(width, 30000);
+      await _pump(tester, TafseerListScreen(service: _service));
+
+      final grid = tester.widget<SliverGrid>(find.byType(SliverGrid));
+      final delegate =
+          grid.gridDelegate as SliverGridDelegateWithFixedCrossAxisCount;
+      expect(delegate.crossAxisCount, columns, reason: 'at ${width}px');
+      // Every surah is reachable at every width.
+      expect(find.text('سورۂ الفاتحہ'), findsOneWidget, reason: '${width}px');
+      expect(find.text('سورۂ الناس'), findsOneWidget, reason: '${width}px');
+    }
   });
 
   testWidgets('a query with no matches shows the empty state', (tester) async {

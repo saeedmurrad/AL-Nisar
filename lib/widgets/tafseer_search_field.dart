@@ -21,13 +21,18 @@ class TafseerSearchField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.c;
+    // The full bilingual hint runs past the end of a phone-width field, so a
+    // narrow screen gets the short form rather than a clipped long one.
+    final narrow = MediaQuery.sizeOf(context).width < 560;
     return TextField(
       controller: controller,
       onChanged: onChanged,
       textInputAction: TextInputAction.search,
       style: AppTheme.lato(fontSize: 15, color: c.textPrimary),
       decoration: InputDecoration(
-        hintText: 'کوئی لفظ یا آیت تلاش کریں  ·  Search any word or ayah',
+        hintText: narrow
+            ? 'سورت یا لفظ  ·  Surah or word'
+            : 'سورت، لفظ یا آیت  ·  Search a surah, word or ayah',
         hintStyle: AppTheme.lato(fontSize: 13, color: c.textMuted),
         prefixIcon: Icon(Icons.search_rounded, color: c.accentGold, size: 21),
         suffixIcon: controller.text.isEmpty

@@ -52,10 +52,8 @@ void main() {
   group('foldForSearch matches the reference folding', () {
     test('for every code unit, alone and inside a word', () {
       for (var u = 0; u <= 0xFFFF; u++) {
-        for (final input in [
-          '${String.fromCharCode(u)}',
-          'ا${String.fromCharCode(u)}ا',
-        ]) {
+        final ch = String.fromCharCode(u);
+        for (final input in [ch, 'ا$chا']) {
           final got = foldForSearch(input);
           final want = _reference(input);
           expect(got.value, want.value, reason: 'U+${u.toRadixString(16)}');
