@@ -18,6 +18,10 @@ class TafseerBundledService {
 
   static const _indexPath = 'assets/tafseer/index.json';
 
+  /// Built by `tool/build_tafseer_search_index.dart`. Optional: when it is
+  /// missing the search service scans the content instead.
+  static const _searchIndexPath = 'assets/tafseer/search-index.json';
+
   static String _surahPath(String id) => 'assets/tafseer/$id/surah.json';
 
   static String rukuPath(String id, int number) =>
@@ -48,6 +52,15 @@ class TafseerBundledService {
       );
       _surahCache[id] = surah;
       return surah;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// The precomputed full-text search index, or null if it is not bundled.
+  Future<String?> loadSearchIndexJson() async {
+    try {
+      return await _bundle.loadString(_searchIndexPath);
     } catch (_) {
       return null;
     }

@@ -7,7 +7,20 @@ there is no admin UI and nothing is stored in Firestore.
 index.json              list of surahs shown on /tafseer
 <id>/surah.json         masthead, preface, symbol key, ruku index + glossaries
 <id>/rukus/NN.html      one ruku's body paragraphs, zero-padded
+search-index.json       GENERATED — do not edit by hand
 ```
+
+`search-index.json` is the full-text search index, precomputed so the first
+query does not have to read all 114 surahs and 558 ruku bodies. Regenerate it
+whenever the content changes:
+
+```sh
+dart run tool/build_tafseer_search_index.dart
+```
+
+The deploy workflow runs it too, and `test/tafseer_search_index_test.dart`
+fails if the committed file has drifted — so a surah added without it will not
+ship a stale index, it will fail the build.
 
 Currently bundled, in surah order:
 

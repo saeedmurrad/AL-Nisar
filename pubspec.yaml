@@ -100,6 +100,7 @@ flutter:
     - assets/shajra/urdu/list.json
     - assets/shajra/urdu/details/
     - assets/tafseer/index.json
+    - assets/tafseer/search-index.json
     - assets/tafseer/fatihah/surah.json
     - assets/tafseer/fatihah/rukus/
     - assets/tafseer/baqarah/surah.json

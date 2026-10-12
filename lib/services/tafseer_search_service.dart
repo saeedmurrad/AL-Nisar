@@ -1,43 +1,29 @@
 import '../models/tafseer_search.dart';
 import '../utils/arabic_search_text.dart';
-import '../utils/tafseer_plain_text.dart';
+import '../utils/tafseer_passages.dart';
+import '../utils/tafseer_search_index.dart';
 import 'tafseer_bundled_service.dart';
-
-/// One searchable passage: a paragraph, an ayah, a glossary entry or a title.
-class _Passage {
-  _Passage({
-    required this.surahId,
-    required this.surahNameUrdu,
-    required this.surahNumber,
-    required this.rukuNumber,
-    required this.rukuTitle,
-    required this.kind,
-    required this.text,
-  }) : folded = foldForSearch(text);
-
-  final String surahId;
-  final String surahNameUrdu;
-  final int surahNumber;
-  final int rukuNumber;
-  final String rukuTitle;
-  final TafseerMatchKind kind;
-  final String text;
-  final SearchText folded;
-}
 
 /// Full-text search across every bundled surah.
 ///
-/// The index is built once on the first query — the whole corpus is a little
-/// under a megabyte of bundled assets, so there is nothing to gain from a
-/// precomputed index file, and this keeps the content the single source.
+/// The index is `assets/tafseer/search-index.json`, precomputed by
+/// `tool/build_tafseer_search_index.dart`: reading the corpus itself would
+/// mean 673 asset loads and parsing 14MB of HTML before the first query could
+/// answer. If that file is missing — an older bundle, or a test with its own
+/// asset bundle — the same passages are scanned out of the content instead,
+/// which is slower but identical.
 class TafseerSearchService {
   TafseerSearchService({TafseerBundledService? content})
     : _content = content ?? TafseerBundledService();
 
   final TafseerBundledService _content;
 
-  List<_Passage>? _index;
+  List<TafseerPassage>? _index;
   Future<void>? _building;
+
+  /// Whether the last build read the precomputed index rather than scanning.
+  bool get usedPrecomputedIndex => _usedPrecomputed;
+  bool _usedPrecomputed = false;
 
   bool get isIndexed => _index != null;
 
@@ -47,51 +33,28 @@ class TafseerSearchService {
   }
 
   Future<void> _build() async {
-    final passages = <_Passage>[];
+    final precomputed = decodeTafseerSearchIndex(
+      await _content.loadSearchIndexJson(),
+    );
+    _usedPrecomputed = precomputed != null;
+    _index = precomputed ?? await _scanContent();
+    _building = null;
+  }
 
+  /// Rebuilds the passages from the content, for when the index is absent.
+  Future<List<TafseerPassage>> _scanContent() async {
+    final passages = <TafseerPassage>[];
     for (final summary in await _content.loadIndex()) {
       final surah = await _content.loadSurah(summary.id);
       if (surah == null) continue;
-
       for (final ruku in surah.rukus) {
-        void add(TafseerMatchKind kind, String text) {
-          final trimmed = text.trim();
-          if (trimmed.isEmpty) return;
-          passages.add(
-            _Passage(
-              surahId: surah.id,
-              surahNameUrdu: surah.nameUrdu,
-              surahNumber: surah.surahNumber,
-              rukuNumber: ruku.number,
-              rukuTitle: ruku.titleUrdu,
-              kind: kind,
-              text: trimmed,
-            ),
-          );
-        }
-
-        add(TafseerMatchKind.title, ruku.titleUrdu);
-        add(TafseerMatchKind.ayah, ruku.ayahBlock);
-        for (final g in ruku.glossary) {
-          add(
-            TafseerMatchKind.glossary,
-            '${g.term}: ${stripHtml(g.definitionHtml)}',
-          );
-        }
-
         final html = await _content.loadRukuHtml(surah.id, ruku.number);
-        if (html == null) continue;
-        for (final para in _paragraphsOf(html)) {
-          add(TafseerMatchKind.commentary, para.prose);
-          for (final ayah in para.ayat) {
-            add(TafseerMatchKind.ayah, ayah);
-          }
-        }
+        passages.addAll(
+          tafseerRukuPassages(surah: surah, ruku: ruku, bodyHtml: html ?? ''),
+        );
       }
     }
-
-    _index = passages;
-    _building = null;
+    return passages;
   }
 
   Future<List<TafseerSearchHit>> search(
@@ -104,15 +67,21 @@ class TafseerSearchService {
     if (needle.isEmpty) return const [];
 
     await buildIndex();
-    final index = _index ?? const <_Passage>[];
+    final index = _index ?? const <TafseerPassage>[];
 
     final hits = <TafseerSearchHit>[];
     for (final p in index) {
       if (surahId != null && p.surahId != surahId) continue;
-      if (kinds != null && kinds.isNotEmpty && !kinds.contains(p.kind)) continue;
+      if (kinds != null && kinds.isNotEmpty && !kinds.contains(p.kind)) {
+        continue;
+      }
 
-      final at = p.folded.value.indexOf(needle);
+      final at = p.folded.indexOf(needle);
       if (at < 0) continue;
+
+      // Only a hit needs the map back into the original text, so it is built
+      // here rather than kept for every passage in the corpus.
+      final folded = foldForSearch(p.text);
 
       hits.add(
         TafseerSearchHit(
@@ -123,8 +92,8 @@ class TafseerSearchService {
           rukuTitle: p.rukuTitle,
           kind: p.kind,
           text: p.text,
-          matchStart: p.folded.sourceIndex[at],
-          matchEnd: p.folded.sourceIndex[at + needle.length],
+          matchStart: folded.sourceIndex[at],
+          matchEnd: folded.sourceIndex[at + needle.length],
         ),
       );
       if (hits.length >= limit) break;
@@ -146,28 +115,5 @@ class TafseerSearchService {
       return a.rukuNumber.compareTo(b.rukuNumber);
     });
     return hits;
-  }
-
-  /// Splits a ruku body into paragraphs, separating the inline ayah fragments
-  /// from the prose around them so each can be matched and labelled.
-  static List<({String prose, List<String> ayat})> _paragraphsOf(String html) {
-    final out = <({String prose, List<String> ayat})>[];
-    final paraRe = RegExp(r'<p\b[^>]*>(.*?)</p>', dotAll: true, caseSensitive: false);
-    final ayahRe = RegExp(
-      r'<span[^>]*class="[^"]*\bayah\b[^"]*"[^>]*>(.*?)</span>',
-      dotAll: true,
-      caseSensitive: false,
-    );
-
-    for (final m in paraRe.allMatches(html)) {
-      final inner = m.group(1) ?? '';
-      final ayat = ayahRe
-          .allMatches(inner)
-          .map((a) => stripHtml(a.group(1) ?? ''))
-          .where((a) => a.isNotEmpty)
-          .toList();
-      out.add((prose: stripHtml(inner), ayat: ayat));
-    }
-    return out;
   }
 }

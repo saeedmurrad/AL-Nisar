@@ -17,10 +17,45 @@ class SearchText {
   bool get isEmpty => value.isEmpty;
 }
 
-// Harakat, tanwin, superscript alef, and the Quranic annotation marks.
-final _marks = RegExp(
-  r'[ً-ٰٟـۖ-ࣰۭ-ࣿ‌‍﻿]',
-);
+// Harakat, tanwin, superscript alef, tatweel, the Quranic annotation marks,
+// and the zero-width joiners — everything a reader never types.
+//
+// Tested by code unit rather than by regex: folding runs over the whole corpus
+// when the search index is read, and a `RegExp.hasMatch` per character was the
+// single most expensive thing in that loop.
+bool _isMark(int u) =>
+    (u >= 0x064B && u <= 0x065F) || // harakat and tanwin
+    u == 0x0670 || // superscript alef
+    u == 0x0640 || // tatweel
+    (u >= 0x06D6 && u <= 0x06ED) || // Quranic annotation marks
+    (u >= 0x08F0 && u <= 0x08FF) || // Arabic Extended-A marks
+    u == 0x200C || // ZWNJ
+    u == 0x200D || // ZWJ
+    u == 0xFEFF; // BOM
+
+/// The Unicode White_Space property, which is what `String.trim` matches.
+bool _isSpace(int u) =>
+    u == 0x20 ||
+    (u >= 0x09 && u <= 0x0D) ||
+    u == 0x85 ||
+    u == 0xA0 ||
+    u == 0x1680 ||
+    (u >= 0x2000 && u <= 0x200A) ||
+    u == 0x2028 ||
+    u == 0x2029 ||
+    u == 0x202F ||
+    u == 0x205F ||
+    u == 0x3000;
+
+/// True for the blocks this content is written in, none of which hold a cased
+/// character — so a code unit from them is its own lowercase and needs no
+/// `toLowerCase` call.
+bool _isUncasedArabic(int u) =>
+    (u >= 0x0600 && u <= 0x06FF) ||
+    (u >= 0x0750 && u <= 0x077F) ||
+    (u >= 0x08A0 && u <= 0x08FF) ||
+    (u >= 0xFB50 && u <= 0xFDFF) ||
+    (u >= 0xFE70 && u <= 0xFEFF);
 
 const _folds = <String, String>{
   // Alef forms
@@ -38,46 +73,105 @@ const _folds = <String, String>{
 };
 
 const _digits = <String, String>{
-  '۰': '0', '۱': '1', '۲': '2', '۳': '3', '۴': '4',
-  '۵': '5', '۶': '6', '۷': '7', '۸': '8', '۹': '9',
-  '٠': '0', '١': '1', '٢': '2', '٣': '3', '٤': '4',
-  '٥': '5', '٦': '6', '٧': '7', '٨': '8', '٩': '9',
+  '۰': '0',
+  '۱': '1',
+  '۲': '2',
+  '۳': '3',
+  '۴': '4',
+  '۵': '5',
+  '۶': '6',
+  '۷': '7',
+  '۸': '8',
+  '۹': '9',
+  '٠': '0',
+  '١': '1',
+  '٢': '2',
+  '٣': '3',
+  '٤': '4',
+  '٥': '5',
+  '٦': '6',
+  '٧': '7',
+  '٨': '8',
+  '٩': '9',
+};
+
+/// [_folds] and [_digits] keyed by code unit, which is how [_fold] reads them.
+final _foldUnits = <int, String>{
+  for (final e in _folds.entries) e.key.codeUnitAt(0): e.value,
+  for (final e in _digits.entries) e.key.codeUnitAt(0): e.value,
 };
 
 /// Folds [input] for matching and records where each kept character came from.
 SearchText foldForSearch(String input) {
-  final buf = StringBuffer();
   final map = <int>[];
+  final value = _fold(input, map);
+  map.add(input.length);
+  return SearchText(value, map);
+}
+
+/// The folded text alone, identical to `foldForSearch(input).value`.
+///
+/// The index map is several integers per character, so building one for the
+/// whole corpus just to throw it away is the expensive half of folding. The
+/// search index folds tens of thousands of passages to match against and needs
+/// a map only for the few a query actually hits.
+String foldValueForSearch(String input) => _fold(input, null);
+
+String _fold(String input, List<int>? map) {
+  final buf = StringBuffer();
 
   var pendingSpace = false;
   for (var i = 0; i < input.length; i++) {
-    final ch = input[i];
+    final u = input.codeUnitAt(i);
 
-    if (_marks.hasMatch(ch)) continue;
+    if (_isMark(u)) continue;
 
-    if (ch.trim().isEmpty) {
+    if (_isSpace(u)) {
       // Collapse runs of whitespace to a single space, never leading.
       if (buf.isNotEmpty) pendingSpace = true;
       continue;
     }
     if (pendingSpace) {
       buf.write(' ');
-      map.add(i);
+      map?.add(i);
       pendingSpace = false;
     }
 
-    final folded = _folds[ch] ?? _digits[ch] ?? ch.toLowerCase();
+    final folded = _foldUnit(u);
+    if (folded == null) {
+      buf.writeCharCode(u);
+      map?.add(i);
+      continue;
+    }
     buf.write(folded);
-    // One map entry per emitted character: toLowerCase can widen a character,
+    // One map entry per emitted character: lowercasing can widen a character,
     // and a desynced map would highlight the wrong span.
     for (var k = 0; k < folded.length; k++) {
-      map.add(i);
+      map?.add(i);
     }
   }
 
-  map.add(input.length);
-  return SearchText(buf.toString(), map);
+  return buf.toString();
 }
 
+/// What [u] folds to, or null when it stands for itself.
+String? _foldUnit(int u) {
+  if (u < 0x80) {
+    return (u >= 0x41 && u <= 0x5A) ? _asciiLower[u - 0x41] : null;
+  }
+  final mapped = _foldUnits[u];
+  if (mapped != null) return mapped;
+  if (_isUncasedArabic(u)) return null;
+
+  // Anything else — Latin letters in a glossary, a stray accented character.
+  final lower = String.fromCharCode(u).toLowerCase();
+  return (lower.length == 1 && lower.codeUnitAt(0) == u) ? null : lower;
+}
+
+const _asciiLower = [
+  'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', //
+  'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+];
+
 /// Folds a query the same way, without needing the index map.
-String foldQuery(String query) => foldForSearch(query).value.trim();
+String foldQuery(String query) => foldValueForSearch(query).trim();

@@ -35,6 +35,11 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Precompute the Tafseer search index
+        # Keeps the deployed index authoritative even if the committed one is
+        # stale; test/tafseer_search_index_test.dart guards the commit itself.
+        run: dart run tool/build_tafseer_search_index.dart
+
       - name: Build web
         # Served from https://portal.al-nisar.com/ (GitHub Pages + web/CNAME).
         run: flutter build web --release --base-href /
