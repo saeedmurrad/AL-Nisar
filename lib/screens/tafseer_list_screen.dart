@@ -11,6 +11,7 @@ import '../theme/app_layout.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_theme_colors.dart';
 import '../theme/color_utils.dart';
+import '../theme/tafseer_theme.dart';
 import '../utils/responsive_layout.dart';
 import '../utils/tafseer_surah_filter.dart';
 import '../utils/urdu_digits.dart';
@@ -126,42 +127,56 @@ class _TafseerListScreenState extends State<TafseerListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final c = context.c;
-
-    return Scaffold(
-      backgroundColor: c.backgroundPrimary,
-      drawer: ResponsiveLayout.isExpanded(context) ? null : const AppDrawer(),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const StandardShellHeader(title: 'Tafseer'),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-              AppLayout.md,
-              AppLayout.sm,
-              AppLayout.md,
-              0,
+    // The index reads on the same paper as the surahs it opens into; the
+    // shell header keeps the app's emerald chrome, as it does in the reader.
+    // The palette has to be read from a context *below* this wrapper, hence
+    // the Builder — an outer `context.c` would still be the app's own.
+    return Theme(
+      data: tafseerTheme(context),
+      child: Builder(
+        builder: (context) {
+          final c = context.c;
+          return Scaffold(
+            backgroundColor: c.backgroundPrimary,
+            drawer: ResponsiveLayout.isExpanded(context)
+                ? null
+                : const AppDrawer(),
+            body: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const StandardShellHeader(title: 'Tafseer'),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    AppLayout.md,
+                    AppLayout.sm,
+                    AppLayout.md,
+                    0,
+                  ),
+                  child: ContentColumn(
+                    maxWidth: 720,
+                    child: TafseerSearchField(
+                      controller: _queryController,
+                      onChanged: _onQueryChanged,
+                      onClear: _clearSearch,
+                    ),
+                  ),
+                ),
+                // The ranges stay put while the grid scrolls — on a phone,
+                // scrolling back to the top of 114 surahs to change filter is
+                // the whole problem this strip exists to solve.
+                if (!_isSearching)
+                  _SurahRangeStrip(
+                    surahs: _all,
+                    selected: _range,
+                    onSelected: _selectRange,
+                  ),
+                Expanded(
+                  child: _isSearching ? _buildResults() : _buildBrowse(),
+                ),
+              ],
             ),
-            child: ContentColumn(
-              maxWidth: 720,
-              child: TafseerSearchField(
-                controller: _queryController,
-                onChanged: _onQueryChanged,
-                onClear: _clearSearch,
-              ),
-            ),
-          ),
-          // The ranges stay put while the grid scrolls — on a phone, scrolling
-          // back to the top of 114 surahs to change filter is the whole
-          // problem this strip exists to solve.
-          if (!_isSearching)
-            _SurahRangeStrip(
-              surahs: _all,
-              selected: _range,
-              onSelected: _selectRange,
-            ),
-          Expanded(child: _isSearching ? _buildResults() : _buildBrowse()),
-        ],
+          );
+        },
       ),
     );
   }

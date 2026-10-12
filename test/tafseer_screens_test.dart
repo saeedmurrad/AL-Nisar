@@ -673,6 +673,30 @@ void main() {
     expect(prev.onPressed, isNotNull);
   });
 
+  testWidgets('the index reads on the same paper as the reader', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(900, 3000);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
+    // The harness supplies a green app palette; if the index were still on it,
+    // the index and the surah it opens would not match.
+    for (final (brightness, colors) in const [
+      (Brightness.light, kTafseerLightColors),
+      (Brightness.dark, kTafseerDarkColors),
+    ]) {
+      await _pump(
+        tester,
+        TafseerListScreen(service: _service),
+        brightness: brightness,
+      );
+      final scaffold = tester.widget<Scaffold>(find.byType(Scaffold).last);
+      expect(scaffold.backgroundColor, colors.backgroundPrimary);
+      expect(scaffold.backgroundColor, isNot(_colors.backgroundPrimary));
+    }
+  });
+
   testWidgets('reader adopts the dark paper palette in dark mode', (
     tester,
   ) async {
