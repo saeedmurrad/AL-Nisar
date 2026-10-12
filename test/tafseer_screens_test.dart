@@ -118,7 +118,7 @@ void main() {
   setUpAll(() => GoogleFonts.config.allowRuntimeFetching = false);
 
   testWidgets('index screen lists every bundled surah', (tester) async {
-    tester.view.physicalSize = const Size(900, 27000);
+    tester.view.physicalSize = const Size(900, 30000);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.reset);
 
@@ -128,6 +128,17 @@ void main() {
 
     // One card per surah, each with its own Urdu name and number badge.
     for (final (name, badge) in const [
+      ('سورۂ الفاتحہ', '۱'),
+      ('سورۂ البقرہ', '۲'),
+      ('سورۂ آلِ عمران', '۳'),
+      ('سورۂ النساء', '۴'),
+      ('سورۂ المائدہ', '۵'),
+      ('سورۂ الانعام', '۶'),
+      ('سورۂ الاعراف', '۷'),
+      ('سورۂ الانفال', '۸'),
+      ('سورۂ التوبہ', '۹'),
+      ('سورۂ یونس', '۱۰'),
+      ('سورۂ ہود', '۱۱'),
       ('سورۂ یوسف', '۱۲'),
       ('سورۂ رعد', '۱۳'),
       ('سورۂ ابراہیم', '۱۴'),
@@ -236,12 +247,24 @@ void main() {
       expect(find.text(badge), findsOneWidget, reason: badge);
     }
 
-    expect(find.text('16 rukus · Urdu'), findsOneWidget);
-    // Yusuf, Bani Israel and Al-Kahf all have twelve.
+    // The whole Quran is bundled, so the tallies below cover every surah.
+    expect(find.text('40 rukus · Urdu'), findsOneWidget); // Al-Baqarah
+    expect(find.text('24 rukus · Urdu'), findsNWidgets(2)); // An-Nisa, Al-A'raf
+    expect(
+      find.text('20 rukus · Urdu'),
+      findsNWidgets(2),
+    ); // Al-'Imran, Al-An'am
+    // Al-Ma'idah, At-Tawbah and An-Nahl.
+    expect(find.text('16 rukus · Urdu'), findsNWidgets(3));
+    // Yusuf, Bani Israel and Al-Kahf.
     expect(find.text('12 rukus · Urdu'), findsNWidgets(3));
-    expect(find.text('11 rukus · Urdu'), findsOneWidget);
-    expect(find.text('10 rukus · Urdu'), findsOneWidget);
-    // An-Nur, Al-Qasas, Al-Ahzab and Ghafir all have nine.
+    expect(
+      find.text('11 rukus · Urdu'),
+      findsNWidgets(2),
+    ); // Yunus, Ash-Shu'ara
+    // Al-Anfal, Hud and Al-Hajj.
+    expect(find.text('10 rukus · Urdu'), findsNWidgets(3));
+    // An-Nur, Al-Qasas, Al-Ahzab and Ghafir.
     expect(find.text('9 rukus · Urdu'), findsNWidgets(4));
     // Ta-Ha and Az-Zumar.
     expect(find.text('8 rukus · Urdu'), findsNWidgets(2));
@@ -257,12 +280,12 @@ void main() {
     // As-Sajdah, Ad-Dukhan, Qaf, Adh-Dhariyat, An-Najm, Al-Qamar,
     // Ar-Rahman, Al-Waqi'ah, Al-Mujadilah and Al-Hashr.
     expect(find.text('3 rukus · Urdu'), findsNWidgets(10));
-    // Al-Hujurat, At-Tur, the nineteen short surahs from Al-Mumtahanah
-    // through An-Naba, and An-Nazi'at.
+    // Al-Hujurat, At-Tur and the nineteen short surahs from Al-Mumtahanah
+    // through An-Naba, plus An-Nazi'at.
     expect(find.text('2 rukus · Urdu'), findsNWidgets(22));
-    // 'Abasa onward are a single ruku each, so the noun is singular —
-    // "1 rukus" would be wrong.
-    expect(find.text('1 ruku · Urdu'), findsNWidgets(35));
+    // Al-Fatihah and 'Abasa onward are a single ruku each, so the noun is
+    // singular — "1 rukus" would be wrong.
+    expect(find.text('1 ruku · Urdu'), findsNWidgets(36));
     expect(find.text('1 rukus · Urdu'), findsNothing);
   });
 
@@ -272,6 +295,41 @@ void main() {
     addTearDown(tester.view.reset);
 
     for (final (id, first, last, lastNum, pastEnd) in const [
+      ('fatihah', 'بندے اور رب کی گفتگو', 'بندے اور رب کی گفتگو', '۱', '۲'),
+      (
+        'baqarah',
+        'غیب پر ایمان اور دل کی مہر',
+        'ایمانِ رسول اور آخری دعا',
+        '۴۰',
+        '۴۱',
+      ),
+      (
+        'al-imran',
+        'قیّوم ذات اور راسخ دل',
+        'اہلِ دانش کا ذکر و فکر',
+        '۲۰',
+        '۲۱',
+      ),
+      ('nisa', 'نفسِ واحدہ اور یتیم کا حق', 'عبدیت، برہان اور نور', '۲۴', '۲۵'),
+      (
+        'maidah',
+        'عہدوں کی وفا اور دین کا کمال',
+        'جواب میں ادب کی معراج',
+        '۱۶',
+        '۱۷',
+      ),
+      ('anam', 'تاریکیاں اور ایک نور', 'ساری زندگی ایک سجدہ', '۲۰', '۲۱'),
+      ('araf', 'کتاب، سوال اور میزان', 'ولایت، عفو، ذکر اور سجدہ', '۲۴', '۲۵'),
+      ('anfal', 'جب دل لرز اٹھیں', 'دل کی بھلائی کا علم', '۱۰', '۱۱'),
+      (
+        'tawbah',
+        'اعلانِ براءت اور دروازۂ امان',
+        'رؤوف و رحیم رسول',
+        '۱۶',
+        '۱۷',
+      ),
+      ('yunus', 'کتابِ حکیم اور سچا قدم', 'جو راہ پائے اپنے لیے', '۱۱', '۱۲'),
+      ('hud', 'رزق، عرش اور آزمائش', 'حکم کے مطابق استقامت', '۱۰', '۱۱'),
       ('raad', 'ایک پانی، مختلف پھل', 'محو و اثبات اور اُمّ الکتاب', '۶', '۷'),
       ('ibrahim', 'ظلمات سے نور تک', 'تبدیلِ ارض اور بلاغ', '۷', '۸'),
       ('hijr', 'ذکرِ محفوظ اور مسحور نگاہ', 'یقین کی آمد تک', '۶', '۷'),
@@ -676,12 +734,37 @@ void main() {
     expect(find.text('۱۲'), findsOneWidget);
   });
 
+  testWidgets('At-Tawbah renders no basmala line, every other surah does', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(900, 4000);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
+    const basmala = 'بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ';
+
+    await _pump(
+      tester,
+      TafseerSurahScreen(surahId: 'tawbah', service: _service),
+    );
+    expect(find.text('سورۂ التوبہ'), findsWidgets);
+    expect(find.text(basmala), findsNothing);
+    // An empty Text would still occupy the masthead, so assert on the gap.
+    expect(find.text(''), findsNothing);
+
+    await _pump(
+      tester,
+      TafseerSurahScreen(surahId: 'yunus', service: _service),
+    );
+    expect(find.text(basmala), findsOneWidget);
+  });
+
   testWidgets('surah screen shows a branded state for an unknown surah', (
     tester,
   ) async {
     await _pump(
       tester,
-      TafseerSurahScreen(surahId: 'baqarah', service: _service),
+      TafseerSurahScreen(surahId: 'not-a-surah', service: _service),
     );
     expect(find.text('Tafseer not found'), findsOneWidget);
   });

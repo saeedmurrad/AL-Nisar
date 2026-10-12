@@ -30,16 +30,28 @@ void main() {
     expect(rukus.last.eyebrow, isNot(contains('آیات آیت')));
   });
 
-  // The bundle now runs unbroken from Surah Yusuf to the end of the Quran.
+  // The bundle now runs unbroken across the whole Quran.
   // A missing or duplicated surah would otherwise only show as a shifted
   // count somewhere far away in the fixtures.
-  test('index covers surahs 12 through 114 with no gaps', () async {
+  // At-Tawbah is the only surah of the Quran that opens without a basmala.
+  // Every other surah must still carry one.
+  test('only At-Tawbah has no basmala', () async {
+    final index = await service.loadIndex();
+    final without = <String>[];
+    for (final summary in index) {
+      final surah = await service.loadSurah(summary.id);
+      if (surah!.basmala.trim().isEmpty) without.add(summary.id);
+    }
+    expect(without, ['tawbah']);
+  });
+
+  test('index covers the whole Quran, surahs 1 through 114', () async {
     final index = await service.loadIndex();
     final numbers = index.map((s) => s.surahNumber).toList();
 
-    expect(numbers.first, 12);
+    expect(numbers.first, 1);
     expect(numbers.last, 114);
-    expect(numbers, List<int>.generate(114 - 12 + 1, (i) => 12 + i));
+    expect(numbers, List<int>.generate(114, (i) => 1 + i));
     expect(numbers.toSet(), hasLength(numbers.length));
     expect(index.map((s) => s.id).toSet(), hasLength(index.length));
   });
@@ -47,6 +59,17 @@ void main() {
   test('index lists the bundled surahs in surah order', () async {
     final index = await service.loadIndex();
     expect(index.map((s) => s.id).toList(), [
+      'fatihah',
+      'baqarah',
+      'al-imran',
+      'nisa',
+      'maidah',
+      'anam',
+      'araf',
+      'anfal',
+      'tawbah',
+      'yunus',
+      'hud',
       'yusuf',
       'raad',
       'ibrahim',
@@ -152,6 +175,17 @@ void main() {
       'nas',
     ]);
     expect(index.map((s) => s.surahNumber).toList(), [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
       12,
       13,
       14,
@@ -277,6 +311,83 @@ void main() {
         String,
         ({int number, String name, int rukus, String first, String last})
       >{
+        'fatihah': (
+          number: 1,
+          name: 'سورۂ الفاتحہ',
+          rukus: 1,
+          first: 'بندے اور رب کی گفتگو',
+          last: 'بندے اور رب کی گفتگو',
+        ),
+        'baqarah': (
+          number: 2,
+          name: 'سورۂ البقرہ',
+          rukus: 40,
+          first: 'غیب پر ایمان اور دل کی مہر',
+          last: 'ایمانِ رسول اور آخری دعا',
+        ),
+        'al-imran': (
+          number: 3,
+          name: 'سورۂ آلِ عمران',
+          rukus: 20,
+          first: 'قیّوم ذات اور راسخ دل',
+          last: 'اہلِ دانش کا ذکر و فکر',
+        ),
+        'nisa': (
+          number: 4,
+          name: 'سورۂ النساء',
+          rukus: 24,
+          first: 'نفسِ واحدہ اور یتیم کا حق',
+          last: 'عبدیت، برہان اور نور',
+        ),
+        'maidah': (
+          number: 5,
+          name: 'سورۂ المائدہ',
+          rukus: 16,
+          first: 'عہدوں کی وفا اور دین کا کمال',
+          last: 'جواب میں ادب کی معراج',
+        ),
+        'anam': (
+          number: 6,
+          name: 'سورۂ الانعام',
+          rukus: 20,
+          first: 'تاریکیاں اور ایک نور',
+          last: 'ساری زندگی ایک سجدہ',
+        ),
+        'araf': (
+          number: 7,
+          name: 'سورۂ الاعراف',
+          rukus: 24,
+          first: 'کتاب، سوال اور میزان',
+          last: 'ولایت، عفو، ذکر اور سجدہ',
+        ),
+        'anfal': (
+          number: 8,
+          name: 'سورۂ الانفال',
+          rukus: 10,
+          first: 'جب دل لرز اٹھیں',
+          last: 'دل کی بھلائی کا علم',
+        ),
+        'tawbah': (
+          number: 9,
+          name: 'سورۂ التوبہ',
+          rukus: 16,
+          first: 'اعلانِ براءت اور دروازۂ امان',
+          last: 'رؤوف و رحیم رسول',
+        ),
+        'yunus': (
+          number: 10,
+          name: 'سورۂ یونس',
+          rukus: 11,
+          first: 'کتابِ حکیم اور سچا قدم',
+          last: 'جو راہ پائے اپنے لیے',
+        ),
+        'hud': (
+          number: 11,
+          name: 'سورۂ ہود',
+          rukus: 10,
+          first: 'رزق، عرش اور آزمائش',
+          last: 'حکم کے مطابق استقامت',
+        ),
         'raad': (
           number: 13,
           name: 'سورۂ رعد',
@@ -1007,7 +1118,11 @@ void main() {
         expect(surah.surahNumber, want.number);
         expect(surah.nameUrdu, want.name);
         expect(surah.titleUrdu, 'تفسیرِ ابنِ عربی');
-        expect(surah.basmala, contains('بِسْمِ'));
+        if (id == 'tawbah') {
+          expect(surah.basmala, isEmpty);
+        } else {
+          expect(surah.basmala, contains('بِسْمِ'));
+        }
         expect(surah.prefaceHtml, isNotEmpty);
         expect(surah.key, isNotEmpty);
         expect(surah.colophonHtml, isNotEmpty);
@@ -1152,7 +1267,7 @@ void main() {
 
   test('missing content degrades to empty/null rather than throwing', () async {
     expect(await service.loadSurah(''), isNull);
-    expect(await service.loadSurah('baqarah'), isNull);
+    expect(await service.loadSurah('not-a-surah'), isNull);
     expect(await service.loadRukuHtml('raad', 0), isNull);
     expect(await service.loadRukuHtml('yusuf', 0), isNull);
     expect(await service.loadRukuHtml('yusuf', 99), isNull);

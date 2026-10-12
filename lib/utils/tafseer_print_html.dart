@@ -39,7 +39,9 @@ String _renderSurah(TafseerSurah surah, Map<int, String> bodies) {
 
   out.write(
     '<header class="masthead">'
-    '<p class="basmala">${_esc(surah.basmala)}</p>'
+    // At-Tawbah has no basmala; an empty <p> would still print its margin.
+    '${surah.basmala.isEmpty ? '' : '<p class="basmala">'
+              '${_esc(surah.basmala)}</p>'}'
     '<h1>${_esc(surah.titleUrdu)}</h1>'
     '<p class="surah-name">${_esc(surah.nameUrdu)}</p>'
     '<p class="sub">${_esc(surah.subtitleUrdu)}</p>'

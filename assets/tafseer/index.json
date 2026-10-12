@@ -1,5 +1,104 @@
 [
   {
+    "id": "fatihah",
+    "surahNumber": 1,
+    "nameUrdu": "سورۂ الفاتحہ",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۱ رکوع",
+    "rukuCount": 1,
+    "isAvailable": true
+  },
+  {
+    "id": "baqarah",
+    "surahNumber": 2,
+    "nameUrdu": "سورۂ البقرہ",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۴۰ رکوع",
+    "rukuCount": 40,
+    "isAvailable": true
+  },
+  {
+    "id": "al-imran",
+    "surahNumber": 3,
+    "nameUrdu": "سورۂ آلِ عمران",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۲۰ رکوع",
+    "rukuCount": 20,
+    "isAvailable": true
+  },
+  {
+    "id": "nisa",
+    "surahNumber": 4,
+    "nameUrdu": "سورۂ النساء",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۲۴ رکوع",
+    "rukuCount": 24,
+    "isAvailable": true
+  },
+  {
+    "id": "maidah",
+    "surahNumber": 5,
+    "nameUrdu": "سورۂ المائدہ",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۱۶ رکوع",
+    "rukuCount": 16,
+    "isAvailable": true
+  },
+  {
+    "id": "anam",
+    "surahNumber": 6,
+    "nameUrdu": "سورۂ الانعام",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۲۰ رکوع",
+    "rukuCount": 20,
+    "isAvailable": true
+  },
+  {
+    "id": "araf",
+    "surahNumber": 7,
+    "nameUrdu": "سورۂ الاعراف",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۲۴ رکوع",
+    "rukuCount": 24,
+    "isAvailable": true
+  },
+  {
+    "id": "anfal",
+    "surahNumber": 8,
+    "nameUrdu": "سورۂ الانفال",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۱۰ رکوع",
+    "rukuCount": 10,
+    "isAvailable": true
+  },
+  {
+    "id": "tawbah",
+    "surahNumber": 9,
+    "nameUrdu": "سورۂ التوبہ",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۱۶ رکوع",
+    "rukuCount": 16,
+    "isAvailable": true
+  },
+  {
+    "id": "yunus",
+    "surahNumber": 10,
+    "nameUrdu": "سورۂ یونس",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۱۱ رکوع",
+    "rukuCount": 11,
+    "isAvailable": true
+  },
+  {
+    "id": "hud",
+    "surahNumber": 11,
+    "nameUrdu": "سورۂ ہود",
+    "titleUrdu": "تفسیرِ ابنِ عربی",
+    "subtitleUrdu": "اشاری تفسیر · ۱۰ رکوع",
+    "rukuCount": 10,
+    "isAvailable": true
+  },
+  {
     "id": "yusuf",
     "surahNumber": 12,
     "nameUrdu": "سورۂ یوسف",

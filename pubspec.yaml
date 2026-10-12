@@ -100,6 +100,28 @@ flutter:
     - assets/shajra/urdu/list.json
     - assets/shajra/urdu/details/
     - assets/tafseer/index.json
+    - assets/tafseer/fatihah/surah.json
+    - assets/tafseer/fatihah/rukus/
+    - assets/tafseer/baqarah/surah.json
+    - assets/tafseer/baqarah/rukus/
+    - assets/tafseer/al-imran/surah.json
+    - assets/tafseer/al-imran/rukus/
+    - assets/tafseer/nisa/surah.json
+    - assets/tafseer/nisa/rukus/
+    - assets/tafseer/maidah/surah.json
+    - assets/tafseer/maidah/rukus/
+    - assets/tafseer/anam/surah.json
+    - assets/tafseer/anam/rukus/
+    - assets/tafseer/araf/surah.json
+    - assets/tafseer/araf/rukus/
+    - assets/tafseer/anfal/surah.json
+    - assets/tafseer/anfal/rukus/
+    - assets/tafseer/tawbah/surah.json
+    - assets/tafseer/tawbah/rukus/
+    - assets/tafseer/yunus/surah.json
+    - assets/tafseer/yunus/rukus/
+    - assets/tafseer/hud/surah.json
+    - assets/tafseer/hud/rukus/
     - assets/tafseer/yusuf/surah.json
     - assets/tafseer/yusuf/rukus/
     - assets/tafseer/raad/surah.json

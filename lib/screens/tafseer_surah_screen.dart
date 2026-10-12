@@ -206,17 +206,21 @@ class _Masthead extends StatelessWidget {
       child: Column(
         children: [
           const SizedBox(height: 16),
-          Text(
-            surah.basmala,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontFamily: tafseerArabicFamily,
-              fontSize: 26,
-              height: 1.8,
-              color: c.accentGold,
+          // At-Tawbah is the one surah of the Quran with no basmala, so the
+          // line is dropped entirely rather than rendered blank.
+          if (surah.basmala.isNotEmpty) ...[
+            Text(
+              surah.basmala,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontFamily: tafseerArabicFamily,
+                fontSize: 26,
+                height: 1.8,
+                color: c.accentGold,
+              ),
             ),
-          ),
-          const SizedBox(height: 10),
+            const SizedBox(height: 10),
+          ],
           Text(
             surah.titleUrdu,
             textAlign: TextAlign.center,
