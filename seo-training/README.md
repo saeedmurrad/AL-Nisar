@@ -38,6 +38,14 @@ Each blog has an outline, a draft, a final, an SEO block, and a short edit note.
 | Blog quality | 40 | `final.md` for the four posts |
 | Feedback and deadlines | 20 | `tracker.csv`, `seo-check.md`, and `walkthrough.md` |
 
+Printable copies are in `seo-training/pdf/`:
+
+- `SEO-training-submissions.pdf` — both hand-ins
+- `Zaheer-Daraz-SEO-submission.pdf`
+- `Amna-Kaya-SEO-submission.pdf`
+
+Regenerate them with `python3 seo-training/build_pdf.py`.
+
 Run the checker from the repository root:
 
 ```bash
