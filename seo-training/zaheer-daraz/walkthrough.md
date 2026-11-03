@@ -1,8 +1,8 @@
-# Five-minute walkthrough: Zaheer
+# Five-minute walkthrough: Zaheer Murad
 
 Spoken notes for the Day 10 walkthrough. Read at a steady pace, about five minutes.
 
-I am Zaheer, and my practice site is Daraz Pakistan. I had already done keyword research, but the sheet was not in this workspace, so I did not invent search volumes. I took the focus keywords from the two assigned topics and from what each live page is actually for.
+I am Zaheer Murad, and my practice site is Daraz Pakistan. I had already done keyword research, but the sheet was not in this workspace, so I did not invent search volumes. I took the focus keywords from the two assigned topics and from what each live page is actually for.
 
 The homepage keyword is “online shopping in Pakistan”. The old title had that idea at the start, which is right, and the brand at the end, which is also right, but the title was 72 characters. The description was the single word “Pakistan”. My replacement is 51 characters, still starts with the keyword, still ends with Daraz, and the description is 145 characters. It tells a shopper to compare sellers and then browse.
 

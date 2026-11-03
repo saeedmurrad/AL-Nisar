@@ -52,7 +52,7 @@ def check_meta(path: Path, errors: list[str]) -> int:
             errors.append(f"{where}: focus keyword is at index {position}")
         if keyword.lower() not in description.lower():
             errors.append(f"{where}: description misses the focus keyword")
-        if not (title.endswith("| Daraz") or title.endswith("| Kaya Clinic")):
+        if not title.endswith("| Daraz"):
             errors.append(f"{where}: brand is not at the end")
     if found == 0:
         errors.append(f"{path.relative_to(ROOT)}: no meta blocks found")
@@ -89,17 +89,21 @@ def check_article(path: Path, errors: list[str], final: bool) -> None:
 def main() -> int:
     errors: list[str] = []
     metas = 0
+    drafts = 0
+    finals = 0
     for path in sorted(ROOT.rglob("*.md")):
         if path.name in {"02-meta-titles-descriptions.md", "seo-block.md"}:
             metas += check_meta(path, errors)
         elif path.name == "final.md":
             check_article(path, errors, final=True)
+            finals += 1
         elif path.name == "draft.md":
             check_article(path, errors, final=False)
+            drafts += 1
     if errors:
         print("\n".join(errors))
         return 1
-    print(f"OK: {metas} meta blocks, 4 drafts and 4 finals inside the rules.")
+    print(f"OK: {metas} meta blocks, {drafts} drafts and {finals} finals inside the rules.")
     return 0
 
 

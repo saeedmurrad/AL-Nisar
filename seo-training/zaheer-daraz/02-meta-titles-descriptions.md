@@ -1,6 +1,6 @@
 # New meta titles and descriptions: Daraz Pakistan
 
-Trainee: Zaheer
+Trainee: Zaheer Murad
 Brand at the end of every title: Daraz
 Rule: title within 60 characters, focus keyword at the start, description 140–155 characters with the keyword and one next step.
 

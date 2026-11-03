@@ -1,6 +1,6 @@
 # Site audit: Daraz Pakistan
 
-Trainee: Zaheer
+Trainee: Zaheer Murad
 Site: https://www.daraz.pk/
 Read on: 3 November 2026 (Asia/Karachi)
 

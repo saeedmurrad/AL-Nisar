@@ -21,11 +21,11 @@ PAPER = (255, 255, 255)
 TRAINEES = (
     {
         "key": "zaheer",
-        "name": "Zaheer",
+        "name": "Zaheer Murad",
         "site": "Daraz Pakistan",
         "url": "https://www.daraz.pk/",
         "folder": "zaheer-daraz",
-        "file": "Zaheer-Daraz-SEO-submission.pdf",
+        "file": "Zaheer-Murad-Daraz-SEO-submission.pdf",
         "blogs": (
             (
                 "Blog 1. How to Choose the Right Smartphone in Pakistan",
@@ -34,24 +34,6 @@ TRAINEES = (
             (
                 "Blog 2. Online Shopping in Pakistan",
                 "blog-2-safe-shopping",
-            ),
-        ),
-    },
-    {
-        "key": "amna",
-        "name": "Amna",
-        "site": "Kaya Skin Clinic",
-        "url": "https://www.kayaskinclinic.com/",
-        "folder": "amna-kaya",
-        "file": "Amna-Kaya-SEO-submission.pdf",
-        "blogs": (
-            (
-                "Blog 1. Laser Hair Removal",
-                "blog-1-laser",
-            ),
-            (
-                "Blog 2. Acne Care Basics",
-                "blog-2-acne",
             ),
         ),
     },
@@ -362,7 +344,7 @@ def build_one(trainee: dict) -> Path:
             trainee["url"],
             "Hand-in for days 1 to 10.",
             "Pages were read on Tuesday 3 November 2026 (Asia/Karachi).",
-            "No prices, specifications, or treatment promises were added.",
+            "No prices or handset specifications were added.",
         ],
         [
             "1    Site audit of five live pages",
@@ -379,34 +361,8 @@ def build_one(trainee: dict) -> Path:
     return destination
 
 
-def build_combined() -> Path:
-    pdf = Handin()
-    pdf.set_title("SEO training submissions")
-    pdf.set_author("Zaheer and Amna")
-    pdf.cover(
-        "SEO TRAINING  ·  27 OCTOBER – 9 NOVEMBER 2026",
-        "Submissions",
-        [
-            "Zaheer: Daraz Pakistan, https://www.daraz.pk/",
-            "Amna: Kaya Skin Clinic, https://www.kayaskinclinic.com/",
-            "The Kaya address opens the UAE site. That is the site in this file.",
-            "Program window: Tuesday 27 October 2026 to Monday 9 November 2026.",
-        ],
-        [
-            "Part 1    Zaheer, Daraz Pakistan",
-            "Part 2    Amna, Kaya Skin Clinic",
-        ],
-    )
-    for trainee in TRAINEES:
-        add_trainee(pdf, trainee, divider=True)
-    destination = PDF_DIR / "SEO-training-submissions.pdf"
-    pdf.output(destination)
-    return destination
-
-
 def main() -> None:
     written = [build_one(trainee) for trainee in TRAINEES]
-    written.append(build_combined())
     for path in written:
         print(f"{path.relative_to(ROOT)}  {path.stat().st_size // 1024} KB")
 
